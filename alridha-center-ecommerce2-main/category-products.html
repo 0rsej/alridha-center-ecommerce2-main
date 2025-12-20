@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>منتجات القسم - سنتر الرضا</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="main.css" />
+</head>
+<body>
+
+<div id="notification" class="notification"></div>
+
+<nav class="navbar" id="mainNavbar">
+    <div class="search-box-container" id="searchBoxContainer">
+        <input type="text" id="navbar-search-input" placeholder="ابحث عن منتج..." />
+        <button id="navbar-search-submit" aria-label="تنفيذ البحث"><i class="fas fa-search"></i></button>
+        <button id="close-search-btn" aria-label="إغلاق البحث"><i class="fas fa-times"></i></button>
+    </div>
+
+    <div class="header-right">
+        <button class="icon-btn search-trigger-btn" id="searchTriggerBtn" aria-label="فتح البحث">
+            <i class="fas fa-search"></i>
+        </button>
+    </div>
+
+    <a href="index.html" class="brand-logo-container">
+        <span>سنتر الرضا</span>
+        <img src="logo.png" alt="شعار سنتر الرضا">
+    </a>
+
+    <div class="header-left">
+        <a href="cart.html" class="icon-btn cart-btn">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="badge" id="navCartCount">0</span>
+        </a>
+    </div>
+    
+    <div class="desktop-nav-links">
+        <a href="index.html">
+            <i class="fas fa-home"></i> الرئيسية
+        </a>
+        <a href="categories.html">
+            <i class="fas fa-th-large"></i> الأقسام
+        </a>
+        
+        <a href="wishlist.html">
+            <div style="position: relative;">
+                <i class="fas fa-heart"></i> المفضلة
+                <span class="desktop-badge" id="desktopWishlistCount" style="display: none;">0</span>
+            </div>
+        </a>
+        
+        <a href="cart.html">
+            <div style="position: relative;">
+                <i class="fas fa-shopping-cart"></i> السلة
+                <span class="desktop-badge" id="desktopCartCount" style="display: none;">0</span>
+            </div>
+        </a>
+
+        <a href="orders.html">
+            <i class="fas fa-receipt"></i> طلباتي
+        </a>
+        
+        <a href="#" id="desktopSearchTrigger">
+             <i class="fas fa-search"></i> بحث
+        </a>
+    </div>
+</nav>
+
+<div class="container">
+    <h1 class="page-title" id="category-title">منتجات القسم</h1>
+
+    <div class="search-container card">
+      <input type="text" id="search-input" placeholder="ابحث بالاسم أو رقم المادة"/>
+      <button id="search-btn">بحث</button>
+      <button id="clear-search-btn">عرض الكل</button>
+    </div>
+
+    <div class="products card">
+      <h2>المنتجات المتوفرة</h2>
+      <div id="products-list"></div>
+    </div>
+    
+</div>
+
+<script src="script.js"></script>
+
+<footer class="footer">
+    <p>&copy; 2025 سنتر الرضا. جميع الحقوق محفوظة.</p>
+</footer>
+
+</body>
+</html>

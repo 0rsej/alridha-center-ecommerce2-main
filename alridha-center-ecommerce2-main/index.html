@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>سنتر الرضا - وجهتك للمنتجات عالية الجودة</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="main.css" />
+    <style>
+        /* تنسيق لضمان عدم اختفاء المحتوى خلف الأشرطة الثابتة */
+        body {
+            padding-top: 70px;    /* مسافة للشريط العلوي */
+            padding-bottom: 80px; /* مسافة للشريط السفلي */
+        }
+        @media (min-width: 1024px) {
+            body {
+                padding-bottom: 0; /* إلغاء مسافة الشريط السفلي في الحاسوب */
+            }
+        }
+    </style>
+</head>
+<body class="mobile-app-view">
+
+    <div id="notification" class="notification"></div>
+
+<nav class="navbar" id="mainNavbar">
+    <div class="search-box-container" id="searchBoxContainer">
+        <input type="text" id="navbar-search-input" placeholder="ابحث عن منتج..." />
+        <button id="navbar-search-submit" aria-label="تنفيذ البحث"><i class="fas fa-search"></i></button>
+        <button id="close-search-btn" aria-label="إغلاق البحث"><i class="fas fa-times"></i></button>
+    </div>
+
+    <div class="header-right">
+        <button class="icon-btn search-trigger-btn" id="searchTriggerBtn" aria-label="فتح البحث">
+            <i class="fas fa-search"></i>
+        </button>
+    </div>
+
+    <a href="index.html" class="brand-logo-container">
+        <span>سنتر الرضا</span>
+        <img src="logo.png" alt="شعار سنتر الرضا">
+    </a>
+
+    <div class="header-left">
+        <a href="cart.html" class="icon-btn cart-btn">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="badge" id="navCartCount">0</span>
+        </a>
+    </div>
+    
+    <div class="desktop-nav-links">
+        <a href="index.html">
+            <i class="fas fa-home"></i> الرئيسية
+        </a>
+        <a href="categories.html">
+            <i class="fas fa-th-large"></i> الأقسام
+        </a>
+        
+        <a href="wishlist.html">
+            <div style="position: relative;">
+                <i class="fas fa-heart"></i> المفضلة
+                <span class="desktop-badge" id="desktopWishlistCount" style="display: none;">0</span>
+            </div>
+        </a>
+        
+        <a href="cart.html">
+            <div style="position: relative;">
+                <i class="fas fa-shopping-cart"></i> السلة
+                <span class="desktop-badge" id="desktopCartCount" style="display: none;">0</span>
+            </div>
+        </a>
+
+        <a href="orders.html">
+            <i class="fas fa-receipt"></i> طلباتي
+        </a>
+        
+        <a href="#" id="desktopSearchTrigger">
+             <i class="fas fa-search"></i> بحث
+        </a>
+    </div>
+</nav>
+    <section class="hero-section">
+        <div class="hero-overlay"></div> 
+        <div class="hero-content">
+            <p class="welcome-text">مرحباً بك في</p>
+            <h1 class="hero-title">
+                <span class="store-name">سنتر الرضا</span>
+            </h1>
+            <p class="hero-slogan">
+                وجهتك الأولى للمنتجات عالية الجودة، <br> من البهارات النادرة إلى الأدوات المنزلية العصرية.
+            </p>
+            <a href="categories.html" class="hero-btn">اكتشف مجموعتنا الآن <i class="fas fa-arrow-left"></i></a>
+        </div>
+    </section>
+
+    <div class="main-container">
+        <section class="main-categories-section">
+            <h2>استكشف أقسامنا الرئيسية</h2>
+            <div class="categories-grid">
+                <a href="category-products.html?category=spices" class="category-item">
+                    <i class="fas fa-pepper-hot"></i>
+                    <h3>البهارات</h3>
+                </a>
+                <a href="category-products.html?category=groceries" class="category-item">
+                    <i class="fas fa-shopping-basket"></i>
+                    <h3>مواد غذائية</h3>
+                </a>
+                <a href="category-products.html?category=cleaning_supplies" class="category-item">
+                    <i class="fas fa-broom"></i> <h3>مواد التنظيف</h3>
+                </a>
+                <a href="category-products.html?category=personal_care" class="category-item">
+                    <i class="fas fa-pump-soap"></i>
+                    <h3>عناية شخصية</h3>
+                </a>
+                <a href="category-products.html?category=sweets" class="category-item">
+                    <i class="fas fa-ice-cream"></i>
+                    <h3>حلويات</h3>
+                </a>
+                <a href="category-products.html?category=home_tools" class="category-item">
+                    <i class="fas fa-screwdriver-wrench"></i>
+                    <h3>أدوات منزلية</h3>
+                </a>
+                <a href="category-products.html?category=nuts" class="category-item">
+                    <i class="fas fa-seedling"></i> <h3>المكسرات</h3>
+                </a>
+                <a href="category-products.html?category=body_care_perfumes" class="category-item">
+                    <i class="fas fa-spray-can"></i> <h3>عطور وعناية</h3>
+                </a>
+            </div>
+            <a href="categories.html" class="view-all-categories-btn">
+                <i class="fas fa-th-list"></i> عرض جميع الأقسام
+            </a>
+        </section>
+
+        <section class="how-it-works-section">
+            <h2>تجربة تسوق فريدة بخطوات بسيطة</h2>
+            <div class="steps-grid">
+                <div class="step-item">
+                    <div class="step-icon"><i class="fas fa-search"></i></div>
+                    <div class="step-content">
+                        <h3>تصفح المنتجات</h3>
+                        <p>استكشف مجموعتنا الواسعة من المنتجات عبر أقسامنا المختلفة والعروض المميزة.</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-icon"><i class="fas fa-cart-plus"></i></div>
+                    <div class="step-content">
+                        <h3>أضف مفضلاتك إلى السلة</h3>
+                        <p>اختر المنتجات التي تعجبك وأضفها بسهولة إلى سلة مشترياتك الخاصة.</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-icon"><i class="fas fa-receipt"></i></div>
+                    <div class="step-content">
+                        <h3>أكمل طلبك</h3>
+                        <p>أدخل تفاصيل الشحن ورقم الهاتف الخاص بك، وراجع طلبك لتأكيده.</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-icon"><i class="fas fa-motorcycle"></i></div>
+                    <div class="step-content">
+                        <h3>استلم طلبك</h3>
+                        <p>سنقوم بتوصيل طلبك المجهز بعناية إلى باب منزلك بأسرع وقت ممكن.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="featured-products-section" class="featured-products-section">
+            <h2>منتجاتنا المميزة</h2>
+            <div class="products-display-area">
+                <div class="product-item">
+                    <img src="قسم البهارات/بهارات تكة دجاج.jpeg" alt="بهارات تكة" />
+                    <h3>بهارات تكة دجاج طويلة جداً جداً جداً</h3>
+                    <p>أجود بهارات التكة لطبق شهي.</p>
+                    <span class="price">20 ألف د.ع</span>
+                    <div class="product-actions">
+                        <button class="add-to-cart-btn" data-id="3">أضف للسلة</button>
+                        <button class="add-to-wishlist-btn" data-id="3"><i class="far fa-heart"></i></button>
+                    </div>
+                </div>
+                <div class="product-item">
+                    <img src="قسم البهارات/حلويات شرقية مشكلة.jpeg" alt="حلويات شرقية" />
+                    <h3>حلويات شرقية مشكلة</h3>
+                    <p>تشكيلة فاخرة لأوقاتكم السعيدة.</p>
+                    <span class="price">15 ألف د.ع</span>
+                    <div class="product-actions">
+                        <button class="add-to-cart-btn" data-id="100">أضف للسلة</button>
+                        <button class="add-to-wishlist-btn" data-id="100"><i class="far fa-heart"></i></button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact-section" class="contact-section">
+            <h2>تواصل معنا في أي وقت</h2>
+            <div class="contact-info">
+                <a href="https://g.co/kgs/vmgaFgq" target="_blank" class="location-info-link" aria-label="عنواننا على الخريطة">
+                    <p class="location-info">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>العراق، البصرة، قرب سوق ام هاني , امام مدرسة الهداية ومركز الانتخابات</span>
+                    </p>
+                </a>
+            </div>
+            <div class="social-links">
+                <a href="https://t.me/+zyhjU6ZIIUpiMWMy" target="_blank" title="تليجرام"><i class="fab fa-telegram"></i></a>
+                <a href="https://www.instagram.com/center_alreda?igsh=Nmd0NDczdThvcjBu" target="_blank" title="إنستجرام"><i class="fab fa-instagram"></i></a>
+                <a href="https://wa.me/9647816780645" target="_blank" title="واتساب"><i class="fab fa-whatsapp"></i></a>
+            </div>
+        </section>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2025 سنتر الرضا. جميع الحقوق محفوظة.</p>
+    </footer>
+
+    <div class="bottom-nav">
+        <a href="index.html" class="nav-item active">
+            <i class="fas fa-home"></i>
+            <span>الرئيسية</span>
+        </a>
+        
+        <a href="categories.html" class="nav-item">
+            <i class="fas fa-th-large"></i>
+            <span>الأقسام</span>
+        </a>
+        
+        <a href="wishlist.html" class="nav-item">
+            <div class="icon-wrapper">
+                <i class="fas fa-heart"></i>
+                <span class="badge-dot" id="navWishlistCount">0</span>
+            </div>
+            <span>المفضلة</span>
+        </a>
+        
+        <a href="orders.html" class="nav-item">
+            <i class="fas fa-receipt"></i>
+            <span>طلباتي</span>
+        </a>
+    </div>
+
+    <script src="script.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // تفعيل الزر المناسب بناءً على الرابط الحالي
+            const currentPath = window.location.pathname;
+            const navItems = document.querySelectorAll('.bottom-nav .nav-item');
+            
+            navItems.forEach(item => {
+                const href = item.getAttribute('href');
+                // التحقق مما إذا كان الرابط الحالي ينتهي برابط الزر
+                if(currentPath.endsWith(href) || (href === 'index.html' && (currentPath.endsWith('/') || currentPath === '/'))) {
+                    // إزالة active من الجميع أولاً
+                    navItems.forEach(i => i.classList.remove('active'));
+                    // إضافتها للعنصر المطابق
+                    item.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

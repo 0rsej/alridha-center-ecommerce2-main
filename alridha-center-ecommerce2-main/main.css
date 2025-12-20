@@ -1,0 +1,596 @@
+/*
+ * أنماط عامة للموقع - سنتر الرضا
+ * هذا الملف هو ملف الاستيراد الرئيسي لجميع الأنماط المنظمة.
+ */
+
+/* 1. المتغيرات الأساسية (الألوان، الظلال، إلخ) */
+@import url('variables.css');
+
+/* 2. الأنماط الأساسية وإعادة تعيين المتصفح */
+@import url('base.css');
+
+/* 3. أنماط شريط التنقل (Navbar) */
+@import url('navbar.css');
+
+/* 4. أنماط التذييل (Footer) */
+@import url('footer.css');
+
+/* 5. أنماط الصفحة الرئيسية والأقسام العامة */
+@import url('home.css');
+
+/* 6. أنماط المنتجات الشائعة (البطاقات، القوائم العامة) */
+@import url('product_common.css');
+
+/* 7. أنماط الأزرار المشتركة */
+@import url('buttons_common.css');
+
+/* 8. أنماط صفحة قائمة المنتجات حسب الفئة */
+@import url('category_products_page.css');
+
+/* 9. أنماط صفحة السلة */
+@import url('cart_page.css');
+
+/* 10. أنماط صفحة الطلبات */
+@import url('orders_page.css');
+
+/* 11. أنماط صفحة تفاصيل المنتج (الاسم المختصر) */
+@import url('prod_details.css'); /* استخدام الاسم المختصر هنا */
+
+/* 12. أنماط صفحة المفضلة */
+@import url('wishlist_page.css');
+
+/* 13. أنماط الأدوات المساعدة والعامة (الإشعارات، البحث، إلخ) */
+@import url('utilities.css');
+
+/*
+ * ملاحظة: ترتيب الاستيراد مهم!
+ * يفضل استيراد المتغيرات والأنماط الأساسية أولاً،
+ * ثم المكونات العامة، ثم الأنماط الخاصة بالصفحات.
+ */
+ /* =========================================
+   تحسينات خاصة بشاشات الحاسوب (Desktop Only)
+   ========================================= */
+@media (min-width: 1024px) {
+
+    /* 1. تحديد أقصى عرض للمحتوى لتجنب التمدد المزعج */
+    .container, .main-container, .navbar {
+        max-width: 1200px; /* عرض مثالي للقراءة */
+        margin-left: auto !important;
+        margin-right: auto !important;
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    /* إصلاح شريط التنقل ليملأ الشاشة ولكن المحتوى في الوسط */
+    .navbar {
+        width: 100%;
+        max-width: 100%; /* الشريط الخلفي يملأ الشاشة */
+        padding: 0 50px; /* حشوة جانبية */
+        display: flex;
+        justify-content: space-between;
+    }
+    
+    /* جعل الروابط في الوسط تماماً */
+    .navbar .nav-links {
+        gap: 30px; /* مسافة مريحة بين الروابط */
+    }
+
+    /* 2. تحسين شبكة المنتجات (4 منتجات في الصف) */
+    .products-display-area, .categories-grid {
+        display: grid !important;
+        grid-template-columns: repeat(4, 1fr) !important; /* 4 أعمدة */
+        gap: 30px !important;
+    }
+
+    /* تكبير وتجميل بطاقة المنتج */
+    .product-item, .category-item {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .product-item:hover, .category-item:hover {
+        transform: translateY(-10px) scale(1.02); /* حركة ناعمة للأعلى */
+        box-shadow: 0 15px 30px rgba(0,0,0,0.15); /* ظل فخم */
+    }
+
+    /* 3. تحسين جدول السلة (Cart Table) */
+    .cart table {
+        font-size: 1.1em;
+        width: 100%;
+        box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    }
+    
+    .cart th {
+        background-color: var(--alridha-main-orange-red);
+        color: white;
+        padding: 15px;
+    }
+    
+    .cart td {
+        padding: 15px;
+    }
+
+    /* 4. تحسين قسم "تواصل معنا" ليكون بجانب بعضه */
+    .contact-section {
+        display: flex;
+        flex-direction: row; /* جعل المحتوى أفقياً */
+        justify-content: space-around;
+        align-items: center;
+        text-align: right;
+    }
+    
+    .contact-info, .social-links {
+        margin: 0;
+        width: 45%;
+    }
+
+    /* 5. تحسين الهيرو (الواجهة الرئيسية) */
+    .hero-content {
+        max-width: 50%; /* النص يأخذ نصف الشاشة فقط لجمالية أكثر */
+        text-align: right; /* محاذاة لليمين ليتناسب مع العربية */
+        margin-right: 10%; /* إزاحة قليلة */
+    }
+    
+    .hero-title {
+        font-size: 4em;
+    }
+}
+/* ==========================================================================
+   تغيير جذري وقسري لتصميم الحاسوب (Desktop Overhaul) - Force Override
+   ========================================================================== */
+@media (min-width: 1024px) {
+
+    /* --- 1. إصلاح جذري لصفحة تفاصيل المنتج (Split Layout) --- */
+    
+    .product-detail-card {
+        display: grid !important; /* استخدام الشبكة للتقسيم الصارم */
+        grid-template-columns: 450px 1fr !important; /* عمود للصورة وعمود للنص */
+        gap: 50px !important;
+        align-items: start !important;
+        text-align: right !important;
+        padding: 50px !important;
+        max-width: 1200px !important;
+        margin: 0 auto 40px auto !important;
+        border: none !important;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08) !important;
+    }
+
+    /* الصورة: تكبير وتثبيت الحجم */
+    .detail-image {
+        width: 100% !important;
+        height: 450px !important;
+        max-width: 450px !important;
+        object-fit: contain !important;
+        margin: 0 !important;
+        border: 1px solid #f0f0f0 !important;
+        box-shadow: none !important;
+    }
+
+    /* النصوص */
+    .detail-info {
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        padding-top: 20px !important;
+    }
+    .detail-info h3 {
+        font-size: 2.8em !important;
+        margin-bottom: 20px !important;
+    }
+
+    /* --- 2. إصلاح أزرار صفحة التفاصيل (صغيرة وأنيقة) --- */
+
+    .product-detail-card .product-actions {
+        flex-direction: row !important; /* إجبار الوضع الأفقي */
+        width: auto !important; /* إلغاء العرض الكامل */
+        justify-content: flex-start !important;
+        gap: 15px !important;
+        margin-top: 25px !important;
+    }
+
+    /* زر أضف للسلة: تقليص الحجم */
+    .product-detail-card .add-btn {
+        width: auto !important; /* إلغاء تمدد الزر */
+        min-width: 200px !important; /* عرض ثابت مناسب */
+        padding: 0 30px !important;
+        height: 55px !important;
+        font-size: 1.2em !important;
+        border-radius: 10px !important;
+        margin: 0 !important;
+    }
+
+    /* زر المفضلة في صفحة التفاصيل */
+    .product-detail-card .add-to-wishlist-btn {
+        width: 55px !important;
+        height: 55px !important;
+        border-radius: 10px !important;
+        border: 2px solid #eee !important;
+        background: white !important;
+        color: #888 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0 !important;
+    }
+    .product-detail-card .add-to-wishlist-btn:hover {
+        border-color: var(--alridha-main-orange-red) !important;
+        color: var(--alridha-main-orange-red) !important;
+    }
+    .product-detail-card .add-to-wishlist-btn i {
+        margin: 0 !important;
+        font-size: 1.4em !important;
+    }
+
+    /* --- 3. إصلاحات بطاقات المنتجات في الصفحة الرئيسية والأقسام (Grid View) --- */
+
+    /* إجبار زر "اختر النوع" على اللون البرتقالي */
+    .product-item .product-actions .view-details-btn {
+        background-color: var(--alridha-main-orange-red) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 50px !important;
+        padding: 0 20px !important;
+        font-weight: bold !important;
+    }
+    .product-item .product-actions .view-details-btn:hover {
+        background-color: #cc3700 !important; /* لون أغمق عند التحويم */
+        transform: translateY(-3px) !important;
+    }
+
+    /* إصلاح زر القلب (المفضلة) في البطاقات: توسيط تام */
+    .product-item .product-actions .add-to-wishlist-btn {
+        width: 45px !important;
+        height: 45px !important;
+        padding: 0 !important; /* إزالة الحشوة هي سر التوسيط */
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        border-radius: 50% !important; /* دائرة كاملة */
+        background-color: #f9f9f9 !important;
+        border: 1px solid #ddd !important;
+        color: #555 !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    .product-item .product-actions .add-to-wishlist-btn:hover {
+        background-color: var(--alridha-main-orange-red) !important;
+        color: white !important;
+        border-color: var(--alridha-main-orange-red) !important;
+    }
+
+    /* ضبط أيقونة القلب داخل الدائرة */
+    .product-item .product-actions .add-to-wishlist-btn i {
+        margin: 0 !important; /* إزالة الهوامش الجانبية للأيقونة */
+        padding: 0 !important;
+        font-size: 1.1em !important;
+        line-height: 1 !important;
+        display: block !important;
+        transform: translateY(1px) !important; /* تعديل بصري دقيق جداً للمنتصف */
+    }
+}
+/* ==========================================================================
+   إصلاحات نهائية للألوان (توحيد البرتقالي) - Orange Theme Unification
+   ========================================================================== */
+
+/* --- 1. زر "اختر النوع" (برتقالي دائماً) --- */
+.view-details-btn,
+.product-item .product-actions .view-details-btn,
+#products-list .view-details-btn {
+    background-color: var(--alridha-main-orange-red) !important; /* برتقالي */
+    color: white !important;
+    border: none !important;
+    box-shadow: 0 4px 10px rgba(255, 69, 0, 0.2) !important;
+    opacity: 1 !important;
+}
+
+.view-details-btn:hover,
+.view-details-btn:active,
+.product-item .product-actions .view-details-btn:hover,
+#products-list .view-details-btn:hover {
+    background-color: #e63e00 !important; /* برتقالي داكن عند التحويم */
+    color: white !important;
+    transform: translateY(-2px);
+}
+
+/* --- 2. زر "المفضلة" (توحيد التصميم في كل الموقع) --- */
+
+/* الوضع الافتراضي (غير مضاف): خلفية بيضاء، قلب رمادي */
+.add-to-wishlist-btn,
+.product-item .product-actions .add-to-wishlist-btn,
+.product-detail-card .add-to-wishlist-btn,
+#products-list .add-to-wishlist-btn {
+    background-color: white !important;
+    border: 1px solid #ddd !important;
+    color: #777 !important; /* لون القلب رمادي */
+    transition: all 0.3s ease;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important;
+}
+
+/* عند التحويم (Hover) - قبل الإضافة: يصبح القلب والإطار برتقالي */
+.add-to-wishlist-btn:hover,
+.product-item .product-actions .add-to-wishlist-btn:hover,
+.product-detail-card .add-to-wishlist-btn:hover {
+    background-color: white !important;
+    color: var(--alridha-main-orange-red) !important; /* قلب برتقالي */
+    border-color: var(--alridha-main-orange-red) !important;
+}
+
+/* --- الوضع النشط (Active) - عند الإضافة للمفضلة --- */
+/* هنا التغيير الجذري: يصبح مثل زر "اختر النوع" تماماً */
+.add-to-wishlist-btn.active,
+.product-item .product-actions .add-to-wishlist-btn.active,
+.product-detail-card .add-to-wishlist-btn.active,
+#products-list .add-to-wishlist-btn.active {
+    background-color: var(--alridha-main-orange-red) !important; /* خلفية برتقالية */
+    border-color: var(--alridha-main-orange-red) !important;
+    color: white !important; /* قلب أبيض */
+    box-shadow: 0 4px 10px rgba(255, 69, 0, 0.3) !important;
+    opacity: 1 !important;
+}
+
+/* عند التحويم على الزر النشط */
+.add-to-wishlist-btn.active:hover {
+    background-color: #e63e00 !important; /* برتقالي داكن */
+    color: white !important;
+}
+
+/* ضبط حجم الأيقونة */
+.add-to-wishlist-btn i {
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 1.1em !important;
+    line-height: 1 !important;
+    display: block !important;
+}
+
+/* ==========================================================================
+   تنسيقات الحاسوب (Desktop) - الحفاظ على الهيكلية
+   ========================================================================== */
+@media (min-width: 1024px) {
+    /* أزرار البطاقة */
+    .product-item .product-actions .view-details-btn {
+        border-radius: 50px !important;
+        padding: 0 20px !important;
+        height: 45px !important;
+        font-weight: bold !important;
+    }
+
+    .product-item .product-actions .add-to-wishlist-btn {
+        width: 45px !important;
+        height: 45px !important;
+        border-radius: 50% !important; 
+        padding: 0 !important;
+    }
+
+    /* صفحة تفاصيل المنتج */
+    .product-detail-card {
+        display: grid !important;
+        grid-template-columns: 450px 1fr !important;
+        gap: 50px !important;
+        align-items: start !important;
+        text-align: right !important;
+        padding: 50px !important;
+        max-width: 1200px !important;
+        margin: 0 auto 40px auto !important;
+    }
+    
+    .detail-image {
+        width: 100% !important;
+        height: 450px !important;
+        max-width: 450px !important;
+        object-fit: contain !important;
+    }
+
+    /* زر المفضلة في صفحة التفاصيل (مربع بحواف ناعمة) */
+    .product-detail-card .add-to-wishlist-btn {
+        width: 55px !important;
+        height: 55px !important;
+        border-radius: 10px !important;
+    }
+    
+    .product-detail-card .product-actions {
+        flex-direction: row !important;
+        justify-content: flex-start !important;
+    }
+}
+/* =========================================
+   تنسيقات الماسح الضوئي الزجاجي (Glassmorphism)
+   ========================================= */
+
+/* 1. خلفية النافذة (الضبابية) */
+.scanner-modal {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    /* خلفية شبه شفافة داكنة */
+    background: rgba(0, 0, 0, 0.5);
+    /* هذا هو السر: تأثير تغبيش الخلفية خلف النافذة */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px); /* لدعم متصفح سفاري */
+    z-index: 2000;
+    display: flex; justify-content: center; align-items: center;
+    padding: 20px;
+    opacity: 1;
+    transition: all 0.4s ease-in-out; /* نعومة في الظهور والاختفاء */
+}
+
+/* إخفاء النافذة بنعومة */
+.scanner-modal.hidden {
+    opacity: 0;
+    pointer-events: none; /* لمنع الضغط عليها وهي مختفية */
+}
+
+/* 2. صندوق المحتوى (الصندوق الزجاجي) */
+.scanner-content {
+    /* خلفية بيضاء شبه شفافة */
+    background: rgba(255, 255, 255, 0.85);
+    /* تغبيش إضافي لداخل الصندوق */
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    /* حدود بيضاء رقيقة جداً لتعريف الحواف */
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    /* ظل ناعم وعميق */
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    width: 100%; max-width: 500px;
+    border-radius: 25px; /* زوايا أكثر استدارة */
+    padding: 25px;
+    text-align: center;
+    position: relative;
+    transform: translateY(0);
+    transition: all 0.4s ease-in-out;
+}
+/* حركة بسيطة عند الظهور */
+.scanner-modal.hidden .scanner-content {
+    transform: translateY(30px); /* ينزلق للأسفل قليلاً عند الاختفاء */
+}
+
+/* 3. زر الإغلاق الزجاجي */
+/* --- زر الإغلاق الزجاجي (تصميم ثابت وأنيق) --- */
+.close-scanner {
+    position: absolute;
+    top: 15px; left: 15px;
+    /* زجاج شفاف وهادئ */
+    background: rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    /* حدود بيضاء ناعمة */
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    color: #333; /* لون الأيقونة */
+    width: 38px; height: 38px;
+    border-radius: 10px; /* مربع بزوايا ناعمة */
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 10;
+    /* انتقال ناعم للون فقط (بدون حركة) */
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.close-scanner:hover {
+    /* عند التحويم: يتحول للأحمر بوقار */
+    background: rgba(220, 53, 69, 0.9); /* أحمر */
+    color: white;
+    border-color: rgba(220, 53, 69, 0.5);
+    box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3); /* ظل خفيف جداً للأحمر */
+}
+/* 4. أزرار التبديل الزجاجية */
+.scan-mode-switch {
+    display: flex; gap: 10px; margin-bottom: 20px;
+    background: rgba(230, 230, 230, 0.5); /* خلفية زجاجية رمادية */
+    backdrop-filter: blur(5px);
+    padding: 6px; border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* تعديل أزرار التبديل لتناسب الشاشات الصغيرة */
+.mode-btn {
+    flex: 1; 
+    border: none; 
+    padding: 10px 2px; /* تقليل الحواف الجانبية لأقصى حد */
+    border-radius: 12px;
+    background: transparent; 
+    color: #666; 
+    cursor: pointer;
+    font-weight: bold; 
+    font-family: inherit;
+    transition: all 0.3s ease;
+    
+    /* --- التعديلات الجديدة --- */
+    font-size: 0.85rem; /* تصغير الخط */
+    white-space: nowrap; /* منع النزول لسطر جديد نهائياً */
+    overflow: hidden; /* إخفاء أي نص زائد (للحماية) */
+    text-overflow: ellipsis;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.mode-btn.active {
+    /* لون برتقالي زجاجي متوهج */
+    background: rgba(230, 81, 0, 0.85);
+    color: white;
+    box-shadow: 0 5px 15px rgba(230, 81, 0, 0.3);
+}
+
+/* 5. منطقة النتائج */
+/* تعديل عرض الصندوق الزجاجي ليملأ الشاشة */
+.scanner-content {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    
+    /* --- التعديل هنا: زيادة العرض --- */
+    width: 95%; /* يأخذ 95% من عرض شاشة الهاتف */
+    max-width: 500px; /* أقصى حد للكمبيوتر */
+    
+    border-radius: 25px;
+    padding: 25px;
+    text-align: center;
+    position: relative;
+    transform: translateY(0);
+    transition: all 0.4s ease-in-out;
+}
+
+/* تعديل منطقة النص لتبقى في سطر واحد */
+.scan-result {
+    margin-top: 20px; 
+    padding: 12px 10px; /* تقليل الحواف الجانبية */
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 12px;
+    font-weight: 700; 
+    color: #2c3e50;
+    min-height: 45px;
+    display: flex; align-items: center; justify-content: center;
+    
+    /* ضمان السطر الواحد */
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+    
+    /* --- التعديل هنا: تصغير الخط قليلاً --- */
+    font-size: 0.9rem; 
+    width: 100%; /* ضمان أن يأخذ العرض الكامل */
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.03);
+}
+/* 6. الشريط السفلي (الحاسبة) */
+.scanner-footer {
+    margin-top: 20px; padding-top: 20px;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    /* حركة انزلاق ناعمة */
+    animation: smoothSlideUp 0.5s ease-out forwards;
+}
+.scanner-footer.hidden { display: none; }
+
+.scanner-stats {
+    display: flex; justify-content: space-between; font-size: 1.1rem;
+    margin-bottom: 10px;
+    background: rgba(245, 245, 245, 0.7); /* زجاجي */
+    backdrop-filter: blur(5px);
+    padding: 12px; border-radius: 12px;
+}
+
+/* زر الطباعة */
+#print-scanned-btn {
+    width: 100%; margin-top: 10px;
+    background: rgba(44, 62, 80, 0.9); /* زجاجي داكن */
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white; padding: 14px;
+    border-radius: 12px; font-weight: bold; cursor: pointer;
+    transition: all 0.3s ease;
+}
+#print-scanned-btn:hover {
+    background: rgba(30, 45, 60, 1);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* تعريف حركة الانزلاق */
+@keyframes smoothSlideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}

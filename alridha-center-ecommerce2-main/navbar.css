@@ -1,0 +1,285 @@
+/* ==================================================
+   navbar.css - النسخة الاحترافية (Glassmorphism Final)
+   ================================================== */
+
+/* -----------------------------------------------------------
+   1. تنسيق الشريط العلوي (الخلفية والحركة)
+   ----------------------------------------------------------- */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    background: linear-gradient(120deg, #d84315, #ef6c00, #ff9800, hsl(33, 84%, 50%), #ff5722);
+    background-size: 300% 300%;
+    animation: gradientPulse 5s ease-in-out infinite alternate;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 15px;
+    box-shadow: 0 4px 20px rgba(230, 81, 0, 0.4);
+    z-index: 1000;
+}
+
+@keyframes gradientPulse {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* الشعار */
+.navbar .brand-logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: white;
+    flex-grow: 1;
+    gap: 5px; 
+}
+.navbar .brand-logo-container img {
+    height: 40px;
+    background: transparent !important;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+.navbar .brand-logo-container span {
+    font-size: 1.2rem;
+    font-weight: 800;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* -----------------------------------------------------------
+   2. أزرار الموبايل العلوية (سلة + بحث)
+   ----------------------------------------------------------- */
+.header-right, .header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.icon-btn {
+    position: relative !important;
+    background: rgba(255, 255, 255, 0.15) !important;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: white;
+    font-size: 1.3rem !important;
+    padding: 0;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    text-decoration: none !important;
+    border-bottom: none !important;
+    outline: none !important;
+    -webkit-tap-highlight-color: transparent;
+}
+.icon-btn i { text-decoration: none !important; display: inline-block; }
+.icon-btn:active { transform: scale(0.95); background: rgba(255, 255, 255, 0.25) !important; }
+
+/* شارة العداد للموبايل العلوي (فوق الزر) */
+.badge {
+    position: absolute !important;
+    top: -3px !important;
+    right: -3px !important;
+    background-color: #d32f2f;
+    color: white;
+    font-size: 0.65rem;
+    font-weight: bold;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    z-index: 10;
+}
+
+/* ==================================================
+   3. نافذة البحث المنبثقة (إصلاح الموبايل)
+   ================================================== */
+.search-box-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.25); 
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    display: flex;
+    align-items: center;
+    
+    /* الإعدادات الافتراضية (للحاسوب) */
+    padding: 0 20px;
+    gap: 15px;
+    
+    z-index: 1001;
+    transform: translateY(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* --- إصلاح المشكلة في الموبايل --- */
+@media (max-width: 768px) {
+    .search-box-container {
+        padding: 0 10px; /* تقليل الحواف الجانبية */
+        gap: 8px;        /* تقريب العناصر من بعضها */
+    }
+    .search-box-container input {
+        padding: 0 15px; /* تقليل حشوة حقل الكتابة */
+        font-size: 0.9rem;
+    }
+}
+
+.search-box-container.active { transform: translateY(0); }
+
+/* حقل الإدخال */
+.search-box-container input {
+    flex-grow: 1;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(5px);
+    padding: 0 20px;
+    height: 42px;
+    border-radius: 50px;
+    font-size: 1rem;
+    outline: none;
+    margin: 0;
+    color: #fff;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+}
+.search-box-container input::placeholder { color: rgba(255, 255, 255, 0.8); }
+
+/* أزرار البحث */
+.search-box-container button {
+    background: rgba(255, 255, 255, 0.3) !important;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+.search-box-container button:active { transform: scale(0.95); }
+.search-box-container button#navbar-search-submit i,
+.search-box-container button#close-search-btn i { color: #fff; font-size: 1.1rem; }
+/* -----------------------------------------------------------
+   4. الشريط السفلي للموبايل (Glassy & Perfect Circle Badge)
+   ----------------------------------------------------------- */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 1000;
+    padding-bottom: 5px;
+}
+
+.nav-item {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; text-decoration: none; color: #888;
+    font-size: 0.75rem; width: 25%; height: 100%; transition: 0.3s;
+}
+.nav-item i { font-size: 1.3rem; margin-bottom: 6px; }
+.nav-item.active { color: #e65100; font-weight: bold; }
+
+/* ----------------------------------------------------------------
+   تعديل شارة الشريط السفلي (زجاجية - كبيرة - متمركزة)
+   ---------------------------------------------------------------- */
+.icon-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.badge-dot {
+    position: absolute;
+    /* الموقع بجانب الأيقونة */
+    top: -7px;    /* رفعناه قليلاً بما أن الحجم زاد */
+    left: 18px;    
+    
+    /* خلفية زجاجية حمراء */
+    background-color: rgba(211, 47, 47, 0.9); /* أحمر شبه شفاف */
+    backdrop-filter: blur(2px); /* تأثير ضبابي خفيف */
+    
+    color: white;
+    font-size: 0.7rem; /* خط أكبر قليلاً للوضوح */
+    font-weight: bold;
+    
+    /* --- دائرة مثالية وكبيرة قليلاً --- */
+    width: 24px;  /* زيادة الحجم لاحتواء الرقم براحة */
+    height: 24px; 
+    padding: 0;   
+    border-radius: 50%;
+    
+    /* توسيط الرقم بدقة */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    border: 2px solid white;
+    box-shadow: 0 3px 6px rgba(211, 47, 47, 0.3); /* ظل أحمر خفيف للعمق */
+    z-index: 5;
+}
+
+.desktop-nav-links { display: none; }
+
+/* -----------------------------------------------------------
+   5. تنسيقات الحاسوب (Desktop)
+   ----------------------------------------------------------- */
+@media (min-width: 1024px) {
+    .bottom-nav, .header-left, .header-right { display: none !important; }
+
+    .navbar {
+        height: 80px; padding: 0 50px;
+        background: linear-gradient(to left, rgb(228, 108, 49), hsl(22, 75%, 49%));
+    }
+    .navbar .brand-logo-container { justify-content: flex-start; flex-grow: 0; margin-left: 30px; }
+    .desktop-nav-links { display: flex !important; align-items: center; gap: 15px; margin-right: auto; }
+
+    .desktop-nav-links a {
+        display: flex; align-items: center; gap: 10px;
+        background: rgba(255, 255, 255, 0.15); 
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white; text-decoration: none; font-size: 0.95rem; font-weight: 500;
+        padding: 8px 18px; border-radius: 50px; transition: all 0.3s ease;
+    }
+    .desktop-nav-links a:hover {
+        background: rgba(255, 255, 255, 0.3); transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .desktop-nav-links a i { display: inline-block !important; font-size: 1.1rem; }
+
+    .desktop-badge {
+        position: static !important;
+        color: #d84315 !important; background-color: white !important; 
+        border-radius: 50% !important; padding: 0 !important;
+        width: 22px; height: 22px; display: inline-flex !important;
+        align-items: center; justify-content: center;
+        font-size: 0.85rem !important; font-weight: bold !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important; margin-right: 0;
+    }
+}
