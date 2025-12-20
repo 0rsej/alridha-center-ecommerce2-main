@@ -9,6 +9,61 @@
     
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        /* الحاوية التي تجمع الأزرار */
+        .scanner-action-buttons {
+            display: flex;
+            gap: 12px; /* مسافة متساوية بين الزرين */
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        /* تنسيق موحد للزرين (التفريغ والطباعة) */
+        .scanner-action-buttons button {
+            flex: 1; /* جعل الزرين بنفس العرض تماماً */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px; /* مسافة بين الأيقونة والنص */
+            height: 48px; /* ارتفاع ثابت وموحد */
+            padding: 0 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            margin: 0 !important; /* إلغاء أي هوامش خارجية قديمة */
+            width: auto !important; /* إلغاء العرض 100% القديم */
+        }
+
+        /* ألوان خاصة لزر الطباعة */
+        #print-scanned-btn {
+            background: #2c3e50 !important; /* لون داكن */
+            color: white;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        }
+
+        /* ألوان خاصة لزر التفريغ */
+        #reset-scanned-btn {
+            background: #c0392b !important; /* لون أحمر */
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        }
+
+        /* تأثير عند الضغط أو التحويم */
+        .scanner-action-buttons button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            opacity: 0.95;
+        }
+
+        .scanner-action-buttons button:active {
+            transform: translateY(0);
+        }
+    </style>
 </head>
 <body class="mobile-app-view">
 
@@ -153,9 +208,15 @@
                 <span>المواد: <b id="scan-count">0</b></span>
                 <span>المجموع: <b id="scan-total" style="color: #e65100;">0</b> د.ع</span>
             </div>
-            <button id="print-scanned-btn" class="action-btn" style="width: 100%; margin-top: 10px; background: #333;">
-                <i class="fas fa-print"></i> طباعة القائمة
-            </button>
+            
+            <div class="scanner-action-buttons">
+                <button id="reset-scanned-btn">
+                    <i class="fas fa-trash-alt"></i> تفريغ
+                </button>
+                <button id="print-scanned-btn">
+                    <i class="fas fa-print"></i> طباعة القائمة
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -166,7 +227,7 @@
         <h3>معاينة القائمة</h3>
         
         <div id="receipt-preview-area" style="background: white; padding: 15px; border-radius: 10px; border: 1px dashed #ccc; margin: 15px 0; text-align: right;">
-            </div>
+        </div>
 
         <div style="display: flex; gap: 10px; flex-direction: column;">
             <button onclick="downloadReceiptAsImage()" class="action-btn" style="background: #27ae60;">

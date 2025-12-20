@@ -1801,10 +1801,9 @@ if (confirmBtn) {
         });
     }
 // ============================================================
-// نظام قراءة الباركود (الكاشير الذكي - سلة منفصلة + معاينة وحفظ)
+// نظام قراءة الباركود (الكاشير الذكي - تحديث التصميم والتفريغ)
 // ============================================================
 
-// تعريف العناصر (بما فيها عناصر نافذة المعاينة الجديدة)
 const barcodeBtn = document.getElementById('barcodeTriggerBtn');
 const scannerModal = document.getElementById('scanner-modal');
 const closeScannerBtn = document.getElementById('close-scanner-btn');
@@ -1814,8 +1813,9 @@ const scannerFooter = document.getElementById('scanner-footer');
 const scanCountEl = document.getElementById('scan-count');
 const scanTotalEl = document.getElementById('scan-total');
 const printScannedBtn = document.getElementById('print-scanned-btn');
+const resetScannedBtn = document.getElementById('reset-scanned-btn'); // زر التفريغ الجديد
 
-// عناصر نافذة المعاينة (Receipt Modal)
+// عناصر نافذة المعاينة
 const receiptModal = document.getElementById('receipt-modal');
 const receiptArea = document.getElementById('receipt-preview-area');
 
@@ -1823,28 +1823,24 @@ let html5QrcodeScanner = null;
 let currentScanMode = 'check'; 
 let isScanning = false;
 
-// --- 1. إنشاء سلة منفصلة للماسح الضوئي ---
+// --- 1. سلة الماسح الضوئي ---
 let scannerCart = []; 
 
-// تحديث إحصائيات الماسح
+// تحديث الإحصائيات
 function updateScannerStats() {
     if (!scannerCart) return;
     const count = scannerCart.reduce((acc, item) => acc + (item.isSoldByPrice ? 1 : item.quantity), 0);
     const total = scannerCart.reduce((sum, item) => {
-        let itemTotal = 0;
-        if (item.isSoldByPrice) { itemTotal = item.quantity; } 
-        else { 
-            let price = item.product.price;
-            if(item.variant && item.variant.price_modifier) price += item.variant.price_modifier;
-            itemTotal = price * item.quantity;
-        }
-        return sum + itemTotal;
+        let price = item.product.price;
+        if(item.variant && item.variant.price_modifier) price += item.variant.price_modifier;
+        return sum + (item.isSoldByPrice ? item.quantity : price * item.quantity);
     }, 0);
+    
     if (scanCountEl) scanCountEl.textContent = count;
     if (scanTotalEl) scanTotalEl.textContent = total.toLocaleString();
 }
 
-// دالة إضافة خاصة لسلة الماسح
+// إضافة للسلة
 function addToScannerCart(globalProductId, quantityOrPrice = 1, isSoldByPrice = false) {
     const product = products.find(p => p.globalId === globalProductId);
     if (!product) return;
@@ -1852,11 +1848,7 @@ function addToScannerCart(globalProductId, quantityOrPrice = 1, isSoldByPrice = 
     const existingItem = scannerCart.find(item => item.product.globalId === globalProductId);
 
     if (existingItem) {
-        if (isSoldByPrice) {
-            existingItem.quantity += quantityOrPrice;
-        } else {
-            existingItem.quantity += quantityOrPrice;
-        }
+        existingItem.quantity += quantityOrPrice;
     } else {
         scannerCart.push({
             product: product,
@@ -1865,6 +1857,20 @@ function addToScannerCart(globalProductId, quantityOrPrice = 1, isSoldByPrice = 
         });
     }
     updateScannerStats();
+}
+
+// --- دالة تفريغ السلة (الجديدة) ---
+function resetScannerCart() {
+    if (scannerCart.length === 0) return;
+    
+    if (confirm('هل أنت متأكد من تفريغ الحاسبة والبدء من جديد؟')) {
+        scannerCart = [];
+        updateScannerStats();
+        scanResultEl.innerHTML = 'تم تفريغ القائمة بنجاح ✨';
+        setTimeout(() => {
+            scanResultEl.innerHTML = 'وضع الحاسبة: جاهز للمسح';
+        }, 1500);
+    }
 }
 
 // التبديل بين الأوضاع
@@ -1885,7 +1891,7 @@ modeBtns.forEach(btn => {
     });
 });
 
-// عند نجاح المسح (تم تعديل التصميم ليكون عمودياً)
+// عند نجاح المسح (تم تعديل التصميم جذرياً)
 function onScanSuccess(decodedText, decodedResult) {
     if (isScanning) return;
     isScanning = true;
@@ -1897,14 +1903,18 @@ function onScanSuccess(decodedText, decodedResult) {
 
     if (product) {
         if (currentScanMode === 'check') {
-            // تصميم عمودي للصورة والاسم والسعر
+            // --- التصميم الجديد (المنفصل) لكشف السعر ---
             scanResultEl.innerHTML = `
-                <div style="color: green; font-size: 0.8rem; margin-bottom: 5px;">✔ تم العثور على المنتج:</div>
-                <div style="display:flex; flex-direction: column; align-items:center; gap:5px;">
-                    <img src="${product.image}" style="width:60px; height:60px; object-fit:contain; border-radius:5px; border:1px solid #eee;">
+                <div style="background:#e8f5e9; color:#2e7d32; padding:5px 10px; border-radius:5px; margin-bottom:10px; font-size:0.85rem; width:100%;">
+                    ✔ تم العثور على المنتج
+                </div>
+                
+                <div style="display:flex; flex-direction: column; align-items:center; width:100%;">
+                    <img src="${product.image}" style="width:65px; height:65px; object-fit:contain; border:1px solid #eee; border-radius:8px; margin-bottom:8px; background:white;">
+                    
                     <div style="text-align:center;">
-                        <div style="font-size:0.9rem; font-weight:bold; margin-bottom:2px; line-height:1.2;">${product.name}</div>
-                        <div style="font-size:1.1rem; color:#d35400; font-weight:bold;">${product.price} د.ع</div>
+                        <h4 style="margin:0 0 5px 0; font-size:0.95rem; color:#333; line-height:1.4;">${product.name}</h4>
+                        <div style="font-size:1.2rem; font-weight:bold; color:#d35400;">${product.price} د.ع</div>
                     </div>
                 </div>
             `;
@@ -1912,7 +1922,7 @@ function onScanSuccess(decodedText, decodedResult) {
             // وضع الحاسبة
             const isSoldByPrice = ['spices', 'nuts'].includes(product.category);
             addToScannerCart(product.globalId, isSoldByPrice ? 1000 : 1, isSoldByPrice);
-            scanResultEl.innerHTML = `<div style="color: #27ae60;">✔ تمت الإضافة: <b>${product.name}</b></div>`;
+            scanResultEl.innerHTML = `<div style="color: #27ae60; font-size:0.9rem;">✔ تمت الإضافة: <b>${product.name}</b></div>`;
         }
     } else {
         scanResultEl.innerHTML = `<span style="color:red;">❌ منتج غير مسجل</span>`;
@@ -1920,15 +1930,10 @@ function onScanSuccess(decodedText, decodedResult) {
     setTimeout(() => { isScanning = false; }, 1500);
 }
 
-// --------------------------------------------------------
-// الوظائف الجديدة: المعاينة، الحفظ كصورة، والطباعة
-// --------------------------------------------------------
-
-// 1. زر "طباعة القائمة": يفتح نافذة المعاينة بدلاً من الطباعة المباشرة
+// فتح نافذة المعاينة
 function printScannedList() {
     if (scannerCart.length === 0) { alert("القائمة فارغة!"); return; }
     
-    // إغلاق نافذة الماسح وفتح نافذة المعاينة
     if (scannerModal) scannerModal.classList.add('hidden');
     if (receiptModal) receiptModal.classList.remove('hidden');
 
@@ -1940,7 +1945,6 @@ function printScannedList() {
 
     const now = new Date().toLocaleString('ar-IQ');
 
-    // تعبئة محتوى الفاتورة داخل المعاينة
     if (receiptArea) {
         receiptArea.innerHTML = `
             <div style="text-align: center; border-bottom: 2px dashed #333; padding-bottom: 10px; margin-bottom: 10px;">
@@ -1970,23 +1974,22 @@ function printScannedList() {
                 <strong style="font-size: 1rem;">المجموع الكلي:</strong>
                 <span style="font-size: 1.2rem; font-weight:bold; color:#d35400;">${total} د.ع</span>
             </div>
-            <p style="text-align: center; margin-top: 10px; font-size: 0.7rem; color: #888;">* هذه القائمة مسودة، يرجى تسليمها للكاشير *</p>
+            <p style="text-align: center; margin-top: 10px; font-size: 0.7rem; color: #888;">* مسودة للكاشير *</p>
         `;
     }
 }
 
-// 2. دالة حفظ الفاتورة كصورة (يتم استدعاؤها من زر في HTML)
+// دوال مساعدة للطباعة والحفظ
 window.downloadReceiptAsImage = function() {
     if (!receiptArea) return;
     html2canvas(receiptArea).then(canvas => {
         const link = document.createElement('a');
-        link.download = `فاتورة_الرضا_${Date.now()}.png`;
+        link.download = `فاتورة_${Date.now()}.png`;
         link.href = canvas.toDataURL();
         link.click();
     });
 }
 
-// 3. دالة الطباعة الورقية النهائية (يتم استدعاؤها من زر في HTML)
 window.printReceiptFinal = function() {
     if (!receiptArea) return;
     const printWindow = window.open('', '_blank');
@@ -1994,22 +1997,15 @@ window.printReceiptFinal = function() {
     printWindow.document.write(receiptArea.innerHTML);
     printWindow.document.write('</body></html>');
     printWindow.document.close();
-    setTimeout(() => {
-        printWindow.print();
-        printWindow.close();
-    }, 500);
+    setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
 }
 
-// 4. دالة إغلاق نافذة المعاينة والعودة للماسح
 window.closeReceiptModal = function() {
     if (receiptModal) receiptModal.classList.add('hidden');
     if (scannerModal) scannerModal.classList.remove('hidden');
 }
 
-// --------------------------------------------------------
-// تشغيل الكاميرا وإدارتها
-// --------------------------------------------------------
-
+// تشغيل الماسح
 function startScanner() {
     if (scannerModal) scannerModal.classList.remove('hidden');
     
@@ -2024,21 +2020,16 @@ function startScanner() {
 
     html5QrcodeScanner = new Html5Qrcode("reader");
     
-    // إعدادات الكاميرا (مربع مستطيل للباركود)
-    const config = { 
-        fps: 15, 
-        qrbox: { width: 250, height: 150 }, 
-        aspectRatio: 1.0
-    };
+    const config = { fps: 15, qrbox: { width: 250, height: 150 }, aspectRatio: 1.0 };
     
     html5QrcodeScanner.start({ facingMode: "environment" }, config, onScanSuccess)
     .catch(err => {
-        console.warn("جاري تجربة الكاميرا الأمامية...", err);
+        console.warn("المحاولة بالكاميرا الأمامية...", err);
         return html5QrcodeScanner.start({ facingMode: "user" }, config, onScanSuccess);
     })
     .catch(finalErr => {
-        scanResultEl.innerHTML = `<span style="color:red; font-size:12px;">❌ الكاميرا لا تعمل: ${finalErr}</span>`;
-        alert("تنبيه: تأكد من منح إذن الكاميرا وأن الموقع يعمل برابط HTTPS.");
+        scanResultEl.innerHTML = `<span style="color:red; font-size:12px;">❌ الكاميرا لا تعمل</span>`;
+        alert("تأكد من السماح للكاميرا.");
     });
 }
 
@@ -2048,13 +2039,14 @@ function stopScanner() {
         html5QrcodeScanner.stop().then(() => { 
             html5QrcodeScanner.clear(); 
             html5QrcodeScanner = null; 
-        }).catch(err => console.log(err)); 
+        }).catch(e => console.log(e)); 
     }
 }
 
-// ربط الأزرار بالأحداث
+// تفعيل الأحداث
 if (barcodeBtn) barcodeBtn.addEventListener('click', startScanner);
 if (closeScannerBtn) closeScannerBtn.addEventListener('click', stopScanner);
-// لاحظ: قمنا بإلغاء EventListener القديم لزر الطباعة واستبدلناه بالدالة الجديدة
 if (printScannedBtn) printScannedBtn.addEventListener('click', printScannedList);
+// تفعيل زر التفريغ الجديد
+if (resetScannedBtn) resetScannedBtn.addEventListener('click', resetScannerCart);
 });
