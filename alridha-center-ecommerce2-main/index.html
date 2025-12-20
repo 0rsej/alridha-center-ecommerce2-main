@@ -7,6 +7,10 @@
     <title>سنتر الرضا - وجهتك للمنتجات عالية الجودة</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="main.css" />
+    
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
     <style>
         /* تنسيق لضمان عدم اختفاء المحتوى خلف الأشرطة الثابتة */
         body {
@@ -32,6 +36,10 @@
     </div>
 
     <div class="header-right">
+        <button class="icon-btn" id="barcodeTriggerBtn" aria-label="مسح الباركود">
+            <i class="fas fa-barcode"></i>
+        </button>
+
         <button class="icon-btn search-trigger-btn" id="searchTriggerBtn" aria-label="فتح البحث">
             <i class="fas fa-search"></i>
         </button>
@@ -169,28 +177,8 @@
 
         <section id="featured-products-section" class="featured-products-section">
             <h2>منتجاتنا المميزة</h2>
-            <div class="products-display-area">
-                <div class="product-item">
-                    <img src="قسم البهارات/بهارات تكة دجاج.jpeg" alt="بهارات تكة" />
-                    <h3>بهارات تكة دجاج طويلة جداً جداً جداً</h3>
-                    <p>أجود بهارات التكة لطبق شهي.</p>
-                    <span class="price">20 ألف د.ع</span>
-                    <div class="product-actions">
-                        <button class="add-to-cart-btn" data-id="3">أضف للسلة</button>
-                        <button class="add-to-wishlist-btn" data-id="3"><i class="far fa-heart"></i></button>
-                    </div>
+            <div class="products-display-area" id="featured-products-list">
                 </div>
-                <div class="product-item">
-                    <img src="قسم البهارات/حلويات شرقية مشكلة.jpeg" alt="حلويات شرقية" />
-                    <h3>حلويات شرقية مشكلة</h3>
-                    <p>تشكيلة فاخرة لأوقاتكم السعيدة.</p>
-                    <span class="price">15 ألف د.ع</span>
-                    <div class="product-actions">
-                        <button class="add-to-cart-btn" data-id="100">أضف للسلة</button>
-                        <button class="add-to-wishlist-btn" data-id="100"><i class="far fa-heart"></i></button>
-                    </div>
-                </div>
-            </div>
         </section>
 
         <section id="contact-section" class="contact-section">
@@ -240,26 +228,60 @@
         </a>
     </div>
 
-    <script src="script.js"></script>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // تفعيل الزر المناسب بناءً على الرابط الحالي
-            const currentPath = window.location.pathname;
-            const navItems = document.querySelectorAll('.bottom-nav .nav-item');
+    <div id="scanner-modal" class="scanner-modal hidden">
+        <div class="scanner-content">
+            <button id="close-scanner-btn" class="close-scanner"><i class="fas fa-times"></i></button>
+            <h3>ماسح المنتجات الذكي</h3>
             
-            navItems.forEach(item => {
-                const href = item.getAttribute('href');
-                // التحقق مما إذا كان الرابط الحالي ينتهي برابط الزر
-                if(currentPath.endsWith(href) || (href === 'index.html' && (currentPath.endsWith('/') || currentPath === '/'))) {
-                    // إزالة active من الجميع أولاً
-                    navItems.forEach(i => i.classList.remove('active'));
-                    // إضافتها للعنصر المطابق
-                    item.classList.add('active');
-                }
-            });
-        });
-    </script>
+            <div class="scan-mode-switch">
+                <button class="mode-btn active" data-mode="check">كشف السعر</button>
+                <button class="mode-btn" data-mode="cart">الحاسبة (سلة)</button>
+            </div>
+
+            <div id="reader" style="width: 100%; border-radius: 10px; overflow: hidden; min-height: 250px;"></div>
+            
+            <div id="scan-result" class="scan-result">
+                وجه الكاميرا نحو الباركود...
+            </div>
+
+            <div id="scanner-footer" class="scanner-footer hidden">
+                <div class="scanner-stats">
+                    <span>المواد: <b id="scan-count">0</b></span>
+                    <span>المجموع: <b id="scan-total" style="color: #e65100;">0</b> د.ع</span>
+                </div>
+                
+                <div class="scanner-action-buttons">
+                    <button id="reset-scanned-btn">
+                        <i class="fas fa-trash-alt"></i> تفريغ
+                    </button>
+                    <button id="print-scanned-btn">
+                        <i class="fas fa-print"></i> طباعة القائمة
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="receipt-modal" class="scanner-modal hidden">
+        <div class="scanner-content" style="max-width: 350px;">
+            <button onclick="closeReceiptModal()" class="close-scanner"><i class="fas fa-times"></i></button>
+            <h3>معاينة القائمة</h3>
+            
+            <div id="receipt-preview-area" style="background: white; padding: 15px; border-radius: 10px; border: 1px dashed #ccc; margin: 15px 0; text-align: right;">
+            </div>
+
+            <div style="display: flex; gap: 10px; flex-direction: column;">
+                <button onclick="downloadReceiptAsImage()" class="action-btn" style="background: #27ae60;">
+                    <i class="fas fa-download"></i> حفظ كصورة
+                </button>
+                <button onclick="printReceiptFinal()" class="action-btn" style="background: #333;">
+                    <i class="fas fa-print"></i> طباعة ورقية
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
     <script src="//instant.page/5.2.0" type="module" integrity="sha384-jnZyxPjiipYXnSU0ygqeac2q7CVYMbh84GO0uHNsr+25Kd7q80n0lu2p0Y/oJxe+" crossorigin="anonymous"></script>
 </body>
 </html>

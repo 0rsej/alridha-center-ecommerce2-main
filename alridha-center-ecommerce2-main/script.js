@@ -1384,72 +1384,7 @@ if (confirmBtn) {
         setMenuTogglePosition();
     }
 
-    // وظيفة تهيئة التطبيق الرئيسية
-    async function initializeApp() {
-        try {
-            const categoriesResponse = await fetch('category_names.json');
-            categoryNames = await categoriesResponse.json();
-
-            const allJsonFilesPaths = CATEGORY_JSON_FILES.map(file => `json/${file}`);
-
-            let allProductsFromFiles = [];
-            for (const filePath of allJsonFilesPaths) {
-                const response = await fetch(filePath);
-                const categoryProducts = await response.json();
-                allProductsFromFiles = allProductsFromFiles.concat(categoryProducts);
-            }
-            products = allProductsFromFiles;
-
-            loadCart();
-            loadOrders();
-            loadWishlist();
-
-            if (isCartPage) {
-                if (checkoutSection) {
-                    checkoutSection.classList.add('hidden');
-                }
-                updateCartUI();
-            } else if (isCategoryProductsPage) {
-                const urlParams = new URLSearchParams(window.location.search);
-                const categoryParam = urlParams.get('category');
-                currentCategory = categoryParam || 'all';
-                if (categoryTitleEl) {
-                    categoryTitleEl.textContent = categoryNames[currentCategory] || 'جميع المنتجات';
-                }
-                const productsForCategory = products.filter(p => p.category === currentCategory);
-                displayProducts(productsForCategory);
-            } else if (isProductDetailsPage) {
-                const urlParams = new URLSearchParams(window.location.search);
-                const globalProductId = urlParams.get('globalId');
-                if (globalProductId) {
-                    currentGlobalProductId = globalProductId;
-                    displayProductDetails(globalProductId);
-                } else {
-                    if (productDetailAreaEl) productDetailAreaEl.innerHTML = '<p style="text-align: center; color: var(--danger-color);">معرف المنتج غير موجود في الرابط.</p>';
-                    if (productPageTitleEl) productPageTitleEl.textContent = 'خطأ في المنتج - سنتر الرضا';
-                    if (productDetailNameEl) productDetailNameEl.textContent = 'خطأ';
-                }
-            } else if (isWishlistPage) {
-                filterWishlistByCategory('all');
-                populateCategoryDropdown();
-                // هنا يتم استدعاء applyWishlistResponsiveStyles بعد بناء الـ DOM
-                // بواسطة filterWishlistByCategory
-            } else if (isIndexPage) {
-                displayFeaturedProducts();
-            } else if (isOrdersPage) {
-                displayOrders();
-            }
-
-            updateNavbarCartCount();
-
-
-        } catch (error) {
-            console.error('Error loading products or initializing app:', error);
-            showNotification('حدث خطأ أثناء تحميل بيانات المتجر.', 'error');
-        }
-    }
-    
-  // ==========================================
+// ==========================================
     //  نظام تسريع الموقع (Caching System) ⚡
     //  (أضف هذا الكود بدلاً من initializeApp القديمة)
     // ==========================================
