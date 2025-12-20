@@ -1449,6 +1449,122 @@ if (confirmBtn) {
         }
     }
     
+  // ==========================================
+    //  نظام تسريع الموقع (Caching System) ⚡
+    //  (أضف هذا الكود بدلاً من initializeApp القديمة)
+    // ==========================================
+
+    // دالة جديدة لجلب المنتجات بذكاء (من ذاكرة الهاتف أولاً)
+    async function fetchProductsWithCache() {
+        const CACHE_KEY = 'spiceShopProductsData_v2'; // مفتاح التخزين
+        const CACHE_DURATION = 1000 * 60 * 60; // مدة الصلاحية: ساعة واحدة
+
+        // 1. محاولة القراءة من التخزين المحلي (Local Storage)
+        const cached = localStorage.getItem(CACHE_KEY);
+        if (cached) {
+            try {
+                const { timestamp, data } = JSON.parse(cached);
+                // إذا لم تمر ساعة على التخزين، استخدم البيانات المحفوظة فوراً
+                if (Date.now() - timestamp < CACHE_DURATION) {
+                    console.log('⚡ تم تحميل المنتجات من الذاكرة (Cache) بسرعة فائقة');
+                    return data;
+                }
+            } catch (e) {
+                console.warn('بيانات الكاش قديمة أو تالفة، سيتم التحميل من السيرفر.');
+            }
+        }
+
+        // 2. إذا لم توجد بيانات، حملها من السيرفر واحفظها
+        console.log('🔄 جاري تحميل المنتجات من السيرفر...');
+        // تأكد من أن قائمة الملفات CATEGORY_JSON_FILES معرفة في بداية الملف
+        const allJsonFilesPaths = CATEGORY_JSON_FILES.map(file => `json/${file}`);
+        let allProductsFromFiles = [];
+
+        try {
+            // تحميل جميع الملفات في نفس الوقت (Parallel) لسرعة أكبر
+            const responses = await Promise.all(allJsonFilesPaths.map(url => fetch(url).then(res => res.json())));
+            responses.forEach(data => {
+                allProductsFromFiles = allProductsFromFiles.concat(data);
+            });
+
+            // 3. حفظ البيانات الجديدة في الهاتف للمرة القادمة
+            localStorage.setItem(CACHE_KEY, JSON.stringify({
+                timestamp: Date.now(),
+                data: allProductsFromFiles
+            }));
+            
+            return allProductsFromFiles;
+
+        } catch (error) {
+            console.error('خطأ في تحميل البيانات:', error);
+            // في حالة انقطاع النت، حاول استخدام البيانات القديمة حتى لو انتهت صلاحيتها
+            if (cached) return JSON.parse(cached).data;
+            return [];
+        }
+    }
+
+    // دالة التشغيل الرئيسية (تم تحديثها لتستخدم الكاش)
+    async function initializeApp() {
+        try {
+            // تحميل أسماء الأقسام
+            const categoriesResponse = await fetch('category_names.json');
+            categoryNames = await categoriesResponse.json();
+
+            // استخدام دالة التسريع الجديدة هنا 👇
+            products = await fetchProductsWithCache();
+
+            // تحميل بيانات المستخدم المحفوظة
+            loadCart();
+            loadOrders();
+            loadWishlist();
+
+            // توجيه العرض حسب الصفحة الحالية
+            if (isCartPage) {
+                if (checkoutSection) checkoutSection.classList.add('hidden');
+                updateCartUI();
+            } else if (isCategoryProductsPage) {
+                const urlParams = new URLSearchParams(window.location.search);
+                const categoryParam = urlParams.get('category');
+                const searchParam = urlParams.get('search'); // دعم البحث عبر الرابط
+
+                if (searchParam) {
+                    if (searchInput) searchInput.value = searchParam;
+                    if (categoryTitleEl) categoryTitleEl.textContent = `نتائج البحث: ${searchParam}`;
+                    handleSearch(); 
+                } else {
+                    currentCategory = categoryParam || 'all';
+                    if (categoryTitleEl) {
+                        categoryTitleEl.textContent = categoryNames[currentCategory] || 'جميع المنتجات';
+                    }
+                    const productsForCategory = products.filter(p => p.category === currentCategory);
+                    displayProducts(productsForCategory);
+                }
+
+            } else if (isProductDetailsPage) {
+                const urlParams = new URLSearchParams(window.location.search);
+                const globalProductId = urlParams.get('globalId');
+                if (globalProductId) {
+                    currentGlobalProductId = globalProductId;
+                    displayProductDetails(globalProductId);
+                }
+            } else if (isWishlistPage) {
+                filterWishlistByCategory('all');
+                populateCategoryDropdown();
+            } else if (isIndexPage) {
+                displayFeaturedProducts();
+            } else if (isOrdersPage) {
+                displayOrders();
+            }
+
+            updateNavbarCartCount();
+
+        } catch (error) {
+            console.error('Error initializing app:', error);
+            showNotification('حدث خطأ أثناء تحميل التطبيق.', 'error');
+        }
+    }
+    
+    // تشغيل التطبيق
     initializeApp();
 // ============================================================
 // بداية نظام إدارة الطلبات المتطور (تم التحديث: إصلاح الترتيب والتكرار)
