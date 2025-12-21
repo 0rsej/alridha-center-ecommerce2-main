@@ -4,11 +4,15 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>منتجات القسم - سنتر الرضا</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-<link rel="stylesheet" href="main.css" />
 
-<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<link rel="preload" href="main.css?v=3.0" as="style" />
+<link rel="preload" href="script.js?v=3.0" as="script" />
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="main.css?v=3.0" />
+
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
 </head>
 <body class="mobile-app-view">
 
@@ -25,7 +29,6 @@
         <button class="icon-btn" id="barcodeTriggerBtn" aria-label="مسح الباركود">
             <i class="fas fa-barcode"></i>
         </button>
-
         <button class="icon-btn search-trigger-btn" id="searchTriggerBtn" aria-label="فتح البحث">
             <i class="fas fa-search"></i>
         </button>
@@ -44,36 +47,25 @@
     </div>
     
     <div class="desktop-nav-links">
-        <a href="index.html">
-            <i class="fas fa-home"></i> الرئيسية
-        </a>
-        <a href="categories.html">
-            <i class="fas fa-th-large"></i> الأقسام
-        </a>
-        
+        <a href="index.html"><i class="fas fa-home"></i> الرئيسية</a>
+        <a href="categories.html"><i class="fas fa-th-large"></i> الأقسام</a>
         <a href="wishlist.html">
             <div style="position: relative;">
                 <i class="fas fa-heart"></i> المفضلة
                 <span class="desktop-badge" id="desktopWishlistCount" style="display: none;">0</span>
             </div>
         </a>
-        
         <a href="cart.html">
             <div style="position: relative;">
                 <i class="fas fa-shopping-cart"></i> السلة
                 <span class="desktop-badge" id="desktopCartCount" style="display: none;">0</span>
             </div>
         </a>
-
-        <a href="orders.html">
-            <i class="fas fa-receipt"></i> طلباتي
-        </a>
-        
-        <a href="#" id="desktopSearchTrigger">
-             <i class="fas fa-search"></i> بحث
-        </a>
+        <a href="orders.html"><i class="fas fa-receipt"></i> طلباتي</a>
+        <a href="#" id="desktopSearchTrigger"><i class="fas fa-search"></i> بحث</a>
     </div>
 </nav>
+
 <div style="height: 80px;"></div>
 
 <div class="container">
@@ -89,19 +81,16 @@
       <h2>المنتجات المتوفرة</h2>
       <div id="products-list"></div>
     </div>
-    
 </div>
 
 <div style="height: 80px;"></div>
 
 <div class="bottom-nav">
     <a href="index.html" class="nav-item">
-        <i class="fas fa-home"></i>
-        <span>الرئيسية</span>
+        <i class="fas fa-home"></i> <span>الرئيسية</span>
     </a>
     <a href="categories.html" class="nav-item active">
-        <i class="fas fa-th-large"></i>
-        <span>الأقسام</span>
+        <i class="fas fa-th-large"></i> <span>الأقسام</span>
     </a>
     <a href="wishlist.html" class="nav-item">
         <div class="icon-wrapper">
@@ -111,8 +100,7 @@
         <span>المفضلة</span>
     </a>
     <a href="orders.html" class="nav-item">
-        <i class="fas fa-receipt"></i>
-        <span>طلباتي</span>
+        <i class="fas fa-receipt"></i> <span>طلباتي</span>
     </a>
 </div>
 
@@ -154,7 +142,7 @@
     </div>
 </div>
 
-<script src="script.js"></script>
+<script src="script.js?v=3.0" defer></script>
 <script src="//instant.page/5.2.0" type="module" integrity="sha384-jnZyxPjiipYXnSU0ygqeac2q7CVYMbh84GO0uHNsr+25Kd7q80n0lu2p0Y/oJxe+" crossorigin="anonymous"></script>
 </body>
 </html>

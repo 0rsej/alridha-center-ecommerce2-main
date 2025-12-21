@@ -5,22 +5,23 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>سنتر الرضا - وجهتك للمنتجات عالية الجودة</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link rel="stylesheet" href="main.css" />
     
-    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="preload" href="main.css?v=3.0" as="style" />
+    <link rel="preload" href="script.js?v=3.0" as="script" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="main.css?v=3.0" />
+    
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
 
     <style>
-        /* تنسيق لضمان عدم اختفاء المحتوى خلف الأشرطة الثابتة */
         body {
-            padding-top: 70px;    /* مسافة للشريط العلوي */
-            padding-bottom: 80px; /* مسافة للشريط السفلي */
+            padding-top: 70px;
+            padding-bottom: 80px;
         }
         @media (min-width: 1024px) {
-            body {
-                padding-bottom: 0; /* إلغاء مسافة الشريط السفلي في الحاسوب */
-            }
+            body { padding-bottom: 0; }
         }
     </style>
 </head>
@@ -39,7 +40,6 @@
         <button class="icon-btn" id="barcodeTriggerBtn" aria-label="مسح الباركود">
             <i class="fas fa-barcode"></i>
         </button>
-
         <button class="icon-btn search-trigger-btn" id="searchTriggerBtn" aria-label="فتح البحث">
             <i class="fas fa-search"></i>
         </button>
@@ -58,39 +58,30 @@
     </div>
     
     <div class="desktop-nav-links">
-        <a href="index.html">
-            <i class="fas fa-home"></i> الرئيسية
-        </a>
-        <a href="categories.html">
-            <i class="fas fa-th-large"></i> الأقسام
-        </a>
-        
+        <a href="index.html"><i class="fas fa-home"></i> الرئيسية</a>
+        <a href="categories.html"><i class="fas fa-th-large"></i> الأقسام</a>
         <a href="wishlist.html">
             <div style="position: relative;">
                 <i class="fas fa-heart"></i> المفضلة
                 <span class="desktop-badge" id="desktopWishlistCount" style="display: none;">0</span>
             </div>
         </a>
-        
         <a href="cart.html">
             <div style="position: relative;">
                 <i class="fas fa-shopping-cart"></i> السلة
                 <span class="desktop-badge" id="desktopCartCount" style="display: none;">0</span>
             </div>
         </a>
-
-        <a href="orders.html">
-            <i class="fas fa-receipt"></i> طلباتي
-        </a>
-        
-        <a href="#" id="desktopSearchTrigger">
-             <i class="fas fa-search"></i> بحث
-        </a>
+        <a href="orders.html"><i class="fas fa-receipt"></i> طلباتي</a>
+        <a href="#" id="desktopSearchTrigger"><i class="fas fa-search"></i> بحث</a>
     </div>
 </nav>
-    <section class="hero-section">
-        <div class="hero-overlay"></div> 
-        <div class="hero-content">
+
+    <section class="hero-section" style="position: relative; overflow: hidden;">
+        <img src="jogohero.jpg" alt="سنتر الرضا" fetchpriority="high" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0;">
+        
+        <div class="hero-overlay" style="z-index: 1;"></div> 
+        <div class="hero-content" style="z-index: 2; position: relative;">
             <p class="welcome-text">مرحباً بك في</p>
             <h1 class="hero-title">
                 <span class="store-name">سنتر الرضا</span>
@@ -107,27 +98,22 @@
             <h2>استكشف أقسامنا الرئيسية</h2>
             <div class="categories-grid">
                 <a href="category-products.html?category=spices" class="category-item">
-                    <i class="fas fa-pepper-hot"></i>
-                    <h3>البهارات</h3>
+                    <i class="fas fa-pepper-hot"></i> <h3>البهارات</h3>
                 </a>
                 <a href="category-products.html?category=groceries" class="category-item">
-                    <i class="fas fa-shopping-basket"></i>
-                    <h3>مواد غذائية</h3>
+                    <i class="fas fa-shopping-basket"></i> <h3>مواد غذائية</h3>
                 </a>
                 <a href="category-products.html?category=cleaning_supplies" class="category-item">
                     <i class="fas fa-broom"></i> <h3>مواد التنظيف</h3>
                 </a>
                 <a href="category-products.html?category=personal_care" class="category-item">
-                    <i class="fas fa-pump-soap"></i>
-                    <h3>عناية شخصية</h3>
+                    <i class="fas fa-pump-soap"></i> <h3>عناية شخصية</h3>
                 </a>
                 <a href="category-products.html?category=sweets" class="category-item">
-                    <i class="fas fa-ice-cream"></i>
-                    <h3>حلويات</h3>
+                    <i class="fas fa-ice-cream"></i> <h3>حلويات</h3>
                 </a>
                 <a href="category-products.html?category=home_tools" class="category-item">
-                    <i class="fas fa-screwdriver-wrench"></i>
-                    <h3>أدوات منزلية</h3>
+                    <i class="fas fa-screwdriver-wrench"></i> <h3>أدوات منزلية</h3>
                 </a>
                 <a href="category-products.html?category=nuts" class="category-item">
                     <i class="fas fa-seedling"></i> <h3>المكسرات</h3>
@@ -177,14 +163,13 @@
 
         <section id="featured-products-section" class="featured-products-section">
             <h2>منتجاتنا المميزة</h2>
-            <div class="products-display-area" id="featured-products-list">
-                </div>
+            <div class="products-display-area" id="featured-products-list"></div>
         </section>
 
         <section id="contact-section" class="contact-section">
             <h2>تواصل معنا في أي وقت</h2>
             <div class="contact-info">
-                <a href="https://g.co/kgs/vmgaFgq" target="_blank" class="location-info-link" aria-label="عنواننا على الخريطة">
+                <a href="https://g.co/kgs/vmgaFgq" target="_blank" class="location-info-link">
                     <p class="location-info">
                         <i class="fas fa-map-marker-alt"></i>
                         <span>العراق، البصرة، قرب سوق ام هاني , امام مدرسة الهداية ومركز الانتخابات</span>
@@ -192,9 +177,9 @@
                 </a>
             </div>
             <div class="social-links">
-                <a href="https://t.me/+zyhjU6ZIIUpiMWMy" target="_blank" title="تليجرام"><i class="fab fa-telegram"></i></a>
-                <a href="https://www.instagram.com/center_alreda?igsh=Nmd0NDczdThvcjBu" target="_blank" title="إنستجرام"><i class="fab fa-instagram"></i></a>
-                <a href="https://wa.me/9647816780645" target="_blank" title="واتساب"><i class="fab fa-whatsapp"></i></a>
+                <a href="https://t.me/+zyhjU6ZIIUpiMWMy" target="_blank"><i class="fab fa-telegram"></i></a>
+                <a href="https://www.instagram.com/center_alreda?igsh=Nmd0NDczdThvcjBu" target="_blank"><i class="fab fa-instagram"></i></a>
+                <a href="https://wa.me/9647816780645" target="_blank"><i class="fab fa-whatsapp"></i></a>
             </div>
         </section>
     </div>
@@ -205,15 +190,11 @@
 
     <div class="bottom-nav">
         <a href="index.html" class="nav-item active">
-            <i class="fas fa-home"></i>
-            <span>الرئيسية</span>
+            <i class="fas fa-home"></i> <span>الرئيسية</span>
         </a>
-        
         <a href="categories.html" class="nav-item">
-            <i class="fas fa-th-large"></i>
-            <span>الأقسام</span>
+            <i class="fas fa-th-large"></i> <span>الأقسام</span>
         </a>
-        
         <a href="wishlist.html" class="nav-item">
             <div class="icon-wrapper">
                 <i class="fas fa-heart"></i>
@@ -221,10 +202,8 @@
             </div>
             <span>المفضلة</span>
         </a>
-        
         <a href="orders.html" class="nav-item">
-            <i class="fas fa-receipt"></i>
-            <span>طلباتي</span>
+            <i class="fas fa-receipt"></i> <span>طلباتي</span>
         </a>
     </div>
 
@@ -232,31 +211,20 @@
         <div class="scanner-content">
             <button id="close-scanner-btn" class="close-scanner"><i class="fas fa-times"></i></button>
             <h3>ماسح المنتجات الذكي</h3>
-            
             <div class="scan-mode-switch">
                 <button class="mode-btn active" data-mode="check">كشف السعر</button>
                 <button class="mode-btn" data-mode="cart">الحاسبة (سلة)</button>
             </div>
-
             <div id="reader" style="width: 100%; border-radius: 10px; overflow: hidden; min-height: 250px;"></div>
-            
-            <div id="scan-result" class="scan-result">
-                وجه الكاميرا نحو الباركود...
-            </div>
-
+            <div id="scan-result" class="scan-result">وجه الكاميرا نحو الباركود...</div>
             <div id="scanner-footer" class="scanner-footer hidden">
                 <div class="scanner-stats">
                     <span>المواد: <b id="scan-count">0</b></span>
                     <span>المجموع: <b id="scan-total" style="color: #e65100;">0</b> د.ع</span>
                 </div>
-                
                 <div class="scanner-action-buttons">
-                    <button id="reset-scanned-btn">
-                        <i class="fas fa-trash-alt"></i> تفريغ
-                    </button>
-                    <button id="print-scanned-btn">
-                        <i class="fas fa-print"></i> طباعة القائمة
-                    </button>
+                    <button id="reset-scanned-btn"><i class="fas fa-trash-alt"></i> تفريغ</button>
+                    <button id="print-scanned-btn"><i class="fas fa-print"></i> طباعة القائمة</button>
                 </div>
             </div>
         </div>
@@ -266,22 +234,15 @@
         <div class="scanner-content" style="max-width: 350px;">
             <button onclick="closeReceiptModal()" class="close-scanner"><i class="fas fa-times"></i></button>
             <h3>معاينة القائمة</h3>
-            
-            <div id="receipt-preview-area" style="background: white; padding: 15px; border-radius: 10px; border: 1px dashed #ccc; margin: 15px 0; text-align: right;">
-            </div>
-
+            <div id="receipt-preview-area" style="background: white; padding: 15px; border-radius: 10px; border: 1px dashed #ccc; margin: 15px 0; text-align: right;"></div>
             <div style="display: flex; gap: 10px; flex-direction: column;">
-                <button onclick="downloadReceiptAsImage()" class="action-btn" style="background: #27ae60;">
-                    <i class="fas fa-download"></i> حفظ كصورة
-                </button>
-                <button onclick="printReceiptFinal()" class="action-btn" style="background: #333;">
-                    <i class="fas fa-print"></i> طباعة ورقية
-                </button>
+                <button onclick="downloadReceiptAsImage()" class="action-btn" style="background: #27ae60;"><i class="fas fa-download"></i> حفظ كصورة</button>
+                <button onclick="printReceiptFinal()" class="action-btn" style="background: #333;"><i class="fas fa-print"></i> طباعة ورقية</button>
             </div>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="script.js?v=3.0" defer></script>
     <script src="//instant.page/5.2.0" type="module" integrity="sha384-jnZyxPjiipYXnSU0ygqeac2q7CVYMbh84GO0uHNsr+25Kd7q80n0lu2p0Y/oJxe+" crossorigin="anonymous"></script>
 </body>
 </html>
