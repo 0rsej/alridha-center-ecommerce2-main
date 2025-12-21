@@ -1438,29 +1438,96 @@ if (confirmBtn) {
         }
     }
 
-    // دالة التشغيل الرئيسية (تم تحديثها لتستخدم الكاش)
+ // ✅ ضع هذا الكود الجديد بدلاً منه 👇
+
+    // ==========================================
+    // 🛠️ دالة إصلاح الصور والبيانات القديمة (جديد)
+    // ==========================================
+    function syncStoredDataWithFreshProducts() {
+        let cartUpdated = false;
+        let wishlistUpdated = false;
+
+        // 1. تحديث السلة (Cart)
+        cart.forEach(cartItem => {
+            const freshProduct = products.find(p => p.globalId === cartItem.product.globalId);
+            if (freshProduct) {
+                // تحديث الصورة والاسم والسعر
+                cartItem.product.image = freshProduct.image;
+                cartItem.product.name = freshProduct.name;
+                if (!cartItem.isSoldByPrice) {
+                    cartItem.product.price = freshProduct.price;
+                }
+                // تحديث صورة النوع (Variant)
+                if (cartItem.variant) {
+                    const freshVariant = freshProduct.variants ? freshProduct.variants.find(v => v.value === cartItem.variant.value) : null;
+                    if (freshVariant) {
+                        cartItem.variant = freshVariant; 
+                    }
+                }
+                cartUpdated = true;
+            }
+        });
+
+        // 2. تحديث المفضلة (Wishlist)
+        const newWishlist = [];
+        wishlist.forEach(wishlistItem => {
+            const freshProduct = products.find(p => p.globalId === wishlistItem.globalId);
+            if (freshProduct) {
+                newWishlist.push(freshProduct); // استبدال القديم بالجديد
+                wishlistUpdated = true;
+            }
+        });
+        
+        if (wishlistUpdated) {
+            wishlist = newWishlist;
+            saveWishlist();
+            console.log('✅ تم تحديث صور وبيانات المفضلة.');
+        }
+
+        if (cartUpdated) { 
+            saveCart(); 
+            console.log('✅ تم تحديث صور وبيانات السلة.'); 
+        }
+    }
+
+    // ==========================================
+    // تهيئة التطبيق (النسخة المحدثة)
+    // ==========================================
     async function initializeApp() {
         try {
-            // تحميل أسماء الأقسام
+            // تحميل الأقسام
             const categoriesResponse = await fetch('category_names.json');
             categoryNames = await categoriesResponse.json();
 
-            // استخدام دالة التسريع الجديدة هنا 👇
-            products = await fetchProductsWithCache();
+            // تحميل المنتجات (تأكد أن دالة fetchProductsWithCache موجودة فوق هذا الكود)
+            if (typeof fetchProductsWithCache === 'function') {
+                products = await fetchProductsWithCache();
+            } else {
+                // احتياط في حال لم تكن دالة الكاش موجودة
+                console.log('Fetching products normally...');
+                const allJsonFilesPaths = CATEGORY_JSON_FILES.map(file => `json/${file}`);
+                for (const filePath of allJsonFilesPaths) {
+                    const response = await fetch(filePath);
+                    const data = await response.json();
+                    products = products.concat(data);
+                }
+            }
 
-            // تحميل بيانات المستخدم المحفوظة
             loadCart();
             loadOrders();
             loadWishlist();
 
-            // توجيه العرض حسب الصفحة الحالية
+            // 🔥 تشغيل إصلاح الصور فوراً 🔥
+            syncStoredDataWithFreshProducts();
+
+            // توجيه الصفحات
             if (isCartPage) {
                 if (checkoutSection) checkoutSection.classList.add('hidden');
                 updateCartUI();
             } else if (isCategoryProductsPage) {
                 const urlParams = new URLSearchParams(window.location.search);
                 const categoryParam = urlParams.get('category');
-                const searchParam = urlParams.get('search'); // دعم البحث عبر الرابط
+                const searchParam = urlParams.get('search');
 
                 if (searchParam) {
                     if (searchInput) searchInput.value = searchParam;
@@ -1468,9 +1535,7 @@ if (confirmBtn) {
                     handleSearch(); 
                 } else {
                     currentCategory = categoryParam || 'all';
-                    if (categoryTitleEl) {
-                        categoryTitleEl.textContent = categoryNames[currentCategory] || 'جميع المنتجات';
-                    }
+                    if (categoryTitleEl) categoryTitleEl.textContent = categoryNames[currentCategory] || 'جميع المنتجات';
                     const productsForCategory = products.filter(p => p.category === currentCategory);
                     displayProducts(productsForCategory);
                 }
@@ -1495,11 +1560,10 @@ if (confirmBtn) {
 
         } catch (error) {
             console.error('Error initializing app:', error);
-            showNotification('حدث خطأ أثناء تحميل التطبيق.', 'error');
         }
     }
     
-    // تشغيل التطبيق
+    // تشغيل التطبيق في النهاية
     initializeApp();
 // ============================================================
 // بداية نظام إدارة الطلبات المتطور (تم التحديث: إصلاح الترتيب والتكرار)

@@ -9,214 +9,373 @@
     <link rel="preload" href="main.css?v=3.0" as="style" />
     <link rel="preload" href="script.js?v=3.0" as="script" />
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="main.css?v=3.0" />
     
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
 
     <style>
+        /* --- 1. إعدادات عامة --- */
         body {
             padding-top: 70px;
             padding-bottom: 80px;
+            background-color: #2c1a12;
+            overflow-x: hidden;
+            margin: 0; /* تأكيد إزالة الهوامش الافتراضية */
         }
-        @media (min-width: 1024px) {
-            body { padding-bottom: 0; }
+        @media (min-width: 1024px) { body { padding-bottom: 0; } }
+
+        /* تعيين الخط للأقسام الجديدة */
+        .hero-section, .main-categories-section, .creative-steps-section, .featured-products-section, .contact-section-dark {
+            font-family: 'Tajawal', sans-serif;
+            /* --- التعديل الجوهري: حواف حادة تماماً بين الأقسام --- */
+            border-radius: 0 !important;
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+            border: none !important;
+            width: 100%;
+            position: relative;
         }
+
+        /* --- 2. الهيرو سكشن --- */
+        .hero-section {
+            background: linear-gradient(135deg, #FF512F 0%, #F09819 100%);
+            min-height: auto; 
+            display: flex; justify-content: center; align-items: center; text-align: center;
+            padding: 40px 15px 50px 15px;
+            overflow: hidden; z-index: 2;
+        }
+        .hero-section::before { content: ''; position: absolute; width: 320px; height: 320px; top: -60px; right: -60px; filter: blur(25px); background: rgba(255, 255, 255, 0.1); border-radius: 50%; pointer-events: none; }
+        .hero-section::after { content: ''; position: absolute; width: 200px; height: 200px; bottom: 30px; left: 30px; filter: blur(20px); background: rgba(255, 255, 255, 0.08); border-radius: 50%; pointer-events: none; }
+
+        .glass-effect {
+            position: relative; z-index: 10;
+            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.5); border-top: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); 
+            border-radius: 20px; /* هذا الانحناء داخلي للكارت فقط ولا يؤثر على حواف القسم */
+            padding: 30px 20px; max-width: 650px; width: 100%; 
+            transform: translateY(0); margin: 0;
+        }
+        
+        .glass-effect .welcome-text { color: #FFF8E1; font-size: 1.1rem; margin-bottom: 5px; font-weight: 500; }
+        .glass-effect .hero-title { margin-bottom: 10px; text-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+        .glass-effect .store-name { font-size: 2.5rem; font-weight: 800; color: #ffffff; filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.3)); }
+        .glass-effect .hero-slogan { color: #ffefe0; font-size: 1.1rem; line-height: 1.6; margin-bottom: 20px; }
+        .glass-effect .hero-btn { background: linear-gradient(to bottom, #ffffff, #f7f7f7); color: #E65C00; padding: 10px 30px; border-radius: 50px; text-decoration: none; font-weight: 800; font-size: 1rem; display: inline-flex; align-items: center; gap: 10px; transition: transform 0.2s; }
+        
+        @media (max-width: 480px) {
+            .hero-section { padding: 30px 10px 40px 10px; }
+            .glass-effect .store-name { font-size: 2rem; } 
+            .glass-effect { padding: 20px 15px; }
+            .glass-effect .hero-slogan { font-size: 0.95rem; }
+        }
+
+        /* --- 3. قسم الأقسام --- */
+        .main-categories-section {
+            background: linear-gradient(135deg, #F09819 0%, #FF512F 100%);
+            padding: 40px 15px; text-align: center;
+            z-index: 1;
+        }
+        .categories-container-inner { max-width: 1200px; margin: 0 auto; }
+        .main-categories-section h2 { color: #ffffff; margin-bottom: 30px; font-size: 1.8rem; font-weight: 800; }
+        .categories-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 0 5px; }
+        @media(min-width: 768px) { .categories-grid { grid-template-columns: repeat(4, 1fr); gap: 25px; } }
+
+        .category-item {
+            background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 15px;
+            padding: 20px 10px; text-decoration: none; color: white; transition: all 0.3s ease;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+        }
+        .category-item:hover { background: rgba(255, 255, 255, 0.25); transform: translateY(-3px); }
+        .category-item i { font-size: 2.2rem; color: #fff; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
+        .category-item h3 { font-size: 1.1rem; margin: 0; color: #fff; font-weight: 600; }
+        .view-all-categories-btn { display: inline-block; margin-top: 30px; padding: 12px 30px; background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.5); color: white; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 1rem; }
+
+/* --- 5. رحلة التسوق (تم تحديث التفاعلات) --- */
+.creative-steps-section {
+    background: linear-gradient(180deg, #FF512F 0%, #4a2c1d 100%);
+    padding: 60px 20px;
+    position: relative; overflow: hidden;
+}
+
+.creative-title { 
+    text-align: center; color: #fff; font-size: 2rem; 
+    margin-bottom: 50px; font-weight: 900; 
+}
+
+.creative-title span { 
+    color: #F09819; border-bottom: 3px solid #F09819; 
+    display: inline-block; padding-bottom: 5px; 
+}
+
+.creative-grid { 
+    display: grid; grid-template-columns: repeat(1, 1fr); gap: 25px; 
+    max-width: 1200px; margin: 0 auto; 
+}
+
+/* تنسيق الكارت الأساسي مع حركة انسيابية */
+.magic-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 30px 20px; 
+    text-align: center; 
+    position: relative; overflow: hidden; 
+    display: flex; flex-direction: column; align-items: center;
+    /* هذا السطر هو سر الحركة الناعمة */
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* ألوان الحدود السفلية لكل كارت */
+.card-1 { border-bottom: 4px solid #FF512F; } 
+.card-2 { border-bottom: 4px solid #F09819; } 
+.card-3 { border-bottom: 4px solid #e52d27; } 
+.card-4 { border-bottom: 4px solid #fff; }
+
+/* التفاعل عند تمرير الماوس (Hover) على الكارت */
+.magic-card:hover {
+    transform: translateY(-15px) scale(1.02); /* يرتفع للأعلى ويكبر قليلاً */
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+}
+
+/* صندوق الأيقونة */
+.magic-icon-box { 
+    width: 70px; height: 70px; border-radius: 50%; 
+    display: flex; align-items: center; justify-content: center; 
+    font-size: 1.8rem; margin-bottom: 20px; 
+    background: rgba(255,255,255,0.05); color: white; 
+    border: 1px solid rgba(255,255,255,0.2);
+    /* إضافة حركة للأيقونة */
+    transition: transform 0.5s ease, background 0.3s;
+}
+
+/* دوران الأيقونة عند تمرير الماوس على الكارت */
+.magic-card:hover .magic-icon-box { 
+    transform: rotateY(360deg) scale(1.1); /* دوران ثلاثي الأبعاد */
+    background: rgba(255, 255, 255, 0.2); 
+}
+
+/* تلوين الأيقونات حسب نوع الكارت */
+.card-1 .magic-icon-box { color: #FF512F; } 
+.card-2 .magic-icon-box { color: #F09819; }
+.card-3 .magic-icon-box { color: #e52d27; } 
+.card-4 .magic-icon-box { color: #fff; }
+
+.magic-card h3 { color: #fff; margin-bottom: 10px; font-size: 1.2rem; font-weight: bold; }
+.magic-card p { color: #ddd; font-size: 0.95rem; line-height: 1.6; margin: 0; }
+
+/* رقم الخطوة في الخلفية */
+.step-number { 
+    position: absolute; top: -5px; left: 10px; 
+    font-size: 4rem; opacity: 0.1; color: white; 
+    font-weight: 900; pointer-events: none; 
+}
+
+/* تنسيقات الشاشات الكبيرة */
+@media (min-width: 1024px) {
+    .creative-grid { grid-template-columns: repeat(4, 1fr); gap: 30px; }
+    .magic-card { padding: 40px 25px; min-height: 320px; justify-content: flex-start; }
+    .magic-icon-box { width: 90px; height: 90px; font-size: 2.5rem; margin-bottom: 30px; }
+    .magic-card h3 { font-size: 1.6rem; margin-bottom: 15px; }
+    .magic-card p { font-size: 1.1rem; line-height: 1.7; }
+    .step-number { font-size: 6rem; opacity: 0.08; top: 0; }
+}
+        /* --- 5. المنتجات المميزة --- */
+        .featured-products-section {
+            background: linear-gradient(180deg, #4a2c1d 0%, #2c1a12 100%);
+            padding: 40px 15px 60px 15px;
+        }
+        .featured-products-section h2 { font-size: 2rem; color: #fff; text-align: center; font-weight: 800; margin-bottom: 40px; text-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        #featured-products-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; max-width: 1200px; margin: 0 auto; }
+        @media(min-width: 768px) { #featured-products-list { grid-template-columns: repeat(3, 1fr); gap: 20px; } }
+        @media(min-width: 1024px) { #featured-products-list { grid-template-columns: repeat(4, 1fr); } }
+
+        #featured-products-list > div, .product-card {
+            background: linear-gradient(145deg, rgba(255, 81, 47, 0.1), rgba(44, 26, 18, 0.4)) !important;
+            backdrop-filter: blur(10px) !important; -webkit-backdrop-filter: blur(10px) !important;
+            border: 1px solid rgba(255, 165, 0, 0.3) !important;
+            border-radius: 15px !important; padding: 15px !important;
+            color: #ffffff !important; box-shadow: 0 4px 15px 0 rgba(0, 0, 0, 0.2) !important;
+            transition: all 0.3s ease !important;
+            display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+        }
+        
+        #featured-products-list img {
+            border-radius: 12px !important; margin-bottom: 10px !important; filter: drop-shadow(0 3px 8px rgba(0,0,0,0.3)) !important;
+            max-width: 100% !important; height: auto !important; max-height: 110px !important; object-fit: contain !important;
+        }
+        #featured-products-list h3, #featured-products-list .product-title {
+            color: #fff !important; font-size: 1rem !important; margin: 6px 0 !important; text-align: center !important; line-height: 1.3 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; width: 100% !important;
+        }
+        #featured-products-list .price, #featured-products-list .product-price {
+            color: #F09819 !important; font-size: 1.1rem !important; font-weight: bold !important; margin-bottom: 10px !important;
+        }
+        #featured-products-list button.add-to-cart-btn, #featured-products-list button[onclick*="addToCart"] {
+            background: linear-gradient(90deg, #FF512F 0%, #F09819 100%) !important;
+            color: white !important; border-radius: 50px !important; padding: 8px 15px !important; font-size: 0.9rem !important;
+            font-weight: bold !important; width: 100% !important; box-shadow: 0 3px 8px rgba(255, 81, 47, 0.3) !important; margin-top: auto !important;
+        }
+        #featured-products-list button.wishlist-btn, #featured-products-list button.fav-btn {
+            background: rgba(255, 255, 255, 0.1) !important; color: white !important;
+            width: 32px !important; height: 32px !important; border-radius: 50% !important; 
+            display: flex !important; align-items: center !important; justify-content: center !important;
+            margin-top: 8px !important; border: 1px solid rgba(255,255,255,0.2) !important; font-size: 0.9rem !important;
+        }
+
+        /* --- 6. التواصل والفوتر --- */
+        .contact-section-dark {
+            background: #2c1a12; padding: 40px 15px 30px 15px; text-align: center; border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        .contact-section-dark h2 { font-size: 1.6rem; margin-bottom: 20px; color: #fff; }
+        .location-info-link-dark {
+            text-decoration: none; color: #F09819; display: inline-flex; align-items: center; gap: 8px;
+            font-size: 1rem; padding: 10px 20px; background: rgba(255,255,255,0.05); border-radius: 50px;
+        }
+        .social-links-dark { display: flex; justify-content: center; gap: 15px; margin-top: 20px; }
+        .social-links-dark a {
+            width: 40px; height: 40px; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; text-decoration: none; border: 1px solid rgba(255,255,255,0.1); font-size: 1.3rem;
+        }
+        .footer { background: #1a0f0a; padding: 15px; text-align: center; color: #888; margin: 0; font-size: 0.85rem; border: none; }
+
     </style>
 </head>
 <body class="mobile-app-view">
 
     <div id="notification" class="notification"></div>
 
-<nav class="navbar" id="mainNavbar">
-    <div class="search-box-container" id="searchBoxContainer">
-        <input type="text" id="navbar-search-input" placeholder="ابحث عن منتج..." />
-        <button id="navbar-search-submit" aria-label="تنفيذ البحث"><i class="fas fa-search"></i></button>
-        <button id="close-search-btn" aria-label="إغلاق البحث"><i class="fas fa-times"></i></button>
-    </div>
+    <nav class="navbar" id="mainNavbar">
+        <div class="search-box-container" id="searchBoxContainer">
+            <input type="text" id="navbar-search-input" placeholder="ابحث عن منتج..." />
+            <button id="navbar-search-submit" aria-label="تنفيذ البحث"><i class="fas fa-search"></i></button>
+            <button id="close-search-btn" aria-label="إغلاق البحث"><i class="fas fa-times"></i></button>
+        </div>
 
-    <div class="header-right">
-        <button class="icon-btn" id="barcodeTriggerBtn" aria-label="مسح الباركود">
-            <i class="fas fa-barcode"></i>
-        </button>
-        <button class="icon-btn search-trigger-btn" id="searchTriggerBtn" aria-label="فتح البحث">
-            <i class="fas fa-search"></i>
-        </button>
-    </div>
+        <div class="header-right">
+            <button class="icon-btn" id="barcodeTriggerBtn" aria-label="مسح الباركود">
+                <i class="fas fa-barcode"></i>
+            </button>
+            <button class="icon-btn search-trigger-btn" id="searchTriggerBtn" aria-label="فتح البحث">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
 
-    <a href="index.html" class="brand-logo-container">
-        <span>سنتر الرضا</span>
-        <img src="logo.png" alt="شعار سنتر الرضا">
-    </a>
-
-    <div class="header-left">
-        <a href="cart.html" class="icon-btn cart-btn">
-            <i class="fas fa-shopping-cart"></i>
-            <span class="badge" id="navCartCount">0</span>
+        <a href="index.html" class="brand-logo-container">
+            <span>سنتر الرضا</span>
+            <img src="logo.png" alt="شعار سنتر الرضا">
         </a>
-    </div>
-    
-    <div class="desktop-nav-links">
-        <a href="index.html"><i class="fas fa-home"></i> الرئيسية</a>
-        <a href="categories.html"><i class="fas fa-th-large"></i> الأقسام</a>
-        <a href="wishlist.html">
-            <div style="position: relative;">
-                <i class="fas fa-heart"></i> المفضلة
-                <span class="desktop-badge" id="desktopWishlistCount" style="display: none;">0</span>
-            </div>
-        </a>
-        <a href="cart.html">
-            <div style="position: relative;">
-                <i class="fas fa-shopping-cart"></i> السلة
-                <span class="desktop-badge" id="desktopCartCount" style="display: none;">0</span>
-            </div>
-        </a>
-        <a href="orders.html"><i class="fas fa-receipt"></i> طلباتي</a>
-        <a href="#" id="desktopSearchTrigger"><i class="fas fa-search"></i> بحث</a>
-    </div>
-</nav>
 
-    <section class="hero-section" style="position: relative; overflow: hidden;">
-        <img src="jogohero.jpg" alt="سنتر الرضا" fetchpriority="high" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0;">
+        <div class="header-left">
+            <a href="cart.html" class="icon-btn cart-btn">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="badge" id="navCartCount">0</span>
+            </a>
+        </div>
         
-        <div class="hero-overlay" style="z-index: 1;"></div> 
-        <div class="hero-content" style="z-index: 2; position: relative;">
+        <div class="desktop-nav-links">
+            <a href="index.html"><i class="fas fa-home"></i> الرئيسية</a>
+            <a href="categories.html"><i class="fas fa-th-large"></i> الأقسام</a>
+            <a href="wishlist.html">
+                <div style="position: relative;">
+                    <i class="fas fa-heart"></i> المفضلة
+                    <span class="desktop-badge" id="desktopWishlistCount" style="display: none;">0</span>
+                </div>
+            </a>
+            <a href="cart.html">
+                <div style="position: relative;">
+                    <i class="fas fa-shopping-cart"></i> السلة
+                    <span class="desktop-badge" id="desktopCartCount" style="display: none;">0</span>
+                </div>
+            </a>
+            <a href="orders.html"><i class="fas fa-receipt"></i> طلباتي</a>
+            <a href="#" id="desktopSearchTrigger"><i class="fas fa-search"></i> بحث</a>
+        </div>
+    </nav>
+
+    <section class="hero-section">
+        <div class="hero-content glass-effect">
             <p class="welcome-text">مرحباً بك في</p>
-            <h1 class="hero-title">
-                <span class="store-name">سنتر الرضا</span>
-            </h1>
-            <p class="hero-slogan">
-                وجهتك الأولى للمنتجات عالية الجودة، <br> من البهارات النادرة إلى الأدوات المنزلية العصرية.
-            </p>
+            <h1 class="hero-title"><span class="store-name">سنتر الرضا</span></h1>
+            <p class="hero-slogan">وجهتك الأولى للمنتجات عالية الجودة، <br> من البهارات النادرة إلى الأدوات المنزلية العصرية.</p>
             <a href="categories.html" class="hero-btn">اكتشف مجموعتنا الآن <i class="fas fa-arrow-left"></i></a>
         </div>
     </section>
 
-    <div class="main-container">
-        <section class="main-categories-section">
+    <section class="main-categories-section">
+        <div style="position: absolute; top: -50px; left: -50px; width: 200px; height: 200px; background: rgba(255,255,255,0.05); border-radius: 50%; pointer-events: none;"></div>
+        <div style="position: absolute; bottom: -30px; right: -30px; width: 150px; height: 150px; background: rgba(255,255,255,0.05); border-radius: 50%; pointer-events: none;"></div>
+
+        <div class="categories-container-inner">
             <h2>استكشف أقسامنا الرئيسية</h2>
             <div class="categories-grid">
-                <a href="category-products.html?category=spices" class="category-item">
-                    <i class="fas fa-pepper-hot"></i> <h3>البهارات</h3>
-                </a>
-                <a href="category-products.html?category=groceries" class="category-item">
-                    <i class="fas fa-shopping-basket"></i> <h3>مواد غذائية</h3>
-                </a>
-                <a href="category-products.html?category=cleaning_supplies" class="category-item">
-                    <i class="fas fa-broom"></i> <h3>مواد التنظيف</h3>
-                </a>
-                <a href="category-products.html?category=personal_care" class="category-item">
-                    <i class="fas fa-pump-soap"></i> <h3>عناية شخصية</h3>
-                </a>
-                <a href="category-products.html?category=sweets" class="category-item">
-                    <i class="fas fa-ice-cream"></i> <h3>حلويات</h3>
-                </a>
-                <a href="category-products.html?category=home_tools" class="category-item">
-                    <i class="fas fa-screwdriver-wrench"></i> <h3>أدوات منزلية</h3>
-                </a>
-                <a href="category-products.html?category=nuts" class="category-item">
-                    <i class="fas fa-seedling"></i> <h3>المكسرات</h3>
-                </a>
-                <a href="category-products.html?category=body_care_perfumes" class="category-item">
-                    <i class="fas fa-spray-can"></i> <h3>عطور وعناية</h3>
-                </a>
+                <a href="category-products.html?category=spices" class="category-item"><i class="fas fa-pepper-hot"></i> <h3>البهارات</h3></a>
+                <a href="category-products.html?category=groceries" class="category-item"><i class="fas fa-shopping-basket"></i> <h3>مواد غذائية</h3></a>
+                <a href="category-products.html?category=cleaning_supplies" class="category-item"><i class="fas fa-broom"></i> <h3>مواد التنظيف</h3></a>
+                <a href="category-products.html?category=personal_care" class="category-item"><i class="fas fa-pump-soap"></i> <h3>عناية شخصية</h3></a>
+                <a href="category-products.html?category=sweets" class="category-item"><i class="fas fa-ice-cream"></i> <h3>حلويات</h3></a>
+                <a href="category-products.html?category=home_tools" class="category-item"><i class="fas fa-screwdriver-wrench"></i> <h3>أدوات منزلية</h3></a>
+                <a href="category-products.html?category=nuts" class="category-item"><i class="fas fa-seedling"></i> <h3>المكسرات</h3></a>
+                <a href="category-products.html?category=body_care_perfumes" class="category-item"><i class="fas fa-spray-can"></i> <h3>عطور وعناية</h3></a>
             </div>
-            <a href="categories.html" class="view-all-categories-btn">
-                <i class="fas fa-th-list"></i> عرض جميع الأقسام
+            <a href="categories.html" class="view-all-categories-btn"><i class="fas fa-th-list"></i> عرض جميع الأقسام</a>
+        </div>
+    </section>
+
+    <section class="creative-steps-section">
+        <h2 class="creative-title">رحلة التسوق <span>الذكية</span></h2>
+        <div class="creative-grid">
+            <div class="magic-card card-1"><div class="step-number">1</div><div class="magic-icon-box"><i class="fas fa-mobile-alt"></i></div><h3>اطلب بلمسة</h3><p>تصفح المنتجات واختر بسهولة.</p></div>
+            <div class="magic-card card-2"><div class="step-number">2</div><div class="magic-icon-box"><i class="fas fa-shopping-basket"></i></div><h3>سلة التوفير</h3><p>أضف للسلة واستمتع بخصومات.</p></div>
+            <div class="magic-card card-3"><div class="step-number">3</div><div class="magic-icon-box"><i class="fas fa-shield-alt"></i></div><h3>تأكيد فوري</h3><p>الدفع عند الاستلام بأمان.</p></div>
+            <div class="magic-card card-4"><div class="step-number">4</div><div class="magic-icon-box"><i class="fas fa-rocket"></i></div><h3>وصول سريع</h3><p>توصيل سريع لباب منزلك.</p></div>
+        </div>
+    </section>
+
+    <section class="featured-products-section">
+        <h2>منتجاتنا المميزة</h2>
+        <div class="products-display-area" id="featured-products-list"></div>
+    </section>
+
+    <section class="contact-section-dark">
+        <h2>تواصل معنا</h2>
+        <div class="contact-info-dark">
+            <a href="https://g.co/kgs/vmgaFgq" target="_blank" class="location-info-link-dark">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>العراق، البصرة، قرب سوق ام هاني</span>
             </a>
-        </section>
-
-        <section class="how-it-works-section">
-            <h2>تجربة تسوق فريدة بخطوات بسيطة</h2>
-            <div class="steps-grid">
-                <div class="step-item">
-                    <div class="step-icon"><i class="fas fa-search"></i></div>
-                    <div class="step-content">
-                        <h3>تصفح المنتجات</h3>
-                        <p>استكشف مجموعتنا الواسعة من المنتجات عبر أقسامنا المختلفة والعروض المميزة.</p>
-                    </div>
-                </div>
-                <div class="step-item">
-                    <div class="step-icon"><i class="fas fa-cart-plus"></i></div>
-                    <div class="step-content">
-                        <h3>أضف مفضلاتك إلى السلة</h3>
-                        <p>اختر المنتجات التي تعجبك وأضفها بسهولة إلى سلة مشترياتك الخاصة.</p>
-                    </div>
-                </div>
-                <div class="step-item">
-                    <div class="step-icon"><i class="fas fa-receipt"></i></div>
-                    <div class="step-content">
-                        <h3>أكمل طلبك</h3>
-                        <p>أدخل تفاصيل الشحن ورقم الهاتف الخاص بك، وراجع طلبك لتأكيده.</p>
-                    </div>
-                </div>
-                <div class="step-item">
-                    <div class="step-icon"><i class="fas fa-motorcycle"></i></div>
-                    <div class="step-content">
-                        <h3>استلم طلبك</h3>
-                        <p>سنقوم بتوصيل طلبك المجهز بعناية إلى باب منزلك بأسرع وقت ممكن.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="featured-products-section" class="featured-products-section">
-            <h2>منتجاتنا المميزة</h2>
-            <div class="products-display-area" id="featured-products-list"></div>
-        </section>
-
-        <section id="contact-section" class="contact-section">
-            <h2>تواصل معنا في أي وقت</h2>
-            <div class="contact-info">
-                <a href="https://g.co/kgs/vmgaFgq" target="_blank" class="location-info-link">
-                    <p class="location-info">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>العراق، البصرة، قرب سوق ام هاني , امام مدرسة الهداية ومركز الانتخابات</span>
-                    </p>
-                </a>
-            </div>
-            <div class="social-links">
-                <a href="https://t.me/+zyhjU6ZIIUpiMWMy" target="_blank"><i class="fab fa-telegram"></i></a>
-                <a href="https://www.instagram.com/center_alreda?igsh=Nmd0NDczdThvcjBu" target="_blank"><i class="fab fa-instagram"></i></a>
-                <a href="https://wa.me/9647816780645" target="_blank"><i class="fab fa-whatsapp"></i></a>
-            </div>
-        </section>
-    </div>
+        </div>
+        <div class="social-links-dark">
+            <a href="https://t.me/+zyhjU6ZIIUpiMWMy" target="_blank"><i class="fab fa-telegram"></i></a>
+            <a href="https://www.instagram.com/center_alreda?igsh=Nmd0NDczdThvcjBu" target="_blank"><i class="fab fa-instagram"></i></a>
+            <a href="https://wa.me/9647816780645" target="_blank"><i class="fab fa-whatsapp"></i></a>
+        </div>
+    </section>
 
     <footer class="footer">
         <p>&copy; 2025 سنتر الرضا. جميع الحقوق محفوظة.</p>
     </footer>
 
     <div class="bottom-nav">
-        <a href="index.html" class="nav-item active">
-            <i class="fas fa-home"></i> <span>الرئيسية</span>
-        </a>
-        <a href="categories.html" class="nav-item">
-            <i class="fas fa-th-large"></i> <span>الأقسام</span>
-        </a>
-        <a href="wishlist.html" class="nav-item">
-            <div class="icon-wrapper">
-                <i class="fas fa-heart"></i>
-                <span class="badge-dot" id="navWishlistCount">0</span>
-            </div>
-            <span>المفضلة</span>
-        </a>
-        <a href="orders.html" class="nav-item">
-            <i class="fas fa-receipt"></i> <span>طلباتي</span>
-        </a>
+        <a href="index.html" class="nav-item active"><i class="fas fa-home"></i> <span>الرئيسية</span></a>
+        <a href="categories.html" class="nav-item"><i class="fas fa-th-large"></i> <span>الأقسام</span></a>
+        <a href="wishlist.html" class="nav-item"><div class="icon-wrapper"><i class="fas fa-heart"></i><span class="badge-dot" id="navWishlistCount">0</span></div><span>المفضلة</span></a>
+        <a href="orders.html" class="nav-item"><i class="fas fa-receipt"></i> <span>طلباتي</span></a>
     </div>
 
     <div id="scanner-modal" class="scanner-modal hidden">
         <div class="scanner-content">
             <button id="close-scanner-btn" class="close-scanner"><i class="fas fa-times"></i></button>
-            <h3>ماسح المنتجات الذكي</h3>
+            <h3>ماسح المنتجات</h3>
             <div class="scan-mode-switch">
                 <button class="mode-btn active" data-mode="check">كشف السعر</button>
-                <button class="mode-btn" data-mode="cart">الحاسبة (سلة)</button>
+                <button class="mode-btn" data-mode="cart">سلة</button>
             </div>
             <div id="reader" style="width: 100%; border-radius: 10px; overflow: hidden; min-height: 250px;"></div>
-            <div id="scan-result" class="scan-result">وجه الكاميرا نحو الباركود...</div>
+            <div id="scan-result" class="scan-result">وجه الكاميرا...</div>
             <div id="scanner-footer" class="scanner-footer hidden">
                 <div class="scanner-stats">
                     <span>المواد: <b id="scan-count">0</b></span>
@@ -224,7 +383,7 @@
                 </div>
                 <div class="scanner-action-buttons">
                     <button id="reset-scanned-btn"><i class="fas fa-trash-alt"></i> تفريغ</button>
-                    <button id="print-scanned-btn"><i class="fas fa-print"></i> طباعة القائمة</button>
+                    <button id="print-scanned-btn"><i class="fas fa-print"></i> طباعة</button>
                 </div>
             </div>
         </div>
@@ -233,11 +392,11 @@
     <div id="receipt-modal" class="scanner-modal hidden">
         <div class="scanner-content" style="max-width: 350px;">
             <button onclick="closeReceiptModal()" class="close-scanner"><i class="fas fa-times"></i></button>
-            <h3>معاينة القائمة</h3>
+            <h3>القائمة</h3>
             <div id="receipt-preview-area" style="background: white; padding: 15px; border-radius: 10px; border: 1px dashed #ccc; margin: 15px 0; text-align: right;"></div>
             <div style="display: flex; gap: 10px; flex-direction: column;">
-                <button onclick="downloadReceiptAsImage()" class="action-btn" style="background: #27ae60;"><i class="fas fa-download"></i> حفظ كصورة</button>
-                <button onclick="printReceiptFinal()" class="action-btn" style="background: #333;"><i class="fas fa-print"></i> طباعة ورقية</button>
+                <button onclick="downloadReceiptAsImage()" class="action-btn" style="background: #27ae60;"><i class="fas fa-download"></i> حفظ</button>
+                <button onclick="printReceiptFinal()" class="action-btn" style="background: #333;"><i class="fas fa-print"></i> طباعة</button>
             </div>
         </div>
     </div>
