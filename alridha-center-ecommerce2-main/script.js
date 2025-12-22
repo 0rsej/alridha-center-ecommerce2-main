@@ -2161,7 +2161,7 @@ function downloadOrderPDF(order) {
             });
         }
 
-    // 7. منطق المسح الناجح (المحدث)
+    // 7. منطق المسح الناجح (تنظيف التكرار + ضبط المسافات)
         const onScanSuccessHandler = (decodedText, decodedResult) => {
             if (isScanning) return;
             
@@ -2180,43 +2180,44 @@ function downloadOrderPDF(order) {
                 lastScannedCode = scannedCode;
 
                 if (currentScanMode === 'check') {
-                    // ==========================================
-                    //  تعديل كاشف السعر (تنظيف وتحديث)
-                    // ==========================================
-                    
+                    // تحديث البيانات الأساسية
                     if (overlayImg) overlayImg.src = product.image;
                     if (overlayName) overlayName.textContent = product.name;
                     
-                    // تنسيق السعر
                     if (overlayPrice) {
                         overlayPrice.innerHTML = `${product.price.toLocaleString()} <span class="currency-symbol">د.ع</span>`;
                     }
 
-                    // تنظيف وإضافة علامة "متوفر"
+                    // --- الحل الجذري لإزالة "متوفر" السوداء ---
                     const foundContent = document.querySelector('.found-content');
                     if (foundContent) {
-                        // 1. حذف أي علامة حالة قديمة (خضراء)
-                        const oldStatus = foundContent.querySelectorAll('.stock-status');
-                        oldStatus.forEach(el => el.remove());
+                        // 1. تنظيف ذكي: إخفاء أي عنصر قديم يحتوي على كلمة "متوفر" وليس الزر الجديد
+                        Array.from(foundContent.children).forEach(child => {
+                            // إذا كان العنصر ليس الصورة ولا الاسم ولا السعر ولا زر الإغلاق
+                            if (child.tagName !== 'IMG' && child.tagName !== 'H2' && !child.classList.contains('found-price') && child.id !== 'close-overlay-btn') {
+                                // وإذا كان لا يحتوي على كلاس الحالة الجديد
+                                if (!child.classList.contains('stock-status')) {
+                                    child.style.display = 'none'; // أخفِه فوراً
+                                }
+                            }
+                        });
 
-                        // 2. حذف أي نصوص عشوائية قديمة (السوداء)
-                        // نقوم بحذف أي عنصر P لا يحوي كلاس السعر
-                        const oldTexts = foundContent.querySelectorAll('p:not(.found-price)');
-                        oldTexts.forEach(el => el.remove());
+                        // 2. حذف أي زر حالة أخضر سابق (لمنع تكرار الأخضر أيضاً)
+                        const oldGreenStatus = foundContent.querySelectorAll('.stock-status');
+                        oldGreenStatus.forEach(el => el.remove());
 
-                        // 3. إنشاء العنصر الجديد (الأخضر فقط)
+                        // 3. إنشاء الزر الأخضر الجديد وإضافته
                         const statusDiv = document.createElement('div');
                         statusDiv.className = 'stock-status';
                         statusDiv.innerHTML = '<i class="fas fa-check-circle"></i> متوفر';
                         
-                        // إضافته
                         foundContent.appendChild(statusDiv);
                     }
 
                     if (overlay) overlay.classList.remove('hidden');
 
                 } else {
-                    // (الكود الخاص بالحاسبة كما هو بدون تغيير)
+                    // (كود الحاسبة كما هو بدون تغيير)
                     const isSoldByPrice = ['spices', 'nuts'].includes(product.category);
                     if (typeof scannerCart === 'undefined') scannerCart = [];
                     const exist = scannerCart.find(item => item.product.globalId === product.globalId);

@@ -535,3 +535,42 @@ button:active,
     font-size: 0.9rem; font-weight: 800;
     font-family: 'Tajawal', sans-serif; margin-top: 5px;
 }
+/* =========================================
+   تحديثات نهائية للنافذة المنبثقة (إصلاح المسافات والتكرار)
+   (أضف هذا الكود في نهاية الملف)
+   ========================================= */
+
+/* 1. ضبط المسافات: تقريب الاسم من السعر */
+.found-content h2 {
+    margin-bottom: 0px !important; /* إلغاء المسافة السفلية للاسم */
+    padding-bottom: 2px !important;
+    line-height: 1.2 !important;
+}
+
+.found-price {
+    margin-top: 0px !important;    /* إلغاء المسافة العلوية للسعر */
+    padding-top: 0px !important;
+    margin-bottom: 8px !important; /* مسافة بسيطة تحت السعر */
+}
+
+/* 2. حل مشكلة التكرار: إخفاء النصوص القديمة */
+/* هذا سيخفي أي نص "متوفر" قديم مكتوب داخل وسم p */
+.found-content p {
+    display: none !important;
+}
+
+/* 3. ضمان ظهور زر "متوفر" الأخضر الجديد بشكل صحيح */
+.stock-status {
+    display: inline-flex !important; /* لضمان ظهوره */
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background-color: #e8f5e9 !important;
+    color: #2e7d32 !important;
+    padding: 5px 20px;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 800;
+    font-family: 'Tajawal', sans-serif;
+    margin-top: 5px;
+}
