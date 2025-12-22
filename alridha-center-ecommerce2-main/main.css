@@ -821,3 +821,43 @@
     from { opacity: 0; transform: scale(0.95); }
     to { opacity: 1; transform: scale(1); }
 }
+/* =========================================================
+   حل مشكلة تعليق الأزرار في الموبايل (Sticky Hover Fix)
+   ========================================================= */
+
+/* 1. تطبيق تأثير الارتفاع (Hover) فقط على الأجهزة التي تملك ماوس (كمبيوتر) */
+@media (hover: hover) {
+    .product-item:hover,
+    .product:hover,
+    button:hover,
+    .add-btn:hover,
+    .view-details-btn:hover,
+    .remove-from-wishlist-btn:hover {
+        /* هنا نضع تأثير الارتفاع الأصلي الخاص بك */
+        transform: translateY(-5px); 
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+}
+
+/* 2. في شاشات اللمس (الموبايل): إلغاء التعليق وإرجاع الزر لمكانه فوراً */
+@media (hover: none) {
+    .product-item:hover,
+    .product:hover,
+    button:hover,
+    .add-btn:hover,
+    .view-details-btn:hover,
+    .remove-from-wishlist-btn:hover {
+        transform: none !important; /* إلغاء الارتفاع */
+        box-shadow: none !important; /* إلغاء ظل التحويم */
+        background-color: inherit !important; /* إلغاء تغيير اللون المعلق */
+    }
+}
+
+/* 3. إضافة تأثير "الضغطة" (Active): يعمل لحظة وضع الإصبع ويختفي فور رفعه */
+button:active,
+.add-btn:active,
+.view-details-btn:active,
+.remove-from-wishlist-btn:active {
+    transform: scale(0.96) !important; /* تصغير الزر قليلاً ليعطي شعور الضغط */
+    transition: transform 0.1s;
+}

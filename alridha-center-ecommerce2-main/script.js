@@ -6,7 +6,14 @@ document.addEventListener('DOMContentLoaded', () => {
     let cart = [];
     let scannerCart = []; // سلة الماسح
     let currentCartView = 'app'; // لعرض السلة الحالية
-
+// ==========================================
+// دالة مساعدة: التحقق من صحة رقم الهاتف العراقي
+// ==========================================
+function validatePhone(phone) {
+    // يقبل الأرقام التي تبدأ بـ 07 وتتكون من 11 رقم
+    const regex = /^07[0-9]{9}$/;
+    return regex.test(phone);
+}
     // عناصر التبويبات والواجهة الجديدة
     const tabAppCart = document.getElementById('tab-app-cart');
     const tabScannerCart = document.getElementById('tab-scanner-cart');
@@ -678,12 +685,11 @@ function updateNavbarCartCount() {
         });
     }
 
-    // وظيفة فلترة قائمة المفضلة حسب القسم
+// ============================================================
+    // دالة عرض المفضلة (تم ضبط الأزرار لتكون متساوية 100%)
+    // ============================================================
     function filterWishlistByCategory(category) {
-        if (!wishlistProductsListEl) {
-            console.error('wishlistProductsListEl element not found. Cannot filter wishlist.');
-            return;
-        }
+        if (!wishlistProductsListEl) return;
 
         wishlistProductsListEl.innerHTML = '';
 
@@ -702,14 +708,12 @@ function updateNavbarCartCount() {
         }
 
         if (filteredItems.length === 0) {
-            wishlistProductsListEl.innerHTML = '<p style="text-align: center; color: var(--light-text);">قائمة المفضلة فارغة حالياً أو لا توجد منتجات مفضلة في هذا القسم.</p>';
+            wishlistProductsListEl.innerHTML = '<p style="text-align: center; color: var(--light-text); width: 100%; margin-top: 30px;">قائمة المفضلة فارغة حالياً.</p>';
             return;
         }
 
         const groupedFilteredWishlist = filteredItems.reduce((acc, product) => {
-            if (!acc[product.category]) {
-                acc[product.category] = [];
-            }
+            if (!acc[product.category]) acc[product.category] = [];
             acc[product.category].push(product);
             return acc;
         }, {});
@@ -735,38 +739,42 @@ function updateNavbarCartCount() {
 
             productsInCategory.forEach(p => {
                 const div = document.createElement('div');
-                div.className = 'product-item';
-                const isFav = wishlist.some(item => item.globalId === p.globalId);
+                div.className = 'product'; 
+                
                 const isSoldByPriceWishlist = ['spices', 'nuts'].includes(p.category);
-                const hasVariants = p.variants && p.variants.length > 0; // إضافة هذا السطر
+                const hasVariants = p.variants && p.variants.length > 0;
 
                 div.innerHTML = `
                     <a href="product-details.html?globalId=${p.globalId}" class="product-link" aria-label="عرض تفاصيل المنتج ${p.name}">
-                        <img src="${p.image}" alt="${p.name}" width="100" height="100" loading="lazy" />
-                        <div class="product-text-info">
-                            <h3>(${p.id}) ${p.name}</h3>
-                            <span class="price">السعر: ${p.price} د.ع</span>
+                        <div class="product-info">
+                            <img src="${p.image}" alt="${p.name}" class="product-thumb" loading="lazy" onerror="this.onerror=null; this.src='logo.png';">
+                            <div class="product-text-content">
+                                <strong>(${p.id}) ${p.name}</strong>
+                                <span class="product-price-inline">السعر: ${p.price} د.ع / ${isSoldByPriceWishlist ? 'كيلو' : 'قطعة'}</span>
+                            </div>
                         </div>
                     </a>
+                    
                     <div class="product-actions">
-                        ${hasVariants ? // إضافة هذا الشرط
-                            `<button class="view-details-btn" data-global-id="${p.globalId}" aria-label="اختر أنواع ${p.name}">
+                        ${hasVariants ? 
+                            `<button class="view-details-btn" data-global-id="${p.globalId}">
                                 <i class="fas fa-info-circle"></i> اختر النوع
                             </button>`
                             :
-                            `<button class="add-to-cart-btn" data-global-id="${p.globalId}" aria-label="أضف ${p.name} إلى السلة">
+                            `<button class="add-btn" data-global-id="${p.globalId}">
                                 <i class="fas fa-cart-plus"></i> أضف للسلة
                             </button>`
                         }
-                        <button class="remove-from-wishlist-btn" data-global-id="${p.globalId}" aria-label="إزالة ${p.name} من المفضلة">
+                        
+                        <button class="remove-from-wishlist-btn" data-global-id="${p.globalId}">
                             <i class="fas fa-trash-alt"></i> إزالة
                         </button>
                     </div>
                 `;
                 wishlistProductsListEl.appendChild(div);
                                                         
-                // معالج لزر "أضف للسلة" للمنتجات التي لا تحتوي على متغيرات
-                const addBtn = div.querySelector('.add-to-cart-btn');
+                // تفعيل الأزرار (Events)
+                const addBtn = div.querySelector('.add-btn');
                 if (addBtn) {
                     addBtn.addEventListener('click', (e) => {
                         const globalProductId = e.target.getAttribute('data-global-id');
@@ -775,7 +783,7 @@ function updateNavbarCartCount() {
                         addToCart(globalProductId, isSoldByPriceForAdd ? 1000 : 1, isSoldByPriceForAdd);
                     });
                 }
-                // معالج لزر "اختر النوع" للمنتجات التي تحتوي على متغيرات
+
                 const viewDetailsBtn = div.querySelector('button.view-details-btn');
                 if (viewDetailsBtn) {
                     viewDetailsBtn.addEventListener('click', (e) => {
@@ -794,12 +802,11 @@ function updateNavbarCartCount() {
                 }
             });
         }
-        // بعد تحديث القائمة، طبق الأنماط المتجاوبة
-        if (isWishlistPage && wishlistProductsListEl) {
+        
+        if (isWishlistPage && wishlistProductsListEl && typeof applyWishlistResponsiveStyles === 'function') {
             applyWishlistResponsiveStyles();
         }
     }
-
     // تفويض الأحداث لزر "أضف للسلة" (في صفحات المنتجات)
     if (productsListEl) {
         productsListEl.addEventListener('click', (e) => {
@@ -994,52 +1001,73 @@ function updateCartUI() {
         });
     }
 
-    // زر تأكيد الطلب النهائي
-    if (confirmBtn) {
-        confirmBtn.addEventListener('click', () => {
+// ==========================================
+    // تحديث زر "تأكيد الطلب" (إصلاح الخطأ الذي يوقف سلة الماسح)
+    // ==========================================
+    
+    // 1. تعريف دالة التحقق من الهاتف (لضمان وجودها)
+    function validatePhone(phone) {
+        const regex = /^07[0-9]{9}$/;
+        return regex.test(phone);
+    }
+
+    // 2. معالجة زر التأكيد بأمان تام
+    const currentConfirmBtn = document.getElementById('confirm-btn');
+
+    // الشرط التالي هو الأهم: لن يعمل الكود إلا إذا كان الزر موجوداً في الصفحة
+    if (currentConfirmBtn && currentConfirmBtn.parentNode) {
+        
+        const newConfirmBtn = currentConfirmBtn.cloneNode(true);
+        currentConfirmBtn.parentNode.replaceChild(newConfirmBtn, currentConfirmBtn);
+
+        newConfirmBtn.addEventListener('click', () => {
+            // تحديد السلة النشطة
             const targetCart = (typeof currentCartView !== 'undefined' && currentCartView === 'scanner') ? scannerCart : cart;
             const sourceLabel = (typeof currentCartView !== 'undefined' && currentCartView === 'scanner') ? 'scanner' : 'app';
 
-            const phone = phoneInput.value.trim();
-            const location = locationInput.value.trim();
-            const notes = notesInput.value.trim();
-            const nameInput = document.getElementById('customer-name');
-            const customerNameVal = (nameInput && nameInput.value.trim() !== "") ? nameInput.value.trim() : "زبون";
+            // قراءة الحقول
+            const phoneEl = document.getElementById('phone');
+            const locationEl = document.getElementById('location');
+            const notesEl = document.getElementById('notes');
+            const nameEl = document.getElementById('customer-name');
 
+            const phone = phoneEl ? phoneEl.value.trim() : '';
+            const location = locationEl ? locationEl.value.trim() : '';
+            const notes = notesEl ? notesEl.value.trim() : '';
+            const customerNameVal = (nameEl && nameEl.value.trim() !== "") ? nameEl.value.trim() : "زبون";
+
+            // التحقق من صحة البيانات
             if (targetCart.length === 0) {
-                showNotification('لا يمكنك إرسال طلب فارغ!', 'error');
+                showNotification('السلة فارغة!', 'error');
                 return;
             }
             if (!validatePhone(phone)) {
-                showNotification('يرجى إدخال رقم هاتف صحيح.', 'error');
-                phoneInput.focus();
+                showNotification('يرجى إدخال رقم هاتف صحيح (07XXXXXXXXX).', 'error');
+                if(phoneEl) phoneEl.focus();
                 return;
             }
             if (!location) {
-                showNotification('يرجى إدخال الموقع/العنوان.', 'error');
-                locationInput.focus();
+                showNotification('يرجى إدخال الموقع.', 'error');
+                if(locationEl) locationEl.focus();
                 return;
             }
 
-            confirmBtn.textContent = 'جاري الحفظ...';
-            confirmBtn.disabled = true;
+            // الحفظ
+            newConfirmBtn.textContent = 'جاري الحفظ...';
+            newConfirmBtn.disabled = true;
 
             const now = new Date();
-            const currentDate = now.toLocaleDateString('en-GB');
-            const currentTime = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }).replace('AM', 'ص').replace('PM', 'م');
-
             const order = {
                 orderId: Date.now(),
-                orderSource: sourceLabel, // التحديث: حفظ مصدر الطلب
+                orderSource: sourceLabel,
                 customerName: customerNameVal,
                 phone: phone,
                 location: location,
                 notes: notes,
-                date: currentDate,
-                time: currentTime,
+                date: now.toLocaleDateString('en-GB'),
+                time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }).replace('AM', 'ص').replace('PM', 'م'),
                 items: targetCart.map(item => ({
                     id: item.product.id,
-                    globalId: item.product.globalId,
                     name: item.product.name,
                     price: item.product.price,
                     quantity: item.quantity,
@@ -1057,31 +1085,26 @@ function updateCartUI() {
             orders.unshift(order);
             saveOrders();
 
-            // تفريغ السلة الصحيحة فقط
+            // تفريغ السلة المناسبة
             if (sourceLabel === 'scanner') {
-                scannerCart.length = 0; // تفريغ مصفوفة الماسح
-                if (typeof saveScannerCart === 'function') saveScannerCart();
+                scannerCart.length = 0;
+                saveScannerCart();
             } else {
-                cart.length = 0; // تفريغ مصفوفة التطبيق
+                cart.length = 0;
                 saveCart();
             }
 
             updateCartUI();
-            showNotification('تم تسجيل الطلب بنجاح! سيتم تحويلك لصفحة الطلبات.', 'success');
+            showNotification('تم الطلب بنجاح!', 'success');
             
             setTimeout(() => {
-                phoneInput.value = '';
-                locationInput.value = '';
-                notesInput.value = '';
-                if(nameInput) nameInput.value = '';
-                if (checkoutSection) checkoutSection.classList.add('hidden');
-                confirmBtn.textContent = 'تأكيد الطلب';
-                confirmBtn.disabled = false;
+                if(checkoutSection) checkoutSection.classList.add('hidden');
+                newConfirmBtn.textContent = 'تأكيد الطلب';
+                newConfirmBtn.disabled = false;
                 window.location.href = 'orders.html';
-            }, 2000);
+            }, 1500);
         });
     }
-
     // زر تفريغ السلة
     if (clearCartBtn) {
         clearCartBtn.addEventListener('click', () => {
@@ -1097,6 +1120,46 @@ function updateCartUI() {
                 showNotification('تم تفريغ السلة.', 'error');
             }
         });
+    }
+    // ==========================================
+    // دالة البحث المفقودة (أضف هذا الكود لإصلاح الخطأ)
+    // ==========================================
+    function handleSearch() {
+        // محاولة العثور على حقل البحث (سواء في الناف بار أو الصفحة الرئيسية)
+        const input = document.getElementById('navbar-search-input') || document.getElementById('search-input');
+        
+        // إذا لم نجد الحقل، نخرج من الدالة
+        if (!input) return;
+
+        const query = input.value.trim().toLowerCase();
+        
+        // إذا كان حقل البحث فارغاً
+        if (!query) {
+            // نعيد عرض المنتجات حسب القسم الحالي
+            if (typeof currentCategory !== 'undefined' && currentCategory && currentCategory !== 'all') {
+                const defaultProducts = products.filter(p => p.category === currentCategory);
+                if (typeof displayProducts === 'function') displayProducts(defaultProducts);
+                if (categoryTitleEl) categoryTitleEl.textContent = categoryNames[currentCategory] || 'المنتجات';
+            } else {
+                // أو نعرض كل المنتجات
+                if (typeof displayProducts === 'function') displayProducts(products);
+                if (categoryTitleEl) categoryTitleEl.textContent = 'جميع المنتجات';
+            }
+            return;
+        }
+
+        // تصفية المنتجات
+        const filtered = products.filter(p => 
+            p.name.toLowerCase().includes(query) || 
+            (p.barcode && p.barcode.includes(query)) ||
+            (p.id && p.id.toString().includes(query))
+        );
+
+        // عرض النتائج
+        if (typeof displayProducts === 'function') displayProducts(filtered);
+        
+        // تحديث العنوان
+        if (categoryTitleEl) categoryTitleEl.textContent = `نتائج البحث عن: "${query}"`;
     }
     if (searchBtn) {
         searchBtn.addEventListener('click', handleSearch);
@@ -1408,7 +1471,84 @@ function updateCartUI() {
             console.log('✅ تم تحديث صور وبيانات السلة.'); 
         }
     }
+// ============================================================
+    // دالة عرض المنتجات (تم إصلاح مشكلة الثقل والتعليق)
+    // ============================================================
+    function displayProducts(productsToShow) {
+        if (!productsListEl) return;
 
+        productsListEl.innerHTML = '';
+        
+        let filteredProducts = productsToShow;
+
+        if (filteredProducts.length === 0) {
+            productsListEl.innerHTML = '<p style="text-align: center; color: var(--light-text);">عفواً، لم يتم العثور على منتجات في هذا القسم أو تطابق بحثك.</p>';
+            return;
+        }
+
+        filteredProducts.forEach(p => {
+            const div = document.createElement('div');
+            div.className = 'product';
+            
+            const isFav = wishlist.some(item => item.globalId === p.globalId);
+            const isSoldByPriceCurrent = ['spices', 'nuts'].includes(p.category);
+            const hasVariants = p.variants && p.variants.length > 0;
+
+            div.innerHTML = `
+                <a href="product-details.html?globalId=${p.globalId}" class="product-link" aria-label="عرض تفاصيل المنتج ${p.name}">
+                    <div class="product-info">
+                        <img src="${p.image}" alt="${p.name}" class="product-thumb" loading="lazy" onerror="this.onerror=null; this.src='logo.png';"> 
+                        <div class="product-text-content">
+                            <strong>(${p.id}) ${p.name}</strong>
+                            <span class="product-price-inline">السعر: ${p.price} د.ع / ${isSoldByPriceCurrent ? 'كيلو' : 'قطعة'}</span>
+                        </div>
+                    </div>
+                </a>
+                <div class="product-actions">
+                    ${hasVariants ? 
+                        `<button class="view-details-btn" data-global-id="${p.globalId}" aria-label="اختر أنواع ${p.name}">
+                            <i class="fas fa-info-circle"></i> اختر النوع
+                        </button>`
+                        :
+                        `<button class="add-btn" data-global-id="${p.globalId}" aria-label="أضف ${p.name} إلى السلة">
+                            <i class="fas fa-cart-plus"></i> أضف للسلة
+                        </button>`
+                    }
+                    <button class="add-to-wishlist-btn ${isFav ? 'active' : ''}" data-global-id="${p.globalId}" aria-label="${isFav ? 'إزالة من المفضلة' : 'أضف إلى المفضلة'}">
+                        <i class="${isFav ? 'fas' : 'far'} fa-heart"></i>
+                    </button>
+                </div>
+            `;
+            productsListEl.appendChild(div);
+        });
+
+        // --- إعادة تفعيل الأزرار ---
+        productsListEl.querySelectorAll('.add-to-wishlist-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const globalProductId = e.currentTarget.getAttribute('data-global-id');
+                if(typeof toggleWishlist === 'function') toggleWishlist(globalProductId, e.currentTarget);
+            });
+        });
+        
+        productsListEl.querySelectorAll('button.add-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const globalProductId = e.currentTarget.getAttribute('data-global-id');
+                const product = products.find(p => p.globalId === globalProductId);
+                const isSoldByPriceCurrent = ['spices', 'nuts'].includes(product.category);
+                if(typeof addToCart === 'function') addToCart(globalProductId, isSoldByPriceCurrent ? 1000 : 1, isSoldByPriceCurrent);
+            });
+        });
+
+        productsListEl.querySelectorAll('button.view-details-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const globalProductId = e.currentTarget.getAttribute('data-global-id');
+                window.location.href = `product-details.html?globalId=${globalProductId}`;
+            });
+        });
+    }
+    // ============================================================
+    // هنا تبدأ دالة initializeApp الموجودة عندك أصلاً...
+    // ============================================================
 // ==========================================
     // تهيئة التطبيق (النسخة النهائية المصلحة)
     // ==========================================
@@ -1712,99 +1852,79 @@ function downloadOrderPDF(order) {
     printWindow.print();
 }
 
-// 4. تحديث حدث زر "تأكيد الطلب" (تم الإصلاح لمنع التكرار ورسالة الخطأ)
-if (confirmBtn) {
-    // هذه الخطوة مهمة جداً: نستنسخ الزر لإزالة أي أحداث سابقة عالقة به
-    // هذا يحل مشكلة ظهور رسالة "لا يمكن إرسال طلب فارغ" بعد الإرسال الناجح
-    const newConfirmBtn = confirmBtn.cloneNode(true);
-    confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+// ============================================================
+    // 1. إصلاح زر تأكيد الطلب (هذا الكود يمنع الخطأ في باقي الصفحات)
+    // ============================================================
+    const checkoutConfirmBtn = document.getElementById('confirm-btn');
 
-    newConfirmBtn.addEventListener('click', () => {
-        // قراءة البيانات
-        const phone = document.getElementById('phone').value.trim();
-        const location = document.getElementById('location').value.trim();
-        const notes = document.getElementById('notes').value.trim();
-        const nameInput = document.getElementById('customer-name');
-        const customerNameVal = (nameInput && nameInput.value.trim() !== "") ? nameInput.value.trim() : "زبون";
-
-        // التحقق من السلة قبل أي شيء
-        if (cart.length === 0) {
-            showNotification('لا يمكنك إرسال طلب فارغ!', 'error');
-            return;
-        }
-        if (!validatePhone(phone)) {
-            showNotification('يرجى إدخال رقم هاتف صحيح.', 'error');
-            document.getElementById('phone').focus();
-            return;
-        }
-        if (!location) {
-            showNotification('يرجى إدخال الموقع/العنوان.', 'error');
-            document.getElementById('location').focus();
-            return;
-        }
-
-        newConfirmBtn.textContent = 'جاري الإرسال...';
-        newConfirmBtn.disabled = true;
-
-        const now = new Date();
-        const currentDate = now.toLocaleDateString('en-GB'); 
-        const currentTime = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }).replace('AM', 'ص').replace('PM', 'م');
-
-        const order = {
-            orderId: Date.now(),
-            customerName: customerNameVal,
-            phone: phone,
-            location: location,
-            notes: notes,
-            date: currentDate,
-            time: currentTime,
-            items: cart.map(item => ({
-                id: item.product.id,
-                globalId: item.product.globalId,
-                name: item.product.name,
-                price: item.product.price,
-                quantity: item.quantity,
-                isSoldByPrice: item.isSoldByPrice || false,
-                variant: item.variant 
-            })),
-            total: cart.reduce((sum, item) => {
-                let itemTotal = 0;
-                if (item.isSoldByPrice) {
-                    itemTotal = item.quantity;
-                } else {
-                    let price = item.product.price;
-                    if(item.variant && item.variant.price_modifier) price += item.variant.price_modifier;
-                    itemTotal = price * item.quantity;
-                }
-                return sum + itemTotal;
-            }, 0),
-            status: 'قيد المراجعة'
-        };
-
-        orders.unshift(order);
-        saveOrders();
+    // الشرط: ننفذ الكود فقط إذا وجدنا الزر في الصفحة الحالية
+    if (checkoutConfirmBtn && checkoutConfirmBtn.parentNode) {
         
-        // تفريغ السلة وتحديث الواجهة
-        cart = [];
-        saveCart();
-        updateCartUI();
-        
-        showNotification('تم تسجيل الطلب بنجاح! سيتم تحويلك لصفحة الطلبات.', 'success');
-        
-        setTimeout(() => {
-            document.getElementById('phone').value = '';
-            document.getElementById('location').value = '';
-            document.getElementById('notes').value = '';
-            if(nameInput) nameInput.value = ''; 
-            
-            if (checkoutSection) checkoutSection.classList.add('hidden');
-            newConfirmBtn.textContent = 'تأكيد الطلب';
-            newConfirmBtn.disabled = false;
-            window.location.href = 'orders.html';
-        }, 2000);
-    });
-}
+        // استنساخ الزر لتنظيف الأحداث القديمة
+        const newConfirmBtn = checkoutConfirmBtn.cloneNode(true);
+        checkoutConfirmBtn.parentNode.replaceChild(newConfirmBtn, checkoutConfirmBtn);
 
+        newConfirmBtn.addEventListener('click', () => {
+            // معرفة السلة الحالية (ماسح أم تطبيق)
+            const isScanner = (typeof currentCartView !== 'undefined' && currentCartView === 'scanner');
+            const targetCart = isScanner ? scannerCart : cart;
+            const sourceLabel = isScanner ? 'scanner' : 'app';
+
+            // قراءة البيانات
+            const phoneVal = document.getElementById('phone').value.trim();
+            const locVal = document.getElementById('location').value.trim();
+            const notesVal = document.getElementById('notes').value.trim();
+            const nameEl = document.getElementById('customer-name');
+            const nameVal = (nameEl && nameEl.value.trim() !== "") ? nameEl.value.trim() : "زبون";
+
+            // التحقق
+            if (!targetCart || targetCart.length === 0) {
+                showNotification('السلة فارغة!', 'error'); return;
+            }
+            if (!phoneVal.startsWith('07') || phoneVal.length < 11) {
+                showNotification('رقم الهاتف غير صحيح.', 'error'); return;
+            }
+            if (!locVal) {
+                showNotification('يرجى كتابة العنوان.', 'error'); return;
+            }
+
+            // الحفظ
+            newConfirmBtn.textContent = 'جاري الحفظ...';
+            newConfirmBtn.disabled = true;
+
+            const now = new Date();
+            const order = {
+                orderId: Date.now(),
+                orderSource: sourceLabel,
+                customerName: nameVal,
+                phone: phoneVal,
+                location: locVal,
+                notes: notesVal,
+                date: now.toLocaleDateString('en-GB'),
+                time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }).replace('AM', 'ص').replace('PM', 'م'),
+                items: targetCart,
+                total: document.getElementById('cart-total').textContent, // نأخذ المجموع المعروض مباشرة
+                status: 'قيد المراجعة'
+            };
+
+            orders.unshift(order);
+            saveOrders();
+
+            // تفريغ السلة وتحديث الصفحة
+            if (isScanner) { scannerCart = []; saveScannerCart(); } 
+            else { cart = []; saveCart(); }
+
+            updateCartUI();
+            showNotification('تم إرسال الطلب بنجاح!', 'success');
+
+            setTimeout(() => {
+                document.querySelector('.checkout').classList.add('hidden');
+                newConfirmBtn.textContent = 'تأكيد الطلب';
+                newConfirmBtn.disabled = false;
+                window.location.href = 'orders.html';
+            }, 1500);
+        });
+    }
 // ============================================================
 // نهاية كود إدارة الطلبات المتطور
 // ============================================================
@@ -1864,83 +1984,167 @@ if (confirmBtn) {
         });
     }
 // ==========================================
-    // 1. منطق التبويبات (إصلاح الانتقال من اللوكو)
+    // 1. منطق التبويبات (إصلاح الانتقال واختفاء البيانات)
     // ==========================================
     if (isCartPage && tabAppCart && tabScannerCart) {
         
+        // دالة لتفعيل سلة الماسح
         function activateScannerTab() {
-            currentCartView = 'scanner';
+            currentCartView = 'scanner'; // تحديد السلة الحالية
+            
+            // تحديث الأزرار
             tabScannerCart.classList.add('active');
             tabAppCart.classList.remove('active');
+            
+            // تحديث العناوين
             if(cartViewTitle) cartViewTitle.textContent = "تفاصيل المنتجات (سلة الماسح)";
             if(clearCartBtn) clearCartBtn.textContent = "تفريغ سلة الماسح";
+            
+            // أهم خطوة: التأكد من وجود بيانات وعرضها
+            loadScannerCart(); 
             updateCartUI(); 
         }
 
+        // دالة لتفعيل سلة التطبيق
+        function activateAppTab() {
+            currentCartView = 'app'; // تحديد السلة الحالية
+            
+            tabAppCart.classList.add('active');
+            tabScannerCart.classList.remove('active');
+            
+            if(cartViewTitle) cartViewTitle.textContent = "تفاصيل المنتجات (سلة التطبيق)";
+            if(clearCartBtn) clearCartBtn.textContent = "تفريغ سلة التطبيق";
+            
+            loadCart();
+            updateCartUI();
+        }
+
+        // قراءة الرابط عند الفتح (إذا جاي من زر الماسح في الهيدر)
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('mode') === 'scanner') {
             activateScannerTab();
+        } else {
+            activateAppTab(); // الافتراضي
         }
 
-        tabAppCart.addEventListener('click', () => {
-            currentCartView = 'app';
-            tabAppCart.classList.add('active');
-            tabScannerCart.classList.remove('active');
-            if(cartViewTitle) cartViewTitle.textContent = "تفاصيل المنتجات (سلة التطبيق)";
-            if(clearCartBtn) clearCartBtn.textContent = "تفريغ سلة التطبيق";
-            updateCartUI();
-        });
-
-        tabScannerCart.addEventListener('click', () => {
-            activateScannerTab();
-        });
+        // أحداث الضغط
+        tabAppCart.addEventListener('click', activateAppTab);
+        tabScannerCart.addEventListener('click', activateScannerTab);
     }
-
+ // ============================================================
+    // 2. كود الماسح الضوئي (مع سطر التحديث الناقص)
     // ============================================================
-    // 2. نظام قراءة الباركود (الكاشير الذكي - التصميم الكبير)
-    // ============================================================
-    const barcodeBtn = document.getElementById('barcodeTriggerBtn');
-    const scannerModal = document.getElementById('scanner-modal');
-    const closeScannerBtn = document.getElementById('close-scanner-btn');
-    const scanResultEl = document.getElementById('scan-result');
-    const modeBtns = document.querySelectorAll('.mode-btn');
-
-    let html5QrcodeScanner = null;
-    let currentScanMode = 'check'; 
-    let isScanning = false;
-
-    if (modeBtns) {
-        modeBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                modeBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                currentScanMode = btn.getAttribute('data-mode');
-                if(scanResultEl) scanResultEl.innerHTML = currentScanMode === 'cart' ? 'وضع الحاسبة: الإضافة تلقائية' : 'كاشف السعر: جاهز';
-            });
-        });
-    }
-
-    function onScanSuccess(decodedText) {
+    window.onScanSuccess = function(decodedText) {
         if (isScanning) return;
-        isScanning = true;
         
-        const audio = new Audio('https://www.soundjay.com/buttons/beep-01a.mp3');
-        audio.play().catch(e => {});
-
         const product = products.find(p => p.id == decodedText || p.globalId == decodedText || p.barcode == decodedText);
 
         if (product) {
-            // عرض الصورة الكبيرة
-            if (foundImg) foundImg.src = product.image;
-            if (foundName) foundName.textContent = product.name;
-            if (foundPrice) foundPrice.textContent = product.price;
-
-            if (productOverlay) productOverlay.classList.remove('hidden');
+            const audio = new Audio('https://www.soundjay.com/buttons/beep-01a.mp3');
+            audio.play().catch(e => {});
 
             if (currentScanMode === 'check') {
-                if(scanResultEl) scanResultEl.innerHTML = '✔ تم الكشف عن المنتج';
+                // وضع الكشف (كما هو)
+                isScanning = true;
+                if (foundImg) foundImg.src = product.image;
+                if (foundName) foundName.textContent = product.name;
+                if (foundPrice) foundPrice.textContent = product.price;
+                if (productOverlay) productOverlay.classList.remove('hidden');
+                if (scanResultEl) scanResultEl.innerHTML = '✔ انظر التفاصيل';
+
             } else {
-                // وضع الحاسبة
+                // وضع السلة
+                isScanning = true; 
+                const isSoldByPrice = ['spices', 'nuts'].includes(product.category);
+                
+                // الإضافة للسلة
+                const exist = scannerCart.find(item => item.product.globalId === product.globalId);
+                if (exist) {
+                    exist.quantity += (isSoldByPrice ? 1000 : 1);
+                } else {
+                    scannerCart.push({
+                        product: product,
+                        quantity: (isSoldByPrice ? 1000 : 1),
+                        isSoldByPrice: isSoldByPrice
+                    });
+                }
+                saveScannerCart();
+
+                // 👇👇 هذا هو السطر المهم جداً الذي كان ناقصاً 👇👇
+                // هذا السطر يقوم بتحديث الجدول فوراً لتظهر المنتجات
+                if (typeof updateCartUI === 'function') updateCartUI(); 
+                // 👆👆 ------------------------------------- 👆👆
+
+                if (productOverlay) productOverlay.classList.add('hidden');
+                if (scanResultEl) scanResultEl.innerHTML = `<span style="color:green;">✔ أضيف: ${product.name}</span>`;
+
+                setTimeout(() => { isScanning = false; }, 800); 
+            }
+        } else {
+            isScanning = true;
+            if (scanResultEl) scanResultEl.innerHTML = `<span style="color:red;">❌ غير موجود</span>`;
+            setTimeout(() => { isScanning = false; }, 2000);
+        }
+    };
+
+    // تشغيل الكاميرا
+    if (document.getElementById('reader')) {
+        html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
+        html5QrcodeScanner.render(onScanSuccess);
+    }
+// ==========================================
+    // تفعيل زر إغلاق نافذة المنتج والماسح الضوئي (مصحح)
+    // ==========================================
+
+    // ملاحظة: المتغيرات closeOverlayBtn و productOverlay و scanResultEl معرفة في أعلى الملف
+    // لذلك نستخدمها مباشرة هنا بدون كلمة const لتجنب خطأ Redeclaration
+
+    if (typeof closeOverlayBtn !== 'undefined' && closeOverlayBtn) {
+        closeOverlayBtn.addEventListener('click', () => {
+            // إخفاء النافذة
+            if (typeof productOverlay !== 'undefined' && productOverlay) {
+                productOverlay.classList.add('hidden');
+            }
+            
+            // إعادة تفعيل المسح
+            isScanning = false; 
+            
+            // تحديث النص
+            if(typeof scanResultEl !== 'undefined' && scanResultEl) {
+                scanResultEl.innerHTML = 'جاهز للمسح...';
+            }
+        });
+    }
+
+    // دالة معالجة الباركود
+    window.onScanSuccess = function(decodedText) {
+        if (isScanning) return;
+        
+        // البحث عن المنتج
+        const product = products.find(p => p.id == decodedText || p.globalId == decodedText || p.barcode == decodedText);
+
+        if (product) {
+            const audio = new Audio('https://www.soundjay.com/buttons/beep-01a.mp3');
+            audio.play().catch(e => {});
+
+            if (currentScanMode === 'check') {
+                // --- وضع كاشف السعر ---
+                isScanning = true;
+
+                // تعبئة البيانات
+                if (foundImg) foundImg.src = product.image;
+                if (foundName) foundName.textContent = product.name;
+                if (foundPrice) foundPrice.textContent = product.price;
+
+                // إظهار النافذة
+                if (productOverlay) productOverlay.classList.remove('hidden');
+                if (scanResultEl) scanResultEl.innerHTML = '✔ انظر تفاصيل المنتج';
+
+            } else {
+                // --- وضع سلة الماسح (الحاسبة) ---
+                isScanning = true; 
+
+                // إضافة المنتج لسلة الماسح
                 const isSoldByPrice = ['spices', 'nuts'].includes(product.category);
                 const exist = scannerCart.find(item => item.product.globalId === product.globalId);
                 
@@ -1954,61 +2158,42 @@ if (confirmBtn) {
                     });
                 }
                 saveScannerCart();
-                if(scanResultEl) scanResultEl.innerHTML = '✔ تمت الإضافة للسلة';
-                showNotification(`تمت إضافة "${product.name}" لسلة الماسح!`);
+
+                // إخفاء النافذة
+                if (productOverlay) productOverlay.classList.add('hidden');
+
+                // كتابة النص تحت القارئ
+                if(scanResultEl) {
+                    scanResultEl.innerHTML = `<span style="color: green; font-weight: bold;">✔ تمت إضافة: ${product.name}</span>`;
+                }
+
+                // تحديث الجدول فوراً
+                if (typeof updateCartUI === 'function') updateCartUI(); 
+
+                // السماح بالمسح التالي بسرعة
+                setTimeout(() => { 
+                    isScanning = false; 
+                }, 800); 
             }
         } else {
+            // المنتج غير موجود
+            isScanning = true;
             if(scanResultEl) scanResultEl.innerHTML = `<span style="color:red;">❌ المنتج غير موجود</span>`;
+            setTimeout(() => { isScanning = false; }, 2000);
         }
+    };
 
-        setTimeout(() => { 
-            isScanning = false; 
-            if (productOverlay) productOverlay.classList.add('hidden'); 
-            if(scanResultEl) scanResultEl.innerHTML = currentScanMode === 'check' ? 'كاشف السعر: جاهز...' : 'وضع الحاسبة: جاهز...';
-        }, 2500); 
-    }
-
-    function startScanner() {
-        if (scannerModal) scannerModal.classList.remove('hidden');
-        if (html5QrcodeScanner) return;
-        html5QrcodeScanner = new Html5Qrcode("reader");
-        html5QrcodeScanner.start({ facingMode: "environment" }, { fps: 15, qrbox: 250 }, onScanSuccess)
-        .catch(() => html5QrcodeScanner.start({ facingMode: "user" }, { fps: 15, qrbox: 250 }, onScanSuccess));
-    }
-
-    function stopScanner() {
-        if (scannerModal) scannerModal.classList.add('hidden');
-        if (html5QrcodeScanner) { 
-            html5QrcodeScanner.stop().then(() => { html5QrcodeScanner.clear(); html5QrcodeScanner = null; }); 
+    // تشغيل الكاميرا إذا كان العنصر موجوداً
+    if (document.getElementById('reader')) {
+        // تنظيف أي ماسح سابق
+        if (typeof html5QrcodeScanner !== 'undefined' && html5QrcodeScanner) {
+            try { html5QrcodeScanner.clear(); } catch(e) {}
         }
-    }
-
-    if (barcodeBtn) barcodeBtn.addEventListener('click', startScanner);
-    if (closeScannerBtn) closeScannerBtn.addEventListener('click', stopScanner);
-
-    // تحميل سلة الماسح عند البدء
-    loadScannerCart();
-    // وظيفة التعامل مع البحث عن المنتجات (ضرورية لمنع الخطأ)
-    function handleSearch() {
-        if (!searchInput) return;
-        const searchTerm = searchInput.value.trim().toLowerCase();
         
-        if (!searchTerm) {
-            // إذا كان البحث فارغاً، عرض منتجات القسم الحالي
-            const productsToShow = (currentCategory === 'all' || !currentCategory) 
-                ? products 
-                : products.filter(p => p.category === currentCategory);
-            displayProducts(productsToShow);
-            return;
-        }
-
-        const filtered = products.filter(p => {
-            const matchesName = p.name.toLowerCase().includes(searchTerm);
-            const matchesBarcode = p.barcode && p.barcode.includes(searchTerm);
-            const matchesId = p.id && String(p.id).includes(searchTerm);
-            return matchesName || matchesBarcode || matchesId;
-        });
-        
-        displayProducts(filtered);
+        // تشغيل الماسح الجديد
+        // ملاحظة: html5QrcodeScanner معرف في بداية الملف كـ let، لذا نستخدمه مباشرة
+        html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
+        html5QrcodeScanner.render(onScanSuccess);
     }
+
 });

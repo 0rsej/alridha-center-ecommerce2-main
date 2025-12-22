@@ -431,3 +431,68 @@
         width: 90%;
     }
 }
+/* =========================================================
+   تنسيق أزرار المفضلة (تطابق تام في الحجم والعرض)
+   ========================================================= */
+
+/* 1. الحاوية: إعداد الشبكة المرنة */
+#wishlist-products-list .product-actions {
+    display: flex !important;
+    flex-direction: row !important; /* صف أفقي */
+    justify-content: space-between !important;
+    gap: 10px !important; /* المسافة بين الزرين */
+    width: 100% !important;
+    box-sizing: border-box !important;
+    margin-top: 10px;
+}
+
+/* 2. الأزرار: إجبارها على التساوي */
+#wishlist-products-list .product-actions button {
+    flex-basis: 0 !important; /* تجاهل حجم النص الداخلي */
+    flex-grow: 1 !important;  /* تمدد لتملأ المساحة المتاحة بالتساوي */
+    max-width: 50% !important; /* لضمان عدم طغيان زر على آخر */
+    
+    height: 40px !important; /* ارتفاع موحد */
+    padding: 0 5px !important;
+    margin: 0 !important;
+    
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    
+    font-size: 13px !important; /* تصغير الخط قليلاً ليناسب المساحة */
+    font-weight: bold !important;
+    border-radius: 6px !important;
+    white-space: nowrap !important; /* منع النص من النزول لسطرين */
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+/* 3. تنسيق خاص لكل زر (الألوان فقط) */
+
+/* زر الإضافة (أخضر) */
+#wishlist-products-list .add-btn {
+    background-color: #27ae60 !important;
+    color: #fff !important;
+    border: none !important;
+}
+
+/* زر اختيار النوع (برتقالي) */
+#wishlist-products-list .view-details-btn {
+    background-color: #f39c12 !important;
+    color: #fff !important;
+    border: none !important;
+}
+
+/* زر الإزالة (أبيض بحدود حمراء) */
+#wishlist-products-list .remove-from-wishlist-btn {
+    background-color: #fff !important;
+    border: 1px solid #e74c3c !important;
+    color: #e74c3c !important;
+}
+
+/* تأثير التمرير لزر الإزالة */
+#wishlist-products-list .remove-from-wishlist-btn:hover {
+    background-color: #e74c3c !important;
+    color: #fff !important;
+}

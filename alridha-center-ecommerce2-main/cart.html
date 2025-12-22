@@ -267,14 +267,18 @@
         <div style="position: relative; min-height: 300px;">
             <div id="reader" style="width: 100%; border-radius: 10px; overflow: hidden;"></div>
             
-            <div id="product-found-overlay" class="product-found-overlay hidden">
-                <div class="found-content">
-                    <img id="found-img" src="" alt="Product">
-                    <h2 id="found-name">اسم المنتج</h2>
-                    <div class="found-price" id="found-price">0000</div>
-                    <div class="found-badge"><i class="fas fa-check-circle"></i> تم العثور على المنتج</div>
-                </div>
-            </div>
+<div id="product-found-overlay" class="product-found-overlay hidden">
+    
+    <button id="close-overlay-btn" class="close-scanner" style="top: 10px; right: 10px; position: absolute; z-index: 101; background: rgba(255,0,0,0.1); color: red; border: none;">
+        <i class="fas fa-times"></i>
+    </button>
+    <div class="found-content">
+        <img id="found-img" src="" alt="Product">
+        <h2 id="found-name">اسم المنتج</h2>
+        <div class="found-price" id="found-price">0000</div>
+        <div class="found-badge"><i class="fas fa-check-circle"></i> متوفر</div>
+    </div>
+</div>
         </div>
 
         <div id="scan-result" class="scan-result">وجه الكاميرا نحو الباركود...</div>
