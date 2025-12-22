@@ -2021,192 +2021,101 @@ function downloadOrderPDF(order) {
         tabAppCart.addEventListener('click', activateAppTab);
         tabScannerCart.addEventListener('click', activateScannerTab);
     }
- // ============================================================
-//  نظام الماسح الضوئي (النسخة النهائية النظيفة) 📷
-// ============================================================
+ // متغير لتخزين آخر كود تم مسحه لمنع التكرار
+let lastScannedCode = null;
+let duplicateBlockerTimer = null;
 
-    // المتغيرات
-    let isScanning = false;
-    let currentScanMode = 'check'; 
-    let html5QrCode = null; 
-    let lastScannedCode = null; 
-    let scanLockTimer = null;
+const onScanSuccess = (decodedText, decodedResult) => {
+    // 1. إذا كان النظام مشغولاً حالياً، توقف
+    if (isScanning) return;
+    
+    const scannedCode = decodedText.trim();
 
-    // العناصر (تأكد من وجودها في كل الصفحات، والكود سيعمل)
-    const scannerModal = document.getElementById('scanner-modal'); 
-    const scanResultEl = document.getElementById('scan-result'); 
-    const scanTotalEl = document.getElementById('scan-total'); 
-    const scanCountEl = document.getElementById('scan-count'); 
-    const scannerFooter = document.getElementById('scanner-footer');
-    const closeOverlayBtn = document.getElementById('close-overlay-btn');
+    // 2. منطق منع التكرار القوي:
+    // إذا كان الكود الحالي هو نفسه الكود السابق، تجاهله تماماً
+    if (scannedCode === lastScannedCode) {
+        return; 
+    }
 
-    // 1. أزرار التبديل
-    const modeBtns = document.querySelectorAll('.mode-btn');
-    modeBtns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            modeBtns.forEach(b => b.classList.remove('active'));
-            e.target.classList.add('active');
-            currentScanMode = e.target.getAttribute('data-mode');
+    const product = products.find(p => 
+        p.id == scannedCode || p.globalId == scannedCode || (p.barcode && p.barcode.trim() == scannedCode)
+    );
 
-            // التحكم في ظهور الفوتر الزجاجي
-            if (currentScanMode === 'cart') {
-                if(scannerFooter) scannerFooter.classList.remove('hidden'); 
-                if(scanResultEl) scanResultEl.innerHTML = '🛒 الوضع: حاسبة المشتريات';
-                updateScannerStats();
-            } else {
-                if(scannerFooter) scannerFooter.classList.add('hidden');
-                if(scanResultEl) scanResultEl.innerHTML = '🔍 الوضع: كاشف السعر';
-            }
-        });
-    });
+    if (product) {
+        // تشغيل الصوت مرة واحدة فقط للمنتج الجديد
+        const audio = new Audio('https://www.soundjay.com/buttons/beep-01a.mp3');
+        audio.play().catch(e => {});
 
-    // 2. تحديث الأرقام (للفوتر الزجاجي الجديد)
-    function updateScannerStats() {
-        if (!scannerCart) scannerCart = [];
-        let totalQty = 0;
-        let totalPrice = 0;
+        // تسجيل الكود الحالي كآخر كود لمنع تكراره فوراً
+        lastScannedCode = scannedCode;
 
-        scannerCart.forEach(item => {
-            let itemPrice = item.product.price;
-            if (item.variant && item.variant.price_modifier) itemPrice += item.variant.price_modifier;
+        if (currentScanMode === 'check') {
+            // === وضع كاشف السعر ===
+            isScanning = true; // نوقف المسح حتى يغلق المستخدم النافذة
             
-            if (item.isSoldByPrice) {
-                totalPrice += item.quantity;
-                totalQty += 1; 
-            } else {
-                totalPrice += (itemPrice * item.quantity);
-                totalQty += item.quantity;
-            }
-        });
-
-        if (scanCountEl) scanCountEl.textContent = totalQty;
-        if (scanTotalEl) scanTotalEl.textContent = totalPrice.toLocaleString();
-    }
-
-    // 3. زر إغلاق النافذة المنبثقة (بدون انميشن نهائياً)
-    if (closeOverlayBtn) {
-        closeOverlayBtn.addEventListener('click', (e) => {
-            e.preventDefault(); 
-            e.stopPropagation(); 
+            if (foundImg) foundImg.src = product.image;
+            if (foundName) foundName.textContent = product.name;
+            if (foundPrice) foundPrice.textContent = product.price.toLocaleString();
             
-            // إخفاء فوري
-            if (productOverlay) productOverlay.classList.add('hidden');
-            
-            setTimeout(() => { 
-                isScanning = false; 
-                lastScannedCode = null; 
-            }, 500);
-            
-            if(scanResultEl) scanResultEl.innerHTML = 'جاهز...';
-        });
-    }
+            // إظهار النافذة مباشرة
+            if (productOverlay) productOverlay.classList.remove('hidden');
 
-    // 4. تشغيل الكاميرا (مستطيل صغير)
-    function startScanner() {
-        if (html5QrCode) return;
-
-        html5QrCode = new Html5Qrcode("reader");
-        
-        const config = { 
-            fps: 15, 
-            qrbox: { width: 220, height: 100 }, // مستطيل صغير
-            aspectRatio: 1.0 
-        };
-        
-        html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess)
-        .catch(err => {
-            console.error("Error:", err);
-            if(scanResultEl) scanResultEl.innerHTML = "يرجى تفعيل الكاميرا";
-        });
-    }
-
-    // 5. زر فتح الماسح
-    const scannerTriggerBtn = document.getElementById('barcodeTriggerBtn');
-    if (scannerTriggerBtn && scannerModal) {
-        scannerTriggerBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            scannerModal.classList.remove('hidden');
-            startScanner();
-            updateScannerStats();
-        });
-    }
-
-    // 6. زر إغلاق الماسح
-    const closeScannerBtn = document.getElementById('close-scanner-btn');
-    if (closeScannerBtn) {
-        closeScannerBtn.addEventListener('click', () => {
-            if (scannerModal) scannerModal.classList.add('hidden');
-            if (html5QrCode) {
-                html5QrCode.stop().then(() => {
-                    html5QrCode.clear();
-                    html5QrCode = null;
-                }).catch(err => console.log(err));
-            }
-            isScanning = false;
-            lastScannedCode = null;
-        });
-    }
-
-    // 7. منطق المسح (مع منع التكرار)
-    const onScanSuccess = (decodedText, decodedResult) => {
-        if (isScanning) return;
-        
-        const scannedCode = decodedText.trim();
-        // منع قراءة نفس الكود مرتين متتاليتين بسرعة
-        if (scannedCode === lastScannedCode) return;
-
-        const product = products.find(p => 
-            p.id == scannedCode || p.globalId == scannedCode || (p.barcode && p.barcode.trim() == scannedCode)
-        );
-
-        if (product) {
-            const audio = new Audio('https://www.soundjay.com/buttons/beep-01a.mp3');
-            audio.play().catch(e => {});
-
-            isScanning = true;
-            lastScannedCode = scannedCode;
-
-            if (currentScanMode === 'check') {
-                // كاشف السعر
-                if (foundImg) foundImg.src = product.image;
-                if (foundName) foundName.textContent = product.name;
-                if (foundPrice) foundPrice.textContent = product.price.toLocaleString();
-                if (productOverlay) productOverlay.classList.remove('hidden');
-
-            } else {
-                // الحاسبة (إضافة مرة واحدة فقط)
-                const isSoldByPrice = ['spices', 'nuts'].includes(product.category);
-                
-                const exist = scannerCart.find(item => item.product.globalId === product.globalId);
-                if (exist) {
-                    exist.quantity += (isSoldByPrice ? 1000 : 1);
-                } else {
-                    scannerCart.push({
-                        product: product,
-                        quantity: (isSoldByPrice ? 1000 : 1),
-                        isSoldByPrice: isSoldByPrice
-                    });
-                }
-                
-                saveScannerCart();
-                updateScannerStats(); 
-                
-                if (scanResultEl) {
-                    scanResultEl.innerHTML = `<span style="color:#27ae60; font-weight:bold;">✔ ${product.name}</span>`;
-                }
-
-                // انتظار 2 ثانية قبل السماح بمسح منتج آخر (أو نفس المنتج)
-                clearTimeout(scanLockTimer);
-                scanLockTimer = setTimeout(() => { 
-                    isScanning = false; 
-                    lastScannedCode = null; 
-                    if(scanResultEl) scanResultEl.innerHTML = 'جاهز...'; 
-                }, 2000); 
-            }
         } else {
-            isScanning = true;
-            if (scanResultEl) scanResultEl.innerHTML = `<span style="color:red;">❌ غير معروف</span>`;
-            setTimeout(() => { isScanning = false; }, 1500);
+            // === وضع الحاسبة ===
+            // نضيف المنتج مرة واحدة
+            const isSoldByPrice = ['spices', 'nuts'].includes(product.category);
+            
+            const exist = scannerCart.find(item => item.product.globalId === product.globalId);
+            if (exist) {
+                exist.quantity += (isSoldByPrice ? 1000 : 1);
+            } else {
+                scannerCart.push({
+                    product: product,
+                    quantity: (isSoldByPrice ? 1000 : 1),
+                    isSoldByPrice: isSoldByPrice
+                });
+            }
+            
+            saveScannerCart();
+            updateScannerStats();
+            
+            if (scanResultEl) {
+                scanResultEl.innerHTML = `<span style="color:#27ae60; font-weight:bold;">✔ ${product.name}</span>`;
+            }
+
+            // هنا نمنع التكرار لمدة 3 ثوانٍ
+            // لن يتمكن الماسح من إضافة نفس المنتج مرة أخرى إلا بعد انتهاء المؤقت
+            clearTimeout(duplicateBlockerTimer);
+            duplicateBlockerTimer = setTimeout(() => {
+                lastScannedCode = null; // الآن نسمح بمسحه مرة أخرى إذا أراد المستخدم
+                if(scanResultEl) scanResultEl.innerHTML = 'جاهز...';
+            }, 3000); 
         }
-    };
+    } else {
+        // إذا الكود غير موجود
+        if(scanResultEl) scanResultEl.innerHTML = `<span style="color:red;">❌ غير معروف</span>`;
+        // ننتظر قليلاً قبل السماح بمسح جديد
+        isScanning = true;
+        setTimeout(() => { isScanning = false; }, 1000);
+    }
+};
+
+// تعديل بسيط لزر إغلاق النافذة لتصفير القفل
+if (closeOverlayBtn) {
+    closeOverlayBtn.addEventListener('click', (e) => {
+        e.preventDefault(); 
+        e.stopPropagation(); 
+        
+        if (productOverlay) productOverlay.classList.add('hidden');
+        
+        // عند إغلاق النافذة، نسمح بالمسح فوراً (لكن نمنع نفس المنتج لثانية لتجنب الفتح الخطأ)
+        setTimeout(() => { 
+            isScanning = false; 
+            // لا نصفر lastScannedCode هنا فوراً لمنع النافذة من الفتح مجدداً إذا كانت الكاميرا لا تزال موجهة
+            setTimeout(() => { lastScannedCode = null; }, 2000); 
+        }, 500);
+        
+        if(scanResultEl) scanResultEl.innerHTML = 'جاهز...';
+    });
+}
 });
