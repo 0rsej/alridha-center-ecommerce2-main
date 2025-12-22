@@ -1916,8 +1916,45 @@ if (confirmBtn) {
         });
     }
 // ============================================================
+// ==========================================
+// 1. منطق تفعيل التبويبات (لحل مشكلة الزر المعطل)
+// ==========================================
+if (isCartPage && tabAppCart && tabScannerCart) {
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    // دالة لتفعيل تبويب الماسح وتحديث العنوان
+    function activateScannerTab() {
+        currentCartView = 'scanner';
+        tabScannerCart.classList.add('active');
+        tabAppCart.classList.remove('active');
+        if(cartViewTitle) cartViewTitle.textContent = "تفاصيل المنتجات (سلة الماسح)";
+        if(clearCartBtn) clearCartBtn.textContent = "تفريغ سلة الماسح";
+        updateCartUI(); 
+    }
+
+    // التحقق عند تحميل الصفحة: هل الرابط يحتوي على طلب للماسح؟
+    if (urlParams.get('mode') === 'scanner') {
+        activateScannerTab();
+    }
+
+    // عند الضغط على تبويب "سلة التطبيق"
+    tabAppCart.addEventListener('click', () => {
+        currentCartView = 'app';
+        tabAppCart.classList.add('active');
+        tabScannerCart.classList.remove('active');
+        if(cartViewTitle) cartViewTitle.textContent = "تفاصيل المنتجات (سلة التطبيق)";
+        if(clearCartBtn) clearCartBtn.textContent = "تفريغ سلة التطبيق";
+        updateCartUI();
+    });
+
+    // عند الضغط على تبويب "سلة الماسح"
+    tabScannerCart.addEventListener('click', () => {
+        activateScannerTab();
+    });
+}
+
 // ============================================================
-// نظام قراءة الباركود (الكاشير الذكي - مرتبط بسلة الماسح)
+// 2. نظام قراءة الباركود (المحدث: شاشة عرض كبيرة للمنتج)
 // ============================================================
 
 const barcodeBtn = document.getElementById('barcodeTriggerBtn');
@@ -1926,13 +1963,19 @@ const closeScannerBtn = document.getElementById('close-scanner-btn');
 const scanResultEl = document.getElementById('scan-result');
 const modeBtns = document.querySelectorAll('.mode-btn');
 
-// ملاحظة: المتغير scannerCart ودالة saveScannerCart() تم تعريفهم في بداية الملف (Global)
+// عناصر واجهة العرض الأنيقة (Overlay) التي ستظهر فوق الكاميرا
+const productOverlay = document.getElementById('product-found-overlay');
+const foundImg = document.getElementById('found-img');
+const foundName = document.getElementById('found-name');
+const foundPrice = document.getElementById('found-price');
+
+// ملاحظة: المتغير scannerCart ودالة saveScannerCart() معرفة في بداية الملف
 
 let html5QrcodeScanner = null;
 let currentScanMode = 'check'; 
 let isScanning = false;
 
-// دالة التبديل بين الأوضاع (كشف سعر / حاسبة)
+// دالة التبديل بين الأوضاع
 modeBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         modeBtns.forEach(b => b.classList.remove('active'));
@@ -1947,87 +1990,73 @@ modeBtns.forEach(btn => {
     });
 });
 
-// عند نجاح المسح (Core Logic)
+// عند نجاح المسح (Core Logic Updated)
 function onScanSuccess(decodedText, decodedResult) {
     if (isScanning) return;
     isScanning = true;
     
-    // تشغيل صوت "بيب" خفيف
+    // تشغيل صوت "بيب"
     const audio = new Audio('https://www.soundjay.com/buttons/beep-01a.mp3');
     audio.play().catch(e => {});
 
-    // البحث عن المنتج
+    // البحث عن المنتج في قاعدة البيانات
     const product = products.find(p => p.id == decodedText || p.globalId == decodedText || p.barcode == decodedText);
 
     if (product) {
+        // 1. تعبئة بيانات الواجهة الكبيرة (الصورة، الاسم، السعر)
+        if (foundImg) foundImg.src = product.image;
+        if (foundName) foundName.textContent = product.name;
+        if (foundPrice) foundPrice.textContent = product.price;
+
+        // 2. إظهار الواجهة الكبيرة لتغطي الكاميرا
+        if (productOverlay) productOverlay.classList.remove('hidden');
+
+        // 3. تنفيذ الإجراء حسب الوضع
         if (currentScanMode === 'check') {
-            // --- وضع كشف السعر ---
-            scanResultEl.innerHTML = `
-                <div style="background:#e8f5e9; color:#2e7d32; padding:5px; border-radius:5px; margin-bottom:10px; font-size:0.8rem;">
-                    ✔ تم العثور على المنتج
-                </div>
-                <div style="display:flex; flex-direction: column; align-items:center;">
-                    <img src="${product.image}" style="width:60px; height:60px; object-fit:contain; border:1px solid #eee; border-radius:8px; background:white;">
-                    <h4 style="margin:5px 0; font-size:0.9rem;">${product.name}</h4>
-                    <div style="font-size:1.1rem; font-weight:bold; color:#d35400;">${product.price} د.ع</div>
-                </div>
-            `;
+            scanResultEl.innerHTML = '✔ تم الكشف عن المنتج';
         } else {
-            // --- وضع الحاسبة (الإضافة للسلة الجديدة) ---
+            // --- وضع الحاسبة (سلة الماسح) ---
             const isSoldByPrice = ['spices', 'nuts'].includes(product.category);
             
-            // 1. التحقق هل المنتج موجود مسبقاً في سلة الماسح لزيادة الكمية
+            // إضافة للسلة أو زيادة الكمية
             const existingItem = scannerCart.find(item => item.product.globalId === product.globalId);
-            
             if (existingItem) {
-                // زيادة الكمية (أو القيمة إذا كان يباع بالسعر)
                 existingItem.quantity += (isSoldByPrice ? 1000 : 1);
             } else {
-                // إضافة منتج جديد
                 scannerCart.push({
                     product: product,
                     quantity: (isSoldByPrice ? 1000 : 1),
                     isSoldByPrice: isSoldByPrice
                 });
             }
+            saveScannerCart(); // حفظ السلة
 
-            // 2. حفظ السلة فوراً
-            if (typeof saveScannerCart === 'function') {
-                saveScannerCart();
-            }
-
-            // 3. عرض رسالة نجاح
-            scanResultEl.innerHTML = `
-                <div style="color:#2980b9; font-weight:bold; font-size:0.95rem;">
-                    ✅ تمت الإضافة لسلة الكاشير
-                    <br>
-                    <span style="color:#333; font-size:0.85rem;">${product.name}</span>
-                </div>
-            `;
-            
-            // إظهار إشعار صغير
+            // رسالة النجاح والإشعار
+            scanResultEl.innerHTML = '✔ تمت الإضافة للسلة';
             if (typeof showNotification === 'function') {
-                showNotification(`تم إضافة "${product.name}" لسلة الماسح`);
+                showNotification(`تمت إضافة "${product.name}" إلى سلة الماسح!`, 'success');
             }
         }
     } else {
-        scanResultEl.innerHTML = `<span style="color:red;">❌ منتج غير مسجل</span>`;
+        scanResultEl.innerHTML = `<span style="color:red;">❌ المنتج غير موجود</span>`;
     }
 
-    // إعادة تفعيل المسح بعد ثانية ونصف
+    // 4. الانتظار 2.5 ثانية لرؤية المنتج ثم العودة للمسح
     setTimeout(() => { 
         isScanning = false; 
+        if (productOverlay) productOverlay.classList.add('hidden'); // إخفاء الواجهة الكبيرة
+        
+        // استعادة النص التوجيهي
         if (scanResultEl.innerText.includes('تم') || scanResultEl.innerText.includes('غير')) {
-            scanResultEl.innerHTML = currentScanMode === 'check' ? 'كاشف السعر: جاهز...' : 'جاري المسح للإضافة...';
+            scanResultEl.innerHTML = currentScanMode === 'check' ? 'كاشف السعر: جاهز...' : 'وضع الحاسبة: جاهز...';
         }
-    }, 1500);
+    }, 2500); 
 }
 
 // تشغيل الماسح
 function startScanner() {
     if (scannerModal) scannerModal.classList.remove('hidden');
     
-    // إعداد وضع العرض الافتراضي
     if (currentScanMode === 'cart') { 
         scanResultEl.innerHTML = 'وضع الحاسبة: امسح للإضافة';
     } else {
@@ -2037,18 +2066,15 @@ function startScanner() {
     if (html5QrcodeScanner) return;
 
     html5QrcodeScanner = new Html5Qrcode("reader");
-    
     const config = { fps: 15, qrbox: { width: 250, height: 150 }, aspectRatio: 1.0 };
     
-    // محاولة تشغيل الكاميرا الخلفية أولاً
     html5QrcodeScanner.start({ facingMode: "environment" }, config, onScanSuccess)
     .catch(err => {
-        console.warn("فشل تشغيل الكاميرا الخلفية، جاري تجربة الأمامية...", err);
+        console.warn("فشل الخلفية، تجربة الأمامية...", err);
         return html5QrcodeScanner.start({ facingMode: "user" }, config, onScanSuccess);
     })
     .catch(finalErr => {
-        scanResultEl.innerHTML = `<span style="color:red; font-size:12px;">❌ الكاميرا لا تعمل أو لا توجد صلاحية</span>`;
-        // alert("يرجى السماح باستخدام الكاميرا.");
+        scanResultEl.innerHTML = `<span style="color:red; font-size:12px;">❌ الكاميرا لا تعمل</span>`;
     });
 }
 
@@ -2059,7 +2085,7 @@ function stopScanner() {
         html5QrcodeScanner.stop().then(() => { 
             html5QrcodeScanner.clear(); 
             html5QrcodeScanner = null; 
-        }).catch(e => console.log("خطأ في إيقاف الكاميرا:", e)); 
+        }).catch(e => console.log(e)); 
     }
 }
 

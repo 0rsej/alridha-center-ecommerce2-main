@@ -761,3 +761,63 @@
     margin-top: 5px;
     border: 1px solid #b3e5fc;
 }
+/* تنسيق طبقة المنتج التي تغطي الكاميرا */
+.product-found-overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: white;
+    border-radius: 15px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.product-found-overlay.hidden {
+    display: none;
+}
+
+.found-content img {
+    width: 150px;
+    height: 150px;
+    object-fit: contain;
+    margin-bottom: 15px;
+    filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));
+}
+
+.found-content h2 {
+    font-size: 1.4rem;
+    color: #2c3e50;
+    margin: 0 0 10px 0;
+}
+
+.found-price {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #e65100; /* برتقالي */
+    margin-bottom: 15px;
+}
+
+.found-price::after {
+    content: ' د.ع';
+    font-size: 1rem;
+    font-weight: normal;
+    color: #777;
+}
+
+.found-badge {
+    background: #e8f5e9;
+    color: #2ecc71;
+    padding: 8px 20px;
+    border-radius: 50px;
+    font-weight: bold;
+    display: inline-block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}

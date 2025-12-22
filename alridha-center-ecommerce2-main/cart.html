@@ -27,7 +27,7 @@
                 align-items: center; justify-content: center; border: 1px solid rgba(0,0,0,0.05);
             }
             .logo-btn-mobile img {
-                width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
+                width: 150%; height: 75%; object-fit: cover; border-radius: 50%;
             }
             .header-left { display: flex; align-items: center; gap: 8px; z-index: 20; }
             .header-right { z-index: 20; }
@@ -54,6 +54,50 @@
         
         /* تنسيق العنوان المتغير */
         #cart-view-title { font-size: 1.1rem; margin-bottom: 15px; color: #2c3e50; }
+
+        /* --- تنسيقات طبقة عرض المنتج الكبير (Product Overlay) --- */
+        .product-found-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: white;
+            border-radius: 15px;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .product-found-overlay.hidden { display: none; }
+
+        .found-content img {
+            width: 150px; height: 150px; object-fit: contain; margin-bottom: 15px;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));
+        }
+
+        .found-content h2 {
+            font-size: 1.4rem; color: #2c3e50; margin: 0 0 10px 0;
+        }
+
+        .found-price {
+            font-size: 2rem; font-weight: 800; color: #e65100; margin-bottom: 15px;
+        }
+
+        .found-price::after {
+            content: ' د.ع'; font-size: 1rem; font-weight: normal; color: #777;
+        }
+
+        .found-badge {
+            background: #e8f5e9; color: #2ecc71; padding: 8px 20px;
+            border-radius: 50px; font-weight: bold; display: inline-block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
     </style>
 </head>
 <body class="mobile-app-view">
@@ -81,7 +125,7 @@
         <img src="logo.png" alt="شعار سنتر الرضا">
     </a>
 
-<div class="header-left">
+    <div class="header-left">
         <a href="cart.html?mode=scanner" class="icon-btn logo-btn-mobile" aria-label="سلة الماسح">
             <img src="logo.png" alt="سلة الماسح">
         </a>
@@ -123,7 +167,7 @@
                 <i class="fas fa-shopping-cart"></i> سلة التطبيق
             </button>
             <button class="cart-tab-btn" id="tab-scanner-cart">
-                <i class="fas fa-barcode"></i> سلة الماسح (الكاشير)
+                <i class="fas fa-barcode"></i> سلة الماسح
             </button>
         </div>
 
@@ -214,12 +258,25 @@
 <div id="scanner-modal" class="scanner-modal hidden">
     <div class="scanner-content">
         <button id="close-scanner-btn" class="close-scanner"><i class="fas fa-times"></i></button>
-        <h3>ماسح المنتجات الذكي</h3>
+        <h3>ماسح المنتجات</h3>
         <div class="scan-mode-switch">
             <button class="mode-btn active" data-mode="check">كشف السعر</button>
             <button class="mode-btn" data-mode="cart">الحاسبة (سلة)</button>
         </div>
-        <div id="reader" style="width: 100%; border-radius: 10px; overflow: hidden; min-height: 250px;"></div>
+        
+        <div style="position: relative; min-height: 300px;">
+            <div id="reader" style="width: 100%; border-radius: 10px; overflow: hidden;"></div>
+            
+            <div id="product-found-overlay" class="product-found-overlay hidden">
+                <div class="found-content">
+                    <img id="found-img" src="" alt="Product">
+                    <h2 id="found-name">اسم المنتج</h2>
+                    <div class="found-price" id="found-price">0000</div>
+                    <div class="found-badge"><i class="fas fa-check-circle"></i> تم العثور على المنتج</div>
+                </div>
+            </div>
+        </div>
+
         <div id="scan-result" class="scan-result">وجه الكاميرا نحو الباركود...</div>
         <div id="scanner-footer" class="scanner-footer hidden"></div>
     </div>
