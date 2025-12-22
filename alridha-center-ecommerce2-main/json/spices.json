@@ -1,87 +1,87 @@
 [
-    { "id": 1, "globalId": "spices_1", "name": "كزبر", "price": 10000, "desc": "بهار الكزبر الطازج", "image": "image/كزبر.webp", "category": "spices" },
-    { "id": 2, "globalId": "spices_2", "name": "ورق غار", "price": 10000, "desc": "ورق غار طبيعي وعطري", "image": "image/ورق-غار.webp", "category": "spices" },
-    { "id": 3, "globalId": "spices_3", "name": "بهارات تكة دجاج", "price": 20000, "desc": "أجود بهارات التكة لطبق شهي", "image": "image/‏‏بهارات-تكة-دجاج.webp", "category": "spices" },
-    { "id": 4, "globalId": "spices_4", "name": "زعتر", "price": 12000, "desc": "زعتر بلدي عالي الجودة", "image": "image/زعتر.webp", "category": "spices" },
-    { "id": 5, "globalId": "spices_5", "name": "هيل", "price": 50000, "desc": "هيل فاخر", "image": "image/هيل.webp", "category": "spices",
+    { "id": 1, "globalId": "spices_1", "name": "كزبر", "price": 10000, "desc": "بهار الكزبر الطازج", "image": "image/coriander.webp", "category": "spices" },
+    { "id": 2, "globalId": "spices_2", "name": "ورق غار", "price": 10000, "desc": "ورق غار طبيعي وعطري", "image": "image/bay_leaves.webp", "category": "spices" },
+    { "id": 3, "globalId": "spices_3", "name": "بهارات تكة دجاج", "price": 20000, "desc": "أجود بهارات التكة لطبق شهي", "image": "image/chicken_tikka_spices.webp", "category": "spices" },
+    { "id": 4, "globalId": "spices_4", "name": "زعتر", "price": 12000, "desc": "زعتر بلدي عالي الجودة", "image": "image/zaatar.webp", "category": "spices" },
+    { "id": 5, "globalId": "spices_5", "name": "هيل", "price": 50000, "desc": "هيل فاخر", "image": "image/cardamom.webp", "category": "spices",
       "variants": [
-        { "type": "شكل", "value": "صحيح", "image": "image/هيل.webp", "price_modifier": 0 },
-        { "type": "شكل", "value": "مطحون", "image": "image/هيل-مطحون.webp", "price_modifier": 0 }
+        { "type": "شكل", "value": "صحيح", "image": "image/cardamom.webp", "price_modifier": 0 },
+        { "type": "شكل", "value": "مطحون", "image": "image/cardamom_ground.webp", "price_modifier": 0 }
       ]
     },
-    { "id": 6, "globalId": "spices_6", "name": "صبغ لوزينة", "price": 15000, "desc": "صبغ لوزينة للمأكولات", "image": "image/صبغ-لوزينة-اصفر.webp", "category": "spices",
+    { "id": 6, "globalId": "spices_6", "name": "صبغ لوزينة", "price": 15000, "desc": "صبغ لوزينة للمأكولات", "image": "image/loozina_dye_yellow.webp", "category": "spices",
       "variants": [
-        { "type": "لون", "value": "أحمر", "image": "image/صبغ لوزينه-احمر.webp" },
-        { "type": "لون", "value": "أصفر", "image": "image/صبغ-لوزينة-اصفر.webp" },
-        { "type": "لون", "value": "ماروني", "image": "image/صبغ-لوزينه-ماروني.webp" }
+        { "type": "لون", "value": "أحمر", "image": "image/loozina_dye_red.webp" },
+        { "type": "لون", "value": "أصفر", "image": "image/loozina_dye_yellow.webp" },
+        { "type": "لون", "value": "ماروني", "image": "image/loozina_dye_maroon.webp" }
       ]
     },
-    { "id": 7, "globalId": "spices_7", "name": "شنان", "price": 15000, "desc": "شنان طازج ومجفف", "image": "image/شنان.webp", "category": "spices" },
-    { "id": 8, "globalId": "spices_8", "name": "دارسين", "price": 10000, "desc": "دارسين طبيعي عالي الجودة", "image": "image/‏‏دارسين-اصلي-عادي.webp", "category": "spices",
+    { "id": 7, "globalId": "spices_7", "name": "شنان", "price": 15000, "desc": "شنان طازج ومجفف", "image": "image/shannan.webp", "category": "spices" },
+    { "id": 8, "globalId": "spices_8", "name": "دارسين", "price": 10000, "desc": "دارسين طبيعي عالي الجودة", "image": "image/cinnamon_regular.webp", "category": "spices",
       "variants": [
-        { "type": "نوع", "value": "عادي", "image": "image/‏‏دارسين-اصلي-عادي.webp", "price_modifier": 0 },
-        { "type": "نوع", "value": "أصلي", "image": "image/دارسين-اصلي.webp", "price_modifier": 5000 },
-        { "type": "نوع", "value": "مطحون", "image": "image/دارسين-مطحون.webp", "price_modifier": 0 }
+        { "type": "نوع", "value": "عادي", "image": "image/cinnamon_regular.webp", "price_modifier": 0 },
+        { "type": "نوع", "value": "أصلي", "image": "image/cinnamon_original.webp", "price_modifier": 5000 },
+        { "type": "نوع", "value": "مطحون", "image": "image/cinnamon_ground.webp", "price_modifier": 0 }
       ]
     },
-    { "id": 9, "globalId": "spices_9", "name": "كبابة", "price": 5000, "desc": "حبوب كبابة ممتازة", "image": "قسم البهارات/كبابة.webp", "category": "spices" },
-    { "id": 10, "globalId": "spices_10", "name": "بصل مطحون", "price": 8000, "desc": "بصل مجفف ومطحون", "image": "image/بصل-مطحون.webp", "category": "spices" },
-    { "id": 11, "globalId": "spices_11", "name": "ثوم مطحون", "price": 8000, "desc": "ثوم مجفف ومطحون", "image": "image/ثوم-مطحون.webp", "category": "spices" },
-    { "id": 12, "globalId": "spices_12", "name": "قرنفل", "price": 15000, "desc": "قرنفل ذو رائحة قوية", "image": "image/قرنفل.webp", "category": "spices" },
-    { "id": 13, "globalId": "spices_13", "name": "عرك حار", "price": 7000, "desc": "عرك حار مجفف", "image": "image/عرك-حار.webp", "category": "spices",
+    { "id": 9, "globalId": "spices_9", "name": "كبابة", "price": 5000, "desc": "حبوب كبابة ممتازة", "image": "image/kabab_pepper.webp", "category": "spices" },
+    { "id": 10, "globalId": "spices_10", "name": "بصل مطحون", "price": 8000, "desc": "بصل مجفف ومطحون", "image": "image/onion_powder.webp", "category": "spices" },
+    { "id": 11, "globalId": "spices_11", "name": "ثوم مطحون", "price": 8000, "desc": "ثوم مجفف ومطحون", "image": "image/garlic_powder.webp", "category": "spices" },
+    { "id": 12, "globalId": "spices_12", "name": "قرنفل", "price": 15000, "desc": "قرنفل ذو رائحة قوية", "image": "image/cloves.webp", "category": "spices" },
+    { "id": 13, "globalId": "spices_13", "name": "عرك حار", "price": 7000, "desc": "عرك حار مجفف", "image": "image/arak_har.webp", "category": "spices",
       "variants": [
-        { "type": "شكل", "value": "صحيح", "image": "image/عرك-حار.webp", "price_modifier": 0 },
-        { "type": "شكل", "value": "مطحون", "image": "image/عرك-حار.webp", "price_modifier": 0 }
+        { "type": "شكل", "value": "صحيح", "image": "image/arak_har.webp", "price_modifier": 0 },
+        { "type": "شكل", "value": "مطحون", "image": "image/arak_har.webp", "price_modifier": 0 }
       ]
     },
-    { "id": 14, "globalId": "spices_14", "name": "بهارات عمبة", "price": 12000, "desc": "بهارات العمبة الأصلية", "image": "image/بهارات-عمبة.webp", "category": "spices" },
-    { "id": 15, "globalId": "spices_15", "name": "سبع بهارات", "price": 20000, "desc": "خلطة السبع بهارات الفاخرة", "image": "image/سبع-بهارات.webp", "category": "spices" },
-    { "id": 16, "globalId": "spices_16", "name": "بهارات مندي", "price": 18000, "desc": "بهارات المندي لطبق شهي", "image": "قسم البهارات/بهارات-مندي.jpeg", "category": "spices" },
-    { "id": 17, "globalId": "spices_17", "name": "كجرات", "price": 15000, "desc": "كجرات طبيعي", "image": "image/كجرات.webp", "category": "spices" },
-    { "id": 18, "globalId": "spices_18", "name": "حبة سودة", "price": 8000, "desc": "حبة سودة (حبة البركة) نقية", "image": "image/حبه-سودة.webp", "category": "spices" },
-    { "id": 19, "globalId": "spices_19", "name": "ثوم جبل", "price": 10000, "desc": "ثوم جبل مجفف", "image": "image/ثوم-جبل.webp", "category": "spices" },
-    { "id": 20, "globalId": "spices_20", "name": "بخور جوري", "price": 20000, "desc": "بخور الجوري الفواح", "image": "image/بخور-جوري.webp", "category": "spices" },
-    { "id": 21, "globalId": "spices_21", "name": "حب رمان", "price": 10000, "desc": "حب رمان مجفف", "image": "image/حب-رمان-مجفف.webp", "category": "spices" },
-    { "id": 22, "globalId": "spices_22", "name": "حلبة", "price": 7000, "desc": "بذور الحلبة الطبيعية", "image": "image/حلبة.webp", "category": "spices" },
-    { "id": 23, "globalId": "spices_23", "name": "بابريكة", "price": 10000, "desc": "بابريكة حلوة", "image": "image/بابريكا.webp", "category": "spices", 
+    { "id": 14, "globalId": "spices_14", "name": "بهارات عمبة", "price": 12000, "desc": "بهارات العمبة الأصلية", "image": "image/amba_spices.webp", "category": "spices" },
+    { "id": 15, "globalId": "spices_15", "name": "سبع بهارات", "price": 20000, "desc": "خلطة السبع بهارات الفاخرة", "image": "image/seven_spices.webp", "category": "spices" },
+    { "id": 16, "globalId": "spices_16", "name": "بهارات مندي", "price": 18000, "desc": "بهارات المندي لطبق شهي", "image": "image/mandi_spices.jpeg", "category": "spices" },
+    { "id": 17, "globalId": "spices_17", "name": "كجرات", "price": 15000, "desc": "كجرات طبيعي", "image": "image/kujarat.webp", "category": "spices" },
+    { "id": 18, "globalId": "spices_18", "name": "حبة سودة", "price": 8000, "desc": "حبة سودة (حبة البركة) نقية", "image": "image/black_seed.webp", "category": "spices" },
+    { "id": 19, "globalId": "spices_19", "name": "ثوم جبل", "price": 10000, "desc": "ثوم جبل مجفف", "image": "image/mountain_garlic.webp", "category": "spices" },
+    { "id": 20, "globalId": "spices_20", "name": "بخور جوري", "price": 20000, "desc": "بخور الجوري الفواح", "image": "image/jouri_incense.webp", "category": "spices" },
+    { "id": 21, "globalId": "spices_21", "name": "حب رمان", "price": 10000, "desc": "حب رمان مجفف", "image": "image/dried_pomegranate.webp", "category": "spices" },
+    { "id": 22, "globalId": "spices_22", "name": "حلبة", "price": 7000, "desc": "بذور الحلبة الطبيعية", "image": "image/fenugreek.webp", "category": "spices" },
+    { "id": 23, "globalId": "spices_23", "name": "بابريكة", "price": 10000, "desc": "بابريكة حلوة", "image": "image/paprika.webp", "category": "spices", 
       "variants": [
-        { "type": "نوع", "value": "عادية", "image": "image/بابريكا.webp" },
-        { "type": "نوع", "value": "مدخنة", "image": "image/‏‏بابريكا-مدخنة.webp" }
+        { "type": "نوع", "value": "عادية", "image": "image/paprika.webp" },
+        { "type": "نوع", "value": "مدخنة", "image": "image/smoked_paprika.webp" }
       ]
     },
-    { "id": 24, "globalId": "spices_24", "name": "بهارات فنكر", "price": 12000, "desc": "بهارات بطاطا فنكر", "image": "image/بهارات-فنكر.webp", "category": "spices" },
-    { "id": 25, "globalId": "spices_25", "name": "ورد محمدي", "price": 15000, "desc": "ورد محمدي مجفف", "image": "image/ورد-محمدي.webp", "category": "spices" },
-    { "id": 26, "globalId": "spices_26", "name": "يانسون", "price": 8000, "desc": "يانسون طبيعي", "image": "image/يانسون.webp", "category": "spices",
+    { "id": 24, "globalId": "spices_24", "name": "بهارات فنكر", "price": 12000, "desc": "بهارات بطاطا فنكر", "image": "image/finger_spices.webp", "category": "spices" },
+    { "id": 25, "globalId": "spices_25", "name": "ورد محمدي", "price": 15000, "desc": "ورد محمدي مجفف", "image": "image/mohammadi_rose.webp", "category": "spices" },
+    { "id": 26, "globalId": "spices_26", "name": "يانسون", "price": 8000, "desc": "يانسون طبيعي", "image": "image/anise.webp", "category": "spices",
       "variants": [
-        { "type": "شكل", "value": "صحيح", "image": "image/يانسون.webp", "price_modifier": 0 }
+        { "type": "شكل", "value": "صحيح", "image": "image/anise.webp", "price_modifier": 0 }
       ]
     },
-    { "id": 27, "globalId": "spices_27", "name": "فلفل حار", "price": 12000, "desc": "فلفل حار مجفف", "image": "image/فلفل-حار-احمر.webp", "category": "spices" },
-    { "id": 28, "globalId": "spices_28", "name": "شب", "price": 7000, "desc": "شب أبيض نقي", "image": "image/شب-مطحون.webp", "category": "spices" },
-    { "id": 29, "globalId": "spices_29", "name": "بهارات برياني", "price": 18000, "desc": "بهارات برياني هندية أصلية", "image": "image/بهارات-برياني.webp", "category": "spices" },
-    { "id": 30, "globalId": "spices_30", "name": "بهارات مرك اصلي", "price": 15000, "desc": "بهارات مرك أصلية", "image": "image/‏‏بهارات-مرك-اصلي.webp", "category": "spices" },
-    { "id": 31, "globalId": "spices_31", "name": "فلفل اسود", "price": 10000, "desc": "فلفل أسود فاخر", "image": "image/فافا-اسود.webp", "category": "spices",
+    { "id": 27, "globalId": "spices_27", "name": "فلفل حار", "price": 12000, "desc": "فلفل حار مجفف", "image": "image/red_chili.webp", "category": "spices" },
+    { "id": 28, "globalId": "spices_28", "name": "شب", "price": 7000, "desc": "شب أبيض نقي", "image": "image/alum_powder.webp", "category": "spices" },
+    { "id": 29, "globalId": "spices_29", "name": "بهارات برياني", "price": 18000, "desc": "بهارات برياني هندية أصلية", "image": "image/biryani_spices.webp", "category": "spices" },
+    { "id": 30, "globalId": "spices_30", "name": "بهارات مرك اصلي", "price": 15000, "desc": "بهارات مرك أصلية", "image": "image/stew_spices.webp", "category": "spices" },
+    { "id": 31, "globalId": "spices_31", "name": "فلفل اسود", "price": 10000, "desc": "فلفل أسود فاخر", "image": "image/black_pepper.webp", "category": "spices",
       "variants": [
-        { "type": "شكل", "value": "صحيح", "image": "image/فافا-اسود.webp", "price_modifier": 0 },
-        { "type": "شكل", "value": "مطحون", "image": "image/فلفل-اسود-مطحون.webp", "price_modifier": 0 }
+        { "type": "شكل", "value": "صحيح", "image": "image/black_pepper.webp", "price_modifier": 0 },
+        { "type": "شكل", "value": "مطحون", "image": "image/black_pepper_ground.webp", "price_modifier": 0 }
       ]
     },
-    { "id": 32, "globalId": "spices_32", "name": "حبة حلوة", "price": 7000, "desc": "حبة حلوة", "image": "image/حبة-حلوة.webp", "category": "spices" },
-    { "id": 33, "globalId": "spices_33", "name": "سماك", "price": 8000, "desc": "سماك بلدي", "image": "image/سماك.webp", "category": "spices" },
-    { "id": 34, "globalId": "spices_34", "name": "ثعلبية", "price": 10000, "desc": "ثعلبية مطحونة", "image": "image/ثعلبية.webp", "category": "spices" },
-    { "id": 35, "globalId": "spices_35", "name": "جوزة الطيبة", "price": 15000, "desc": "جوزة الطيب", "image": "image/جوز-الطيبة.webp", "category": "spices" },
-    { "id": 36, "globalId": "spices_36", "name": "اكليل الجبل", "price": 12000, "desc": "إكليل الجبل مجفف", "image": "image/اكليل-الجبل.webp", "category": "spices" },
-    { "id": 37, "globalId": "spices_37", "name": "لبان الذكر", "price": 10000, "desc": "لبان الذكر الأصلي", "image": "قسم البهارات/لبان-الذكر.jpeg", "category": "spices" },
-    { "id": 38, "globalId": "spices_38", "name": "صودا", "price": 7000, "desc": "صودا الخبز", "image": "image/صودا.webp", "category": "spices" },
-    { "id": 39, "globalId": "spices_39", "name": "بهارات طرشي", "price": 12000, "desc": "بهارات الطرشي الشهية", "image": "image/بهارات-طرشي.webp", "category": "spices" },
-    { "id": 40, "globalId": "spices_40", "name": "علك مر", "price": 15000, "desc": "علك المر الطبيعي", "image": "image/علك-مر.webp", "category": "spices" },
-    { "id": 41, "globalId": "spices_41", "name": "لمندوزي", "price": 12000, "desc": "لمندوزي (ملح الليمون)", "image": "image/لمندوزي.webp", "category": "spices" },
-    { "id": 42, "globalId": "spices_42", "name": "جوز مبروش", "price": 15000, "desc": "جوز هند مبروش", "image": "image/جوز-مبروش.webp", "category": "spices" },
-    { "id": 43, "globalId": "spices_43", "name": "كمون", "price": 10000, "desc": "كمون حب", "image": "image/كمون.webp", "category": "spices" },
-    { "id": 44, "globalId": "spices_44", "name": "حرمل", "price": 10000, "desc": "حبوب الحرمل", "image": "image/حرمل.webp", "category": "spices" },
-    { "id": 45, "globalId": "spices_45", "name": "سمسم", "price": 10000, "desc": "سمسم محمص", "image": "image/سمسم.webp", "category": "spices" },
-    { "id": 46, "globalId": "spices_46", "name": "ككو مطحون", "price": 10000, "desc": "كاكاو مطحون نقي", "image": "قسم البهارات/ككو-مطحون.jpeg", "category": "spices" },
-    { "id": 47, "globalId": "spices_47", "name": "كركم", "price": 8000, "desc": "كركم نقي", "image": "image/كركم.webp", "category": "spices" },
-    { "id": 48, "globalId": "spices_48", "name": "زنجبيل مطحون", "price": 10000, "desc": "زنجبيل مطحون", "image": "image/زنجبيل-مطحون.webp", "category": "spices" },
-    { "id": 49, "globalId": "spices_49", "name": "زعفران", "price": 25000, "desc": "زعفران فاخر", "image": "image/زعفران.webp", "category": "spices" }
+    { "id": 32, "globalId": "spices_32", "name": "حبة حلوة", "price": 7000, "desc": "حبة حلوة", "image": "image/sweet_seed.webp", "category": "spices" },
+    { "id": 33, "globalId": "spices_33", "name": "سماك", "price": 8000, "desc": "سماك بلدي", "image": "image/sumac.webp", "category": "spices" },
+    { "id": 34, "globalId": "spices_34", "name": "ثعلبية", "price": 10000, "desc": "ثعلبية مطحونة", "image": "image/thaalabiya.webp", "category": "spices" },
+    { "id": 35, "globalId": "spices_35", "name": "جوزة الطيبة", "price": 15000, "desc": "جوزة الطيب", "image": "image/nutmeg.webp", "category": "spices" },
+    { "id": 36, "globalId": "spices_36", "name": "اكليل الجبل", "price": 12000, "desc": "إكليل الجبل مجفف", "image": "image/rosemary.webp", "category": "spices" },
+    { "id": 37, "globalId": "spices_37", "name": "لبان الذكر", "price": 10000, "desc": "لبان الذكر الأصلي", "image": "image/male_frankincense.jpeg", "category": "spices" },
+    { "id": 38, "globalId": "spices_38", "name": "صودا", "price": 7000, "desc": "صودا الخبز", "image": "image/baking_soda.webp", "category": "spices" },
+    { "id": 39, "globalId": "spices_39", "name": "بهارات طرشي", "price": 12000, "desc": "بهارات الطرشي الشهية", "image": "image/pickle_spices.webp", "category": "spices" },
+    { "id": 40, "globalId": "spices_40", "name": "علك مر", "price": 15000, "desc": "علك المر الطبيعي", "image": "image/bitter_gum.webp", "category": "spices" },
+    { "id": 41, "globalId": "spices_41", "name": "لمندوزي", "price": 12000, "desc": "لمندوزي (ملح الليمون)", "image": "image/lemon_salt.webp", "category": "spices" },
+    { "id": 42, "globalId": "spices_42", "name": "جوز مبروش", "price": 15000, "desc": "جوز هند مبروش", "image": "image/coconut_shredded.webp", "category": "spices" },
+    { "id": 43, "globalId": "spices_43", "name": "كمون", "price": 10000, "desc": "كمون حب", "image": "image/cumin.webp", "category": "spices" },
+    { "id": 44, "globalId": "spices_44", "name": "حرمل", "price": 10000, "desc": "حبوب الحرمل", "image": "image/harmal.webp", "category": "spices" },
+    { "id": 45, "globalId": "spices_45", "name": "سمسم", "price": 10000, "desc": "سمسم محمص", "image": "image/sesame.webp", "category": "spices" },
+    { "id": 46, "globalId": "spices_46", "name": "ككو مطحون", "price": 10000, "desc": "كاكاو مطحون نقي", "image": "image/cocoa_powder.jpeg", "category": "spices" },
+    { "id": 47, "globalId": "spices_47", "name": "كركم", "price": 8000, "desc": "كركم نقي", "image": "image/turmeric.webp", "category": "spices" },
+    { "id": 48, "globalId": "spices_48", "name": "زنجبيل مطحون", "price": 10000, "desc": "زنجبيل مطحون", "image": "image/ginger_ground.webp", "category": "spices" },
+    { "id": 49, "globalId": "spices_49", "name": "زعفران", "price": 25000, "desc": "زعفران فاخر", "image": "image/saffron.webp", "category": "spices" }
 ]
