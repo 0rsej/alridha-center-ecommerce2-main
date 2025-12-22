@@ -1367,44 +1367,36 @@ function updateCartUI() {
     }
 
 // ==========================================
-    //  نظام تسريع الموقع (Caching System) ⚡
-    //  (أضف هذا الكود بدلاً من initializeApp القديمة)
+    //  نظام تسريع الموقع (تم التحديث لجلب البيانات الجديدة) ⚡
     // ==========================================
-
-    // دالة جديدة لجلب المنتجات بذكاء (من ذاكرة الهاتف أولاً)
     async function fetchProductsWithCache() {
-        const CACHE_KEY = 'spiceShopProductsData_v2'; // مفتاح التخزين
-        const CACHE_DURATION = 1000 * 60 * 60; // مدة الصلاحية: ساعة واحدة
+        // قمت بتغيير الاسم هنا إلى v3 لكي يجبر النظام على تحميل الملفات الجديدة التي تحتوي على الباركود
+        const CACHE_KEY = 'spiceShopProductsData_v3'; 
+        const CACHE_DURATION = 1000 * 60 * 60; // ساعة واحدة
 
-        // 1. محاولة القراءة من التخزين المحلي (Local Storage)
         const cached = localStorage.getItem(CACHE_KEY);
         if (cached) {
             try {
                 const { timestamp, data } = JSON.parse(cached);
-                // إذا لم تمر ساعة على التخزين، استخدم البيانات المحفوظة فوراً
                 if (Date.now() - timestamp < CACHE_DURATION) {
-                    console.log('⚡ تم تحميل المنتجات من الذاكرة (Cache) بسرعة فائقة');
+                    console.log('⚡ تم تحميل المنتجات من الذاكرة (Cache)');
                     return data;
                 }
             } catch (e) {
-                console.warn('بيانات الكاش قديمة أو تالفة، سيتم التحميل من السيرفر.');
+                console.warn('بيانات الكاش تالفة.');
             }
         }
 
-        // 2. إذا لم توجد بيانات، حملها من السيرفر واحفظها
-        console.log('🔄 جاري تحميل المنتجات من السيرفر...');
-        // تأكد من أن قائمة الملفات CATEGORY_JSON_FILES معرفة في بداية الملف
+        console.log('🔄 جاري تحميل المنتجات الجديدة من السيرفر...');
         const allJsonFilesPaths = CATEGORY_JSON_FILES.map(file => `json/${file}`);
         let allProductsFromFiles = [];
 
         try {
-            // تحميل جميع الملفات في نفس الوقت (Parallel) لسرعة أكبر
             const responses = await Promise.all(allJsonFilesPaths.map(url => fetch(url).then(res => res.json())));
             responses.forEach(data => {
                 allProductsFromFiles = allProductsFromFiles.concat(data);
             });
 
-            // 3. حفظ البيانات الجديدة في الهاتف للمرة القادمة
             localStorage.setItem(CACHE_KEY, JSON.stringify({
                 timestamp: Date.now(),
                 data: allProductsFromFiles
@@ -1414,12 +1406,10 @@ function updateCartUI() {
 
         } catch (error) {
             console.error('خطأ في تحميل البيانات:', error);
-            // في حالة انقطاع النت، حاول استخدام البيانات القديمة حتى لو انتهت صلاحيتها
             if (cached) return JSON.parse(cached).data;
             return [];
         }
     }
-
  // ✅ ضع هذا الكود الجديد بدلاً منه 👇
 
     // ==========================================
@@ -2031,211 +2021,130 @@ function downloadOrderPDF(order) {
         tabAppCart.addEventListener('click', activateAppTab);
         tabScannerCart.addEventListener('click', activateScannerTab);
     }
+ // ============================================================
+//  نظام الماسح الضوئي (المتوافق مع الأزرار في ملفات HTML) 📷
 // ============================================================
-    //  نظام الماسح الضوئي الاحترافي (بدون فلاش + دعم شامل + تبديل الوضع)
-    // ============================================================
 
-    let html5QrCode; // متغير القارئ
-    let currentScanMode = 'cart'; // الوضع الافتراضي: وضع السلة
+    // 1. تعريف المتغيرات
+    let isScanning = false;
+    let currentScanMode = 'check'; // الوضع الافتراضي
+    let html5QrcodeScanner = null;
 
-    // تعريف العناصر
-    const scannerTriggerBtn = document.getElementById('barcodeTriggerBtn'); // زر الموبايل
-    const desktopScannerBtn = document.getElementById('scanner-btn');       // زر الحاسوب
+    // 2. عناصر DOM
+    const scannerTriggerBtn = document.getElementById('barcodeTriggerBtn');
     const scannerModal = document.getElementById('scanner-modal');
     const closeScannerBtn = document.getElementById('close-scanner-btn');
+    const scanResultEl = document.getElementById('scan-result'); 
+    const scanTotalEl = document.getElementById('scan-total'); // مجموع سلة الماسح
+    const scanCountEl = document.getElementById('scan-count'); // عدد مواد الماسح
+    const scannerFooter = document.getElementById('scanner-footer'); // تذييل الماسح
+
+    // 3. (مهم) تشغيل أزرار التبديل (Buttons) بدلاً من Radio
+    const modeBtns = document.querySelectorAll('.mode-btn');
     
-    // عنصر جديد لعرض الوضع الحالي
-    let modeIndicator = null;
+    modeBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            // إزالة الكلاس active من جميع الأزرار
+            modeBtns.forEach(b => b.classList.remove('active'));
+            // إضافته للزر المضغوط فقط
+            e.target.classList.add('active');
+            
+            // تحديث الوضع
+            currentScanMode = e.target.getAttribute('data-mode');
 
-    // 1. دالة بدء تشغيل الكاميرا الخلفية مباشرة
-    function startScanner() {
-        if (scannerModal) {
-            scannerModal.classList.remove('hidden');
-            // تأكد من وجود أزرار التحكم بالوضع
-            setupScannerControls();
-        }
-
-        // تنظيف أي جلسة سابقة
-        if (html5QrCode) {
-            html5QrCode.stop().then(() => {
-                html5QrCode.clear();
-                initCamera();
-            }).catch(err => { initCamera(); });
-        } else {
-            initCamera();
-        }
-    }
-
-    function initCamera() {
-        // تحديد الصيغ المدعومة (هام جداً للباركود الطويل والعادي)
-        // هذا يحل مشكلة عدم التعرف على المنتجات
-        const formats = [
-            Html5QrcodeSupportedFormats.UPC_A,
-            Html5QrcodeSupportedFormats.UPC_E,
-            Html5QrcodeSupportedFormats.EAN_13,
-            Html5QrcodeSupportedFormats.EAN_8,
-            Html5QrcodeSupportedFormats.CODE_128, // للباركودات الطويلة
-            Html5QrcodeSupportedFormats.CODE_39,
-            Html5QrcodeSupportedFormats.CODE_93,
-            Html5QrcodeSupportedFormats.CODABAR,
-            Html5QrcodeSupportedFormats.QR_CODE
-        ];
-
-        html5QrCode = new Html5Qrcode("reader");
-
-        const config = { 
-            fps: 25, // سرعة مسح عالية
-            qrbox: { width: 280, height: 180 }, // مستطيل عريض يناسب الباركود الطويل
-            aspectRatio: 1.0,
-            formatsToSupport: formats, // تفعيل دعم جميع الصيغ
-            experimentalFeatures: {
-                useBarCodeDetectorIfSupported: true
-            }
-        };
-
-        // تشغيل الكاميرا الخلفية (بدون فلاش)
-        html5QrCode.start(
-            { facingMode: "environment" }, 
-            config, 
-            onScanSuccess,
-            onScanFailure
-        ).catch(err => {
-            console.error("خطأ في تشغيل الكاميرا:", err);
-            if(scanResultEl) scanResultEl.innerHTML = `<span style="color:red;">❌ تعذر فتح الكاميرا.</span>`;
-        });
-    }
-
-    // 2. دالة إيقاف الماسح
-    function stopScanner() {
-        if (scannerModal) scannerModal.classList.add('hidden');
-        if (html5QrCode) {
-            html5QrCode.stop().then(() => {
-                html5QrCode.clear();
-            }).catch(err => console.log("توقف الكاميرا:", err));
-        }
-    }
-
-    // 3. إعداد أزرار التحكم بالوضع داخل الماسح
-    function setupScannerControls() {
-        // نبحث عن الفوتر أو ننشئه إذا لم يوجد
-        let footer = document.getElementById('scanner-footer');
-        if (!footer && scannerModal) {
-            // محاولة العثور على مكان لإضافة الأزرار إذا لم يكن الفوتر موجوداً في HTML
-            const modalContent = scannerModal.querySelector('.modal-content') || scannerModal;
-            footer = document.createElement('div');
-            footer.id = 'scanner-footer';
-            footer.style.marginTop = '15px';
-            footer.style.display = 'flex';
-            footer.style.gap = '10px';
-            footer.style.justifyContent = 'center';
-            modalContent.appendChild(footer);
-        }
-
-        if (footer) {
-            footer.innerHTML = `
-                <button id="mode-cart-btn" style="flex:1; padding:10px; border-radius:5px; border:none; font-weight:bold; cursor:pointer;">🛒 وضع السلة</button>
-                <button id="mode-check-btn" style="flex:1; padding:10px; border-radius:5px; border:none; font-weight:bold; cursor:pointer;">🔍 كشف السعر</button>
-            `;
-
-            // تحديث الألوان بناءً على الوضع الحالي
-            updateModeButtons();
-
-            // ربط الأحداث
-            document.getElementById('mode-cart-btn').addEventListener('click', (e) => {
-                e.preventDefault();
-                currentScanMode = 'cart';
-                updateModeButtons();
-                if(scanResultEl) scanResultEl.innerHTML = "جاهز للإضافة للسلة...";
-            });
-
-            document.getElementById('mode-check-btn').addEventListener('click', (e) => {
-                e.preventDefault();
-                currentScanMode = 'check';
-                updateModeButtons();
-                if(scanResultEl) scanResultEl.innerHTML = "جاهز للكشف عن السعر...";
-            });
-        }
-    }
-
-    function updateModeButtons() {
-        const cartBtn = document.getElementById('mode-cart-btn');
-        const checkBtn = document.getElementById('mode-check-btn');
-        
-        if(cartBtn && checkBtn) {
-            if(currentScanMode === 'cart') {
-                cartBtn.style.backgroundColor = '#27ae60'; // أخضر
-                cartBtn.style.color = 'white';
-                checkBtn.style.backgroundColor = '#eee';
-                checkBtn.style.color = '#333';
+            // تحديث الواجهة بناءً على الوضع
+            if (currentScanMode === 'cart') {
+                if(scannerFooter) scannerFooter.classList.remove('hidden'); // إظهار المجموع
+                if(scanResultEl) scanResultEl.innerHTML = 'الوضع: 🛒 الحاسبة (إضافة وتجميع)';
             } else {
-                checkBtn.style.backgroundColor = '#f39c12'; // برتقالي
-                checkBtn.style.color = 'white';
-                cartBtn.style.backgroundColor = '#eee';
-                cartBtn.style.color = '#333';
+                if(scannerFooter) scannerFooter.classList.add('hidden'); // إخفاء المجموع
+                if(scanResultEl) scanResultEl.innerHTML = 'الوضع: 🔍 كاشف السعر فقط';
             }
-        }
+        });
+    });
+
+    // 4. دالة تحديث أرقام سلة الماسح (تحديث العدادات أسفل الكاميرا)
+    function updateScannerStats() {
+        if (!scannerCart) return;
+        
+        let totalQty = 0;
+        let totalPrice = 0;
+
+        scannerCart.forEach(item => {
+            // حساب السعر
+            let itemPrice = item.product.price;
+            if (item.variant && item.variant.price_modifier) {
+                itemPrice += item.variant.price_modifier;
+            }
+
+            if (item.isSoldByPrice) {
+                totalPrice += item.quantity;
+                totalQty += 1; // نحسبها كمادة واحدة بقيمة معينة
+            } else {
+                totalPrice += (itemPrice * item.quantity);
+                totalQty += item.quantity;
+            }
+        });
+
+        if (scanCountEl) scanCountEl.textContent = totalQty;
+        if (scanTotalEl) scanTotalEl.textContent = totalPrice.toLocaleString();
     }
 
-    // 4. ربط زر الفتح الرئيسي
-    if (scannerTriggerBtn) {
+    // 5. فتح وإغلاق الماسح
+    if (scannerTriggerBtn && scannerModal) {
         scannerTriggerBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            currentScanMode = 'cart'; // افتراضياً يبدأ بوضع السلة
+            scannerModal.classList.remove('hidden');
             startScanner();
+            updateScannerStats(); // تحديث الأرقام عند الفتح
         });
-    }
-    if (desktopScannerBtn) {
-        desktopScannerBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            currentScanMode = 'cart';
-            startScanner();
-        });
-    }
-    if (closeScannerBtn) {
-        closeScannerBtn.addEventListener('click', stopScanner);
     }
 
-    // 5. دالة المعالجة عند نجاح المسح
-    function onScanSuccess(decodedText, decodedResult) {
+    function closeScanner() {
+        if (scannerModal) scannerModal.classList.add('hidden');
+        if (html5QrcodeScanner) {
+            try { html5QrcodeScanner.clear(); } catch(e) {}
+        }
+        isScanning = false;
+    }
+
+    if (closeScannerBtn) closeScannerBtn.addEventListener('click', closeScanner);
+
+    // 6. منطق المسح (Scan Logic)
+    window.onScanSuccess = function(decodedText, decodedResult) {
         if (isScanning) return;
-        isScanning = true;
-
-        const cleanText = decodedText.trim();
         
-        // البحث عن المنتج (يدعم الباركود النصي والرقمي)
-        // ملاحظة: تأكد أن حقل barcode في ملف JSON مكتوب كنص "String" للأرقام الطويلة
+        const scannedCode = decodedText.trim();
+        
+        // البحث عن المنتج
         const product = products.find(p => 
-            p.id == cleanText || 
-            p.globalId == cleanText || 
-            (p.barcode && String(p.barcode).trim() === cleanText)
+            p.id == scannedCode || 
+            p.globalId == scannedCode || 
+            (p.barcode && p.barcode.trim() == scannedCode)
         );
 
         if (product) {
-            // صوت النجاح
             const audio = new Audio('https://www.soundjay.com/buttons/beep-01a.mp3');
             audio.play().catch(e => {});
 
             if (currentScanMode === 'check') {
                 // --- وضع كاشف السعر ---
+                isScanning = true;
                 if (foundImg) foundImg.src = product.image;
                 if (foundName) foundName.textContent = product.name;
-                if (foundPrice) foundPrice.textContent = product.price;
+                if (foundPrice) foundPrice.textContent = product.price; // رقم فقط
                 
-                // إظهار نافذة المنتج
                 if (productOverlay) productOverlay.classList.remove('hidden');
-                
-                // وميض برتقالي للماسح
-                scannerModal.style.backgroundColor = "rgba(243, 156, 18, 0.3)";
-                setTimeout(() => { scannerModal.style.backgroundColor = "rgba(0,0,0,0.8)"; }, 300);
-                
-                // في وضع الكشف، نوقف المسح حتى يغلق المستخدم النافذة يدوياً
-                // (أو يمكننا جعله يعود للمسح تلقائياً حسب الرغبة)
-                // هنا سنجعله ينتظر قليلاً ثم يعود جاهزاً
-                setTimeout(() => { isScanning = false; }, 1000);
+                if (scanResultEl) scanResultEl.innerHTML = `✔ ${product.name}`;
 
             } else {
-                // --- وضع سلة الماسح (الحاسبة) ---
+                // --- وضع الحاسبة (سلة الماسح) ---
+                isScanning = true;
                 const isSoldByPrice = ['spices', 'nuts'].includes(product.category);
+                
+                // التأكد من وجود المصفوفة
+                if (typeof scannerCart === 'undefined') scannerCart = [];
+
                 const exist = scannerCart.find(item => item.product.globalId === product.globalId);
                 
                 if (exist) {
@@ -2247,55 +2156,52 @@ function downloadOrderPDF(order) {
                         isSoldByPrice: isSoldByPrice
                     });
                 }
+                
                 saveScannerCart();
+                updateScannerStats(); // تحديث الأرقام في شاشة الماسح
+                if (typeof updateCartUI === 'function') updateCartUI(); // تحديث صفحة السلة إذا كانت مفتوحة الخلفية
 
-                // تحديث الجدول
-                if (typeof updateCartUI === 'function') {
-                    if (typeof activateScannerTab === 'function') activateScannerTab();
-                    else updateCartUI();
+                // إخفاء الـ Overlay لعدم المقاطعة
+                if (productOverlay) productOverlay.classList.add('hidden');
+                
+                if (scanResultEl) {
+                    scanResultEl.innerHTML = `<span style="color:#2ecc71; font-weight:bold;">+ أضيف: ${product.name}</span>`;
                 }
 
-                // رسالة نجاح
-                if (scanResultEl) scanResultEl.innerHTML = `<span style="color: green; font-weight: bold; font-size: 1.1em;">✔ أضيف: ${product.name}</span>`;
-
-                // وميض أخضر للماسح
-                scannerModal.style.backgroundColor = "rgba(46, 204, 113, 0.3)";
-                setTimeout(() => { scannerModal.style.backgroundColor = "rgba(0,0,0,0.8)"; }, 300);
-
-                // إغلاق نافذة المنتج إذا كانت مفتوحة (لأننا في وضع السلة السريع)
-                if (productOverlay) productOverlay.classList.add('hidden');
-
-                // جاهز للمنتج التالي بسرعة
-                setTimeout(() => { isScanning = false; }, 800); 
+                // تأخير قصير جداً للمسح التالي
+                setTimeout(() => { 
+                    isScanning = false; 
+                }, 800); 
             }
-
         } else {
-            // المنتج غير موجود
-            if (scanResultEl) scanResultEl.innerHTML = `<span style="color:red; font-weight:bold;">❌ غير مسجل: ${cleanText}</span>`;
-            
-            // وميض أحمر
-            scannerModal.style.backgroundColor = "rgba(231, 76, 60, 0.3)";
-            setTimeout(() => { scannerModal.style.backgroundColor = "rgba(0,0,0,0.8)"; }, 300);
-
+            isScanning = true;
+            if (scanResultEl) scanResultEl.innerHTML = `<span style="color:red;">❌ غير موجود</span>`;
             setTimeout(() => { isScanning = false; }, 1500);
         }
-    }
+    };
 
-    function onScanFailure(error) {
-        // لا نفعل شيئاً لتجنب الإزعاج
-    }
-
-    // ==========================================
-    // تفعيل زر إغلاق نافذة المنتج المنبثقة (Overlay)
-    // ==========================================
-    if (typeof closeOverlayBtn !== 'undefined' && closeOverlayBtn) {
-        closeOverlayBtn.addEventListener('click', () => {
-            if (typeof productOverlay !== 'undefined' && productOverlay) {
-                productOverlay.classList.add('hidden');
+    // 7. تشغيل الكاميرا
+    function startScanner() {
+        if (document.getElementById('reader')) {
+            if (html5QrcodeScanner) {
+                try { html5QrcodeScanner.clear(); } catch(e) {}
             }
-            isScanning = false; // إعادة تفعيل المسح عند إغلاق النافذة
+            html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 }, false);
+            html5QrcodeScanner.render(onScanSuccess);
+        }
+    }
+    
+    // أزرار تفريغ وطباعة داخل الماسح (اختياري إذا أضفتها في HTML)
+    const resetScannedBtn = document.getElementById('reset-scanned-btn');
+    if(resetScannedBtn) {
+        resetScannedBtn.addEventListener('click', () => {
+            if(confirm('تفريغ القائمة المؤقتة؟')) {
+                scannerCart = [];
+                saveScannerCart();
+                updateScannerStats();
+                if(scanResultEl) scanResultEl.innerHTML = 'تم التفريغ';
+            }
         });
     }
+
 });
-
-
