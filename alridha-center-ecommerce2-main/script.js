@@ -2161,12 +2161,12 @@ function downloadOrderPDF(order) {
             });
         }
 
-        // 7. منطق المسح الناجح
+    // 7. منطق المسح الناجح
         const onScanSuccessHandler = (decodedText, decodedResult) => {
             if (isScanning) return;
             
             const scannedCode = decodedText.trim();
-            if (scannedCode === lastScannedCode) return; // منع التكرار
+            if (scannedCode === lastScannedCode) return; 
 
             const product = products.find(p => 
                 p.id == scannedCode || p.globalId == scannedCode || (p.barcode && p.barcode.trim() == scannedCode)
@@ -2180,19 +2180,39 @@ function downloadOrderPDF(order) {
                 lastScannedCode = scannedCode;
 
                 if (currentScanMode === 'check') {
-                    // كاشف السعر
+                    // ==========================================
+                    //  تعديل كاشف السعر (إضافة العناصر تلقائياً)
+                    // ==========================================
                     if (overlayImg) overlayImg.src = product.image;
                     if (overlayName) overlayName.textContent = product.name;
-                    if (overlayPrice) overlayPrice.textContent = product.price.toLocaleString();
+                    
+                    // تنسيق السعر مع العملة (بنفس اللون وحجم أصغر)
+                    if (overlayPrice) {
+                        overlayPrice.innerHTML = `${product.price.toLocaleString()} <span class="currency-symbol">د.ع</span>`;
+                    }
+
+                    // إضافة علامة "متوفر" الخضراء برمجياً إذا لم تكن موجودة
+                    const foundContent = document.querySelector('.found-content');
+                    if (foundContent) {
+                        // نحذف أي علامة حالة قديمة أولاً لمنع التكرار
+                        const oldStatus = foundContent.querySelector('.stock-status');
+                        if (oldStatus) oldStatus.remove();
+
+                        // إنشاء العنصر الجديد
+                        const statusDiv = document.createElement('div');
+                        statusDiv.className = 'stock-status';
+                        statusDiv.innerHTML = '<i class="fas fa-check-circle"></i> متوفر';
+                        
+                        // إضافته تحت السعر
+                        foundContent.appendChild(statusDiv);
+                    }
+
                     if (overlay) overlay.classList.remove('hidden');
 
                 } else {
-                    // الحاسبة
+                    // (الكود الخاص بالحاسبة يبقى كما هو)
                     const isSoldByPrice = ['spices', 'nuts'].includes(product.category);
-                    
-                    // تأكد من وجود المصفوفة العالمية
                     if (typeof scannerCart === 'undefined') scannerCart = [];
-
                     const exist = scannerCart.find(item => item.product.globalId === product.globalId);
                     if (exist) {
                         exist.quantity += (isSoldByPrice ? 1000 : 1);
@@ -2203,14 +2223,9 @@ function downloadOrderPDF(order) {
                             isSoldByPrice: isSoldByPrice
                         });
                     }
-                    
                     if (typeof saveScannerCart === 'function') saveScannerCart();
                     updateLocalScannerStats(); 
-                    
-                    if (scanResultEl) {
-                        scanResultEl.innerHTML = `<span style="color:#27ae60; font-weight:bold;">✔ ${product.name}</span>`;
-                    }
-
+                    if (scanResultEl) scanResultEl.innerHTML = `<span style="color:#27ae60; font-weight:bold;">✔ ${product.name}</span>`;
                     clearTimeout(scanLockTimer);
                     scanLockTimer = setTimeout(() => { 
                         isScanning = false; 
@@ -2224,6 +2239,5 @@ function downloadOrderPDF(order) {
                 setTimeout(() => { isScanning = false; }, 1500);
             }
         };
-
     } // نهاية النطاق المحصور
 });
