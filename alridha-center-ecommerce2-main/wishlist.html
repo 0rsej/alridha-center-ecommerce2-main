@@ -15,6 +15,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
 
     <style>
+        /* --- تنسيقات الماسح الضوئي --- */
         .scanner-action-buttons {
             display: flex; gap: 12px; margin-top: 15px; width: 100%;
         }
@@ -34,6 +35,60 @@
         }
         .scanner-action-buttons button:hover {
             transform: translateY(-2px); opacity: 0.95;
+        }
+
+        /* --- تنسيقات شريط التنقل الجديد (تجربة الموبايل) --- */
+        @media (max-width: 991px) {
+            /* 1. ضبط حاوية العنوان لتكون في المنتصف تماماً */
+            .brand-logo-container {
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%); /* لضمان التوسط الدقيق */
+                margin: 0 !important;
+                justify-content: center;
+                width: auto !important;
+                z-index: 10;
+            }
+
+            /* 2. إخفاء صورة الشعار القديمة (التي بجانب النص) في الموبايل فقط */
+            .brand-logo-container img {
+                display: none !important;
+            }
+
+            /* 3. تنسيق أيقونة الشعار الجديدة (الزجاجية) */
+            .logo-btn-mobile {
+                display: flex !important; /* تظهر في الموبايل فقط */
+                padding: 0 !important; /* إلغاء الحشو لتملأ الصورة الدائرة */
+                overflow: hidden;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .logo-btn-mobile img {
+                width: 150%;
+                height: 75%;
+                object-fit: cover; /* لضمان ملء الدائرة */
+                border-radius: 50%; /* ضمان دائرية الصورة */
+            }
+
+            /* 4. ضبط المسافات بين الأيقونات في الجهة اليسرى */
+            .header-left {
+                display: flex;
+                align-items: center;
+                gap: 8px; /* مسافة بين السلة والشعار */
+                z-index: 20; /* لضمان بقاء الأيقونات فوق العنوان */
+            }
+            
+            .header-right {
+                z-index: 20;
+            }
+        }
+
+        /* إخفاء أيقونة الشعار الجديدة في شاشات الحاسبة */
+        @media (min-width: 992px) {
+            .logo-btn-mobile {
+                display: none !important;
+            }
         }
     </style>
 </head>
@@ -62,7 +117,11 @@
         <img src="logo.png" alt="شعار سنتر الرضا">
     </a>
 
-    <div class="header-left">
+<div class="header-left">
+        <a href="cart.html?mode=scanner" class="icon-btn logo-btn-mobile" aria-label="سلة الماسح">
+            <img src="logo.png" alt="سلة الماسح">
+        </a>
+
         <a href="cart.html" class="icon-btn cart-btn">
             <i class="fas fa-shopping-cart"></i>
             <span class="badge" id="navCartCount">0</span>

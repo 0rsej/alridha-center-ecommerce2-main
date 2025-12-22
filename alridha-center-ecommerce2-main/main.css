@@ -650,3 +650,114 @@
 .scanner-action-buttons button:active {
     transform: translateY(0);
 }
+/* =========================================
+   تنسيقات شريط التنقل الجديد (تجربة الموبايل)
+   ========================================= */
+@media (max-width: 991px) {
+    /* 1. ضبط حاوية العنوان لتكون في المنتصف تماماً */
+    .brand-logo-container {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        margin: 0 !important;
+        justify-content: center;
+        width: auto !important;
+        z-index: 10;
+    }
+
+    /* 2. إخفاء صورة الشعار القديمة (التي بجانب النص) */
+    .brand-logo-container img {
+        display: none !important;
+    }
+
+    /* 3. تنسيق أيقونة الشعار الجديدة (الزجاجية - يسار) */
+    .logo-btn-mobile {
+        display: flex !important;
+        padding: 0 !important;
+        overflow: hidden;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .logo-btn-mobile img {
+        width: 150%;
+        height: 75%;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+
+    /* 4. ضبط المسافات بين الأيقونات في الجهة اليسرى */
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        z-index: 20;
+    }
+    
+    .header-right {
+        z-index: 20;
+    }
+}
+
+/* إخفاء أيقونة الشعار الجديدة في شاشات الحاسبة */
+@media (min-width: 992px) {
+    .logo-btn-mobile {
+        display: none !important;
+    }
+}
+/* =========================================
+   تنسيقات تبويبات السلة (Cart Tabs)
+   ========================================= */
+.cart-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    background: #f1f2f6;
+    padding: 5px;
+    border-radius: 15px;
+}
+
+.cart-tab-btn {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: bold;
+    color: #7f8c8d;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.cart-tab-btn.active {
+    background: white;
+    color: var(--alridha-main-orange-red);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.cart-tab-btn:hover:not(.active) {
+    background: rgba(255,255,255,0.5);
+    color: #333;
+}
+
+/* علامة مميزة لطلب السكنر في صفحة الطلبات */
+.scanner-order-badge {
+    background: #e1f5fe;
+    color: #0288d1;
+    padding: 5px 10px;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 5px;
+    border: 1px solid #b3e5fc;
+}

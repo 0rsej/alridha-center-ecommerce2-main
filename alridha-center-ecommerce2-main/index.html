@@ -248,53 +248,57 @@
 
     <div id="notification" class="notification"></div>
 
-    <nav class="navbar" id="mainNavbar">
-        <div class="search-box-container" id="searchBoxContainer">
-            <input type="text" id="navbar-search-input" placeholder="ابحث عن منتج..." />
-            <button id="navbar-search-submit" aria-label="تنفيذ البحث"><i class="fas fa-search"></i></button>
-            <button id="close-search-btn" aria-label="إغلاق البحث"><i class="fas fa-times"></i></button>
-        </div>
+<nav class="navbar" id="mainNavbar">
+    <div class="search-box-container" id="searchBoxContainer">
+        <input type="text" id="navbar-search-input" placeholder="ابحث عن منتج..." />
+        <button id="navbar-search-submit" aria-label="تنفيذ البحث"><i class="fas fa-search"></i></button>
+        <button id="close-search-btn" aria-label="إغلاق البحث"><i class="fas fa-times"></i></button>
+    </div>
 
-        <div class="header-right">
-            <button class="icon-btn" id="barcodeTriggerBtn" aria-label="مسح الباركود">
-                <i class="fas fa-barcode"></i>
-            </button>
-            <button class="icon-btn search-trigger-btn" id="searchTriggerBtn" aria-label="فتح البحث">
-                <i class="fas fa-search"></i>
-            </button>
-        </div>
+    <div class="header-right">
+        <button class="icon-btn" id="barcodeTriggerBtn" aria-label="مسح الباركود">
+            <i class="fas fa-barcode"></i>
+        </button>
+        <button class="icon-btn search-trigger-btn" id="searchTriggerBtn" aria-label="فتح البحث">
+            <i class="fas fa-search"></i>
+        </button>
+    </div>
 
-        <a href="index.html" class="brand-logo-container">
-            <span>سنتر الرضا</span>
-            <img src="logo.png" alt="شعار سنتر الرضا">
+    <a href="index.html" class="brand-logo-container">
+        <span>سنتر الرضا</span>
+        <img src="logo.png" alt="شعار سنتر الرضا">
+    </a>
+
+<div class="header-left">
+        <a href="cart.html?mode=scanner" class="icon-btn logo-btn-mobile" aria-label="سلة الماسح">
+            <img src="logo.png" alt="سلة الماسح">
         </a>
 
-        <div class="header-left">
-            <a href="cart.html" class="icon-btn cart-btn">
-                <i class="fas fa-shopping-cart"></i>
-                <span class="badge" id="navCartCount">0</span>
-            </a>
-        </div>
-        
-        <div class="desktop-nav-links">
-            <a href="index.html"><i class="fas fa-home"></i> الرئيسية</a>
-            <a href="categories.html"><i class="fas fa-th-large"></i> الأقسام</a>
-            <a href="wishlist.html">
-                <div style="position: relative;">
-                    <i class="fas fa-heart"></i> المفضلة
-                    <span class="desktop-badge" id="desktopWishlistCount" style="display: none;">0</span>
-                </div>
-            </a>
-            <a href="cart.html">
-                <div style="position: relative;">
-                    <i class="fas fa-shopping-cart"></i> السلة
-                    <span class="desktop-badge" id="desktopCartCount" style="display: none;">0</span>
-                </div>
-            </a>
-            <a href="orders.html"><i class="fas fa-receipt"></i> طلباتي</a>
-            <a href="#" id="desktopSearchTrigger"><i class="fas fa-search"></i> بحث</a>
-        </div>
-    </nav>
+        <a href="cart.html" class="icon-btn cart-btn">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="badge" id="navCartCount">0</span>
+        </a>
+    </div>
+    
+    <div class="desktop-nav-links">
+        <a href="index.html"><i class="fas fa-home"></i> الرئيسية</a>
+        <a href="categories.html"><i class="fas fa-th-large"></i> الأقسام</a>
+        <a href="wishlist.html">
+            <div style="position: relative;">
+                <i class="fas fa-heart"></i> المفضلة
+                <span class="desktop-badge" id="desktopWishlistCount" style="display: none;">0</span>
+            </div>
+        </a>
+        <a href="cart.html">
+            <div style="position: relative;">
+                <i class="fas fa-shopping-cart"></i> السلة
+                <span class="desktop-badge" id="desktopCartCount" style="display: none;">0</span>
+            </div>
+        </a>
+        <a href="orders.html"><i class="fas fa-receipt"></i> طلباتي</a>
+        <a href="#" id="desktopSearchTrigger"><i class="fas fa-search"></i> بحث</a>
+    </div>
+</nav>
 
     <section class="hero-section">
         <div class="hero-content glass-effect">

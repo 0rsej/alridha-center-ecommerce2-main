@@ -1916,7 +1916,8 @@ if (confirmBtn) {
         });
     }
 // ============================================================
-// نظام قراءة الباركود (الكاشير الذكي - تحديث التصميم والتفريغ)
+// ============================================================
+// نظام قراءة الباركود (الكاشير الذكي - مرتبط بسلة الماسح)
 // ============================================================
 
 const barcodeBtn = document.getElementById('barcodeTriggerBtn');
@@ -1924,71 +1925,14 @@ const scannerModal = document.getElementById('scanner-modal');
 const closeScannerBtn = document.getElementById('close-scanner-btn');
 const scanResultEl = document.getElementById('scan-result');
 const modeBtns = document.querySelectorAll('.mode-btn');
-const scannerFooter = document.getElementById('scanner-footer');
-const scanCountEl = document.getElementById('scan-count');
-const scanTotalEl = document.getElementById('scan-total');
-const printScannedBtn = document.getElementById('print-scanned-btn');
-const resetScannedBtn = document.getElementById('reset-scanned-btn'); // زر التفريغ الجديد
 
-// عناصر نافذة المعاينة
-const receiptModal = document.getElementById('receipt-modal');
-const receiptArea = document.getElementById('receipt-preview-area');
+// ملاحظة: المتغير scannerCart ودالة saveScannerCart() تم تعريفهم في بداية الملف (Global)
 
 let html5QrcodeScanner = null;
 let currentScanMode = 'check'; 
 let isScanning = false;
 
-// --- 1. سلة الماسح الضوئي ---
-let scannerCart = []; 
-
-// تحديث الإحصائيات
-function updateScannerStats() {
-    if (!scannerCart) return;
-    const count = scannerCart.reduce((acc, item) => acc + (item.isSoldByPrice ? 1 : item.quantity), 0);
-    const total = scannerCart.reduce((sum, item) => {
-        let price = item.product.price;
-        if(item.variant && item.variant.price_modifier) price += item.variant.price_modifier;
-        return sum + (item.isSoldByPrice ? item.quantity : price * item.quantity);
-    }, 0);
-    
-    if (scanCountEl) scanCountEl.textContent = count;
-    if (scanTotalEl) scanTotalEl.textContent = total.toLocaleString();
-}
-
-// إضافة للسلة
-function addToScannerCart(globalProductId, quantityOrPrice = 1, isSoldByPrice = false) {
-    const product = products.find(p => p.globalId === globalProductId);
-    if (!product) return;
-
-    const existingItem = scannerCart.find(item => item.product.globalId === globalProductId);
-
-    if (existingItem) {
-        existingItem.quantity += quantityOrPrice;
-    } else {
-        scannerCart.push({
-            product: product,
-            quantity: quantityOrPrice,
-            isSoldByPrice: isSoldByPrice
-        });
-    }
-    updateScannerStats();
-}
-
-// --- دالة تفريغ السلة (الجديدة) ---
-function resetScannerCart() {
-    if (scannerCart.length === 0) return;
-    
-    if (confirm('هل أنت متأكد من تفريغ الحاسبة والبدء من جديد؟')) {
-        scannerCart = [];
-        updateScannerStats();
-        scanResultEl.innerHTML = 'تم تفريغ القائمة بنجاح ✨';
-        setTimeout(() => {
-            scanResultEl.innerHTML = 'وضع الحاسبة: جاهز للمسح';
-        }, 1500);
-    }
-}
-
-// التبديل بين الأوضاع
+// دالة التبديل بين الأوضاع (كشف سعر / حاسبة)
 modeBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         modeBtns.forEach(b => b.classList.remove('active'));
@@ -1996,139 +1940,98 @@ modeBtns.forEach(btn => {
         currentScanMode = btn.getAttribute('data-mode');
         
         if (currentScanMode === 'cart') {
-            scanResultEl.innerHTML = 'وضع الحاسبة: امسح للإضافة';
-            scannerFooter.classList.remove('hidden');
-            updateScannerStats();
+            scanResultEl.innerHTML = 'وضع الحاسبة: الإضافة تلقائية للسلة';
         } else {
             scanResultEl.innerHTML = 'كاشف السعر: امسح للتأكد';
-            scannerFooter.classList.add('hidden');
         }
     });
 });
 
-// عند نجاح المسح (تم تعديل التصميم جذرياً)
+// عند نجاح المسح (Core Logic)
 function onScanSuccess(decodedText, decodedResult) {
     if (isScanning) return;
     isScanning = true;
     
+    // تشغيل صوت "بيب" خفيف
     const audio = new Audio('https://www.soundjay.com/buttons/beep-01a.mp3');
     audio.play().catch(e => {});
 
+    // البحث عن المنتج
     const product = products.find(p => p.id == decodedText || p.globalId == decodedText || p.barcode == decodedText);
 
     if (product) {
         if (currentScanMode === 'check') {
-            // --- التصميم الجديد (المنفصل) لكشف السعر ---
+            // --- وضع كشف السعر ---
             scanResultEl.innerHTML = `
-                <div style="background:#e8f5e9; color:#2e7d32; padding:5px 10px; border-radius:5px; margin-bottom:10px; font-size:0.85rem; width:100%;">
+                <div style="background:#e8f5e9; color:#2e7d32; padding:5px; border-radius:5px; margin-bottom:10px; font-size:0.8rem;">
                     ✔ تم العثور على المنتج
                 </div>
-                
-                <div style="display:flex; flex-direction: column; align-items:center; width:100%;">
-                    <img src="${product.image}" style="width:65px; height:65px; object-fit:contain; border:1px solid #eee; border-radius:8px; margin-bottom:8px; background:white;">
-                    
-                    <div style="text-align:center;">
-                        <h4 style="margin:0 0 5px 0; font-size:0.95rem; color:#333; line-height:1.4;">${product.name}</h4>
-                        <div style="font-size:1.2rem; font-weight:bold; color:#d35400;">${product.price} د.ع</div>
-                    </div>
+                <div style="display:flex; flex-direction: column; align-items:center;">
+                    <img src="${product.image}" style="width:60px; height:60px; object-fit:contain; border:1px solid #eee; border-radius:8px; background:white;">
+                    <h4 style="margin:5px 0; font-size:0.9rem;">${product.name}</h4>
+                    <div style="font-size:1.1rem; font-weight:bold; color:#d35400;">${product.price} د.ع</div>
                 </div>
             `;
         } else {
-            // وضع الحاسبة
+            // --- وضع الحاسبة (الإضافة للسلة الجديدة) ---
             const isSoldByPrice = ['spices', 'nuts'].includes(product.category);
-            addToScannerCart(product.globalId, isSoldByPrice ? 1000 : 1, isSoldByPrice);
-            scanResultEl.innerHTML = `<div style="color: #27ae60; font-size:0.9rem;">✔ تمت الإضافة: <b>${product.name}</b></div>`;
+            
+            // 1. التحقق هل المنتج موجود مسبقاً في سلة الماسح لزيادة الكمية
+            const existingItem = scannerCart.find(item => item.product.globalId === product.globalId);
+            
+            if (existingItem) {
+                // زيادة الكمية (أو القيمة إذا كان يباع بالسعر)
+                existingItem.quantity += (isSoldByPrice ? 1000 : 1);
+            } else {
+                // إضافة منتج جديد
+                scannerCart.push({
+                    product: product,
+                    quantity: (isSoldByPrice ? 1000 : 1),
+                    isSoldByPrice: isSoldByPrice
+                });
+            }
+
+            // 2. حفظ السلة فوراً
+            if (typeof saveScannerCart === 'function') {
+                saveScannerCart();
+            }
+
+            // 3. عرض رسالة نجاح
+            scanResultEl.innerHTML = `
+                <div style="color:#2980b9; font-weight:bold; font-size:0.95rem;">
+                    ✅ تمت الإضافة لسلة الكاشير
+                    <br>
+                    <span style="color:#333; font-size:0.85rem;">${product.name}</span>
+                </div>
+            `;
+            
+            // إظهار إشعار صغير
+            if (typeof showNotification === 'function') {
+                showNotification(`تم إضافة "${product.name}" لسلة الماسح`);
+            }
         }
     } else {
         scanResultEl.innerHTML = `<span style="color:red;">❌ منتج غير مسجل</span>`;
     }
-    setTimeout(() => { isScanning = false; }, 1500);
-}
 
-// فتح نافذة المعاينة
-function printScannedList() {
-    if (scannerCart.length === 0) { alert("القائمة فارغة!"); return; }
-    
-    if (scannerModal) scannerModal.classList.add('hidden');
-    if (receiptModal) receiptModal.classList.remove('hidden');
-
-    const total = scannerCart.reduce((sum, item) => {
-        let price = item.product.price;
-        if(item.variant && item.variant.price_modifier) price += item.variant.price_modifier;
-        return sum + (item.isSoldByPrice ? item.quantity : price * item.quantity);
-    }, 0);
-
-    const now = new Date().toLocaleString('ar-IQ');
-
-    if (receiptArea) {
-        receiptArea.innerHTML = `
-            <div style="text-align: center; border-bottom: 2px dashed #333; padding-bottom: 10px; margin-bottom: 10px;">
-                <h2 style="margin: 0; font-size: 1.2rem;">سنتر الرضا</h2>
-                <p style="margin: 5px 0; font-size: 0.8rem; color: #666;">${now}</p>
-            </div>
-            
-            <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
-                <thead>
-                    <tr style="background:#f0f0f0; border-bottom: 1px solid #ddd;">
-                        <th style="padding: 5px; text-align: right;">المادة</th>
-                        <th style="padding: 5px; text-align: center;">العدد</th>
-                        <th style="padding: 5px; text-align: left;">السعر</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${scannerCart.map(item => `
-                    <tr style="border-bottom: 1px dashed #eee;">
-                        <td style="padding: 5px;">${item.product.name}</td>
-                        <td style="padding: 5px; text-align: center;">${item.isSoldByPrice ? '-' : item.quantity}</td>
-                        <td style="padding: 5px; text-align: left;">${item.isSoldByPrice ? item.quantity : (item.product.price * item.quantity)}</td>
-                    </tr>`).join('')}
-                </tbody>
-            </table>
-            
-            <div style="margin-top: 15px; border-top: 2px dashed #333; padding-top: 10px; display:flex; justify-content:space-between; align-items:center;">
-                <strong style="font-size: 1rem;">المجموع الكلي:</strong>
-                <span style="font-size: 1.2rem; font-weight:bold; color:#d35400;">${total} د.ع</span>
-            </div>
-            <p style="text-align: center; margin-top: 10px; font-size: 0.7rem; color: #888;">* مسودة للكاشير *</p>
-        `;
-    }
-}
-
-// دوال مساعدة للطباعة والحفظ
-window.downloadReceiptAsImage = function() {
-    if (!receiptArea) return;
-    html2canvas(receiptArea).then(canvas => {
-        const link = document.createElement('a');
-        link.download = `فاتورة_${Date.now()}.png`;
-        link.href = canvas.toDataURL();
-        link.click();
-    });
-}
-
-window.printReceiptFinal = function() {
-    if (!receiptArea) return;
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write('<html><head><title>طباعة</title></head><body dir="rtl" style="font-family:Arial;">');
-    printWindow.document.write(receiptArea.innerHTML);
-    printWindow.document.write('</body></html>');
-    printWindow.document.close();
-    setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
-}
-
-window.closeReceiptModal = function() {
-    if (receiptModal) receiptModal.classList.add('hidden');
-    if (scannerModal) scannerModal.classList.remove('hidden');
+    // إعادة تفعيل المسح بعد ثانية ونصف
+    setTimeout(() => { 
+        isScanning = false; 
+        if (scanResultEl.innerText.includes('تم') || scanResultEl.innerText.includes('غير')) {
+            scanResultEl.innerHTML = currentScanMode === 'check' ? 'كاشف السعر: جاهز...' : 'جاري المسح للإضافة...';
+        }
+    }, 1500);
 }
 
 // تشغيل الماسح
 function startScanner() {
     if (scannerModal) scannerModal.classList.remove('hidden');
     
+    // إعداد وضع العرض الافتراضي
     if (currentScanMode === 'cart') { 
-            scannerFooter.classList.remove('hidden'); 
-            updateScannerStats(); 
-    } else { 
-            scannerFooter.classList.add('hidden'); 
+        scanResultEl.innerHTML = 'وضع الحاسبة: امسح للإضافة';
+    } else {
+        scanResultEl.innerHTML = 'كاشف السعر: امسح للتأكد';
     }
 
     if (html5QrcodeScanner) return;
@@ -2137,31 +2040,30 @@ function startScanner() {
     
     const config = { fps: 15, qrbox: { width: 250, height: 150 }, aspectRatio: 1.0 };
     
+    // محاولة تشغيل الكاميرا الخلفية أولاً
     html5QrcodeScanner.start({ facingMode: "environment" }, config, onScanSuccess)
     .catch(err => {
-        console.warn("المحاولة بالكاميرا الأمامية...", err);
+        console.warn("فشل تشغيل الكاميرا الخلفية، جاري تجربة الأمامية...", err);
         return html5QrcodeScanner.start({ facingMode: "user" }, config, onScanSuccess);
     })
     .catch(finalErr => {
-        scanResultEl.innerHTML = `<span style="color:red; font-size:12px;">❌ الكاميرا لا تعمل</span>`;
-        alert("تأكد من السماح للكاميرا.");
+        scanResultEl.innerHTML = `<span style="color:red; font-size:12px;">❌ الكاميرا لا تعمل أو لا توجد صلاحية</span>`;
+        // alert("يرجى السماح باستخدام الكاميرا.");
     });
 }
 
+// إيقاف الماسح
 function stopScanner() {
     if (scannerModal) scannerModal.classList.add('hidden');
     if (html5QrcodeScanner) { 
         html5QrcodeScanner.stop().then(() => { 
             html5QrcodeScanner.clear(); 
             html5QrcodeScanner = null; 
-        }).catch(e => console.log(e)); 
+        }).catch(e => console.log("خطأ في إيقاف الكاميرا:", e)); 
     }
 }
 
 // تفعيل الأحداث
 if (barcodeBtn) barcodeBtn.addEventListener('click', startScanner);
 if (closeScannerBtn) closeScannerBtn.addEventListener('click', stopScanner);
-if (printScannedBtn) printScannedBtn.addEventListener('click', printScannedList);
-// تفعيل زر التفريغ الجديد
-if (resetScannedBtn) resetScannedBtn.addEventListener('click', resetScannerCart);
 });

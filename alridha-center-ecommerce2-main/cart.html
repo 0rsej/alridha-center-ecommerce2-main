@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>سلة مشترياتك - سنتر الرضا</title>
+    <title>سلة المشتريات - سنتر الرضا</title>
 
     <link rel="preload" href="main.css?v=3.0" as="style" />
     <link rel="preload" href="script.js?v=3.0" as="script" />
@@ -13,6 +13,48 @@
     
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+
+    <style>
+        /* --- تنسيقات شريط التنقل الجديد (تجربة الموبايل) --- */
+        @media (max-width: 991px) {
+            .brand-logo-container {
+                position: absolute; left: 50%; transform: translateX(-50%);
+                margin: 0 !important; justify-content: center; width: auto !important; z-index: 10;
+            }
+            .brand-logo-container img { display: none !important; }
+            .logo-btn-mobile {
+                display: flex !important; padding: 0 !important; overflow: hidden;
+                align-items: center; justify-content: center; border: 1px solid rgba(0,0,0,0.05);
+            }
+            .logo-btn-mobile img {
+                width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
+            }
+            .header-left { display: flex; align-items: center; gap: 8px; z-index: 20; }
+            .header-right { z-index: 20; }
+        }
+        @media (min-width: 992px) { .logo-btn-mobile { display: none !important; } }
+
+        /* --- تنسيقات تبويبات السلة (Cart Tabs) --- */
+        .cart-tabs {
+            display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;
+            background: #f1f2f6; padding: 5px; border-radius: 15px;
+        }
+        .cart-tab-btn {
+            flex: 1; border: none; background: transparent; padding: 12px 5px;
+            border-radius: 12px; font-weight: bold; color: #7f8c8d; cursor: pointer;
+            transition: all 0.3s ease; font-size: 0.9rem;
+            display: flex; align-items: center; justify-content: center; gap: 5px;
+        }
+        .cart-tab-btn i { font-size: 1.1em; }
+        .cart-tab-btn.active {
+            background: white; color: #d35400; /* لون برتقالي */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .cart-tab-btn:hover:not(.active) { background: rgba(255,255,255,0.5); color: #333; }
+        
+        /* تنسيق العنوان المتغير */
+        #cart-view-title { font-size: 1.1rem; margin-bottom: 15px; color: #2c3e50; }
+    </style>
 </head>
 <body class="mobile-app-view">
 
@@ -39,7 +81,11 @@
         <img src="logo.png" alt="شعار سنتر الرضا">
     </a>
 
-    <div class="header-left">
+<div class="header-left">
+        <a href="cart.html?mode=scanner" class="icon-btn logo-btn-mobile" aria-label="سلة الماسح">
+            <img src="logo.png" alt="سلة الماسح">
+        </a>
+
         <a href="cart.html" class="icon-btn cart-btn">
             <i class="fas fa-shopping-cart"></i>
             <span class="badge" id="navCartCount">0</span>
@@ -69,15 +115,25 @@
 <div style="height: 80px;"></div>
 
 <div class="container">
-    <h1 class="page-title">سلة مشترياتك</h1>
+    <h1 class="page-title">سلة المشتريات</h1>
 
     <div class="cart card">
-        <h2>تفاصيل المنتجات</h2>
+        <div class="cart-tabs">
+            <button class="cart-tab-btn active" id="tab-app-cart">
+                <i class="fas fa-shopping-cart"></i> سلة التطبيق
+            </button>
+            <button class="cart-tab-btn" id="tab-scanner-cart">
+                <i class="fas fa-barcode"></i> سلة الماسح (الكاشير)
+            </button>
+        </div>
+
+        <h2 id="cart-view-title">تفاصيل المنتجات (سلة التطبيق)</h2>
+        
         <table id="cart-table">
             <thead>
                 <tr>
                     <th>المنتج</th>
-                    <th>الكمية</th>
+                    <th>العدد</th>
                     <th>السعر</th>
                     <th>الإجمالي</th>
                     <th>حذف</th>
@@ -85,10 +141,11 @@
             </thead>
             <tbody></tbody>
         </table>
+
         <div class="cart-actions">
             <div>
                 <button id="checkout-btn" class="action-btn">التالي (تأكيد البيانات)</button>
-                <button id="clear-cart-btn" class="action-btn clear-cart-btn">تفريغ السلة</button>
+                <button id="clear-cart-btn" class="action-btn clear-cart-btn">تفريغ السلة الحالية</button>
             </div>
             <strong>المجموع: <span id="cart-total">0</span> د.ع</strong>
         </div>
@@ -164,27 +221,7 @@
         </div>
         <div id="reader" style="width: 100%; border-radius: 10px; overflow: hidden; min-height: 250px;"></div>
         <div id="scan-result" class="scan-result">وجه الكاميرا نحو الباركود...</div>
-        <div id="scanner-footer" class="scanner-footer hidden">
-            <div class="scanner-stats">
-                <span>المواد: <b id="scan-count">0</b></span>
-                <span>المجموع: <b id="scan-total" style="color: #e65100;">0</b> د.ع</span>
-            </div>
-            <div class="scanner-action-buttons">
-                <button id="reset-scanned-btn"><i class="fas fa-trash-alt"></i> تفريغ</button>
-                <button id="print-scanned-btn"><i class="fas fa-print"></i> طباعة القائمة</button>
-            </div>
-        </div>
-    </div>
-</div>
-<div id="receipt-modal" class="scanner-modal hidden">
-    <div class="scanner-content" style="max-width: 350px;">
-        <button onclick="closeReceiptModal()" class="close-scanner"><i class="fas fa-times"></i></button>
-        <h3>معاينة القائمة</h3>
-        <div id="receipt-preview-area" style="background: white; padding: 15px; border-radius: 10px; border: 1px dashed #ccc; margin: 15px 0; text-align: right;"></div>
-        <div style="display: flex; gap: 10px; flex-direction: column;">
-            <button onclick="downloadReceiptAsImage()" class="action-btn" style="background: #27ae60;"><i class="fas fa-download"></i> حفظ كصورة</button>
-            <button onclick="printReceiptFinal()" class="action-btn" style="background: #333;"><i class="fas fa-print"></i> طباعة ورقية</button>
-        </div>
+        <div id="scanner-footer" class="scanner-footer hidden"></div>
     </div>
 </div>
 
