@@ -34,7 +34,7 @@
 @import url('orders_page.css');
 
 /* 11. أنماط صفحة تفاصيل المنتج (الاسم المختصر) */
-@import url('prod_details.css'); /* استخدام الاسم المختصر هنا */
+@import url('prod_details.css');
 
 /* 12. أنماط صفحة المفضلة */
 @import url('wishlist_page.css');
@@ -42,57 +42,46 @@
 /* 13. أنماط الأدوات المساعدة والعامة (الإشعارات، البحث، إلخ) */
 @import url('utilities.css');
 
-/*
- * ملاحظة: ترتيب الاستيراد مهم!
- * يفضل استيراد المتغيرات والأنماط الأساسية أولاً،
- * ثم المكونات العامة، ثم الأنماط الخاصة بالصفحات.
- */
- /* =========================================
+/* =========================================
    تحسينات خاصة بشاشات الحاسوب (Desktop Only)
    ========================================= */
 @media (min-width: 1024px) {
 
-    /* 1. تحديد أقصى عرض للمحتوى لتجنب التمدد المزعج */
     .container, .main-container, .navbar {
-        max-width: 1200px; /* عرض مثالي للقراءة */
+        max-width: 1200px;
         margin-left: auto !important;
         margin-right: auto !important;
         padding-left: 0;
         padding-right: 0;
     }
 
-    /* إصلاح شريط التنقل ليملأ الشاشة ولكن المحتوى في الوسط */
     .navbar {
         width: 100%;
-        max-width: 100%; /* الشريط الخلفي يملأ الشاشة */
-        padding: 0 50px; /* حشوة جانبية */
+        max-width: 100%;
+        padding: 0 50px;
         display: flex;
         justify-content: space-between;
     }
     
-    /* جعل الروابط في الوسط تماماً */
     .navbar .nav-links {
-        gap: 30px; /* مسافة مريحة بين الروابط */
+        gap: 30px;
     }
 
-    /* 2. تحسين شبكة المنتجات (4 منتجات في الصف) */
     .products-display-area, .categories-grid {
         display: grid !important;
-        grid-template-columns: repeat(4, 1fr) !important; /* 4 أعمدة */
+        grid-template-columns: repeat(4, 1fr) !important;
         gap: 30px !important;
     }
 
-    /* تكبير وتجميل بطاقة المنتج */
     .product-item, .category-item {
         transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
     
     .product-item:hover, .category-item:hover {
-        transform: translateY(-10px) scale(1.02); /* حركة ناعمة للأعلى */
-        box-shadow: 0 15px 30px rgba(0,0,0,0.15); /* ظل فخم */
+        transform: translateY(-10px) scale(1.02);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.15);
     }
 
-    /* 3. تحسين جدول السلة (Cart Table) */
     .cart table {
         font-size: 1.1em;
         width: 100%;
@@ -109,10 +98,9 @@
         padding: 15px;
     }
 
-    /* 4. تحسين قسم "تواصل معنا" ليكون بجانب بعضه */
     .contact-section {
         display: flex;
-        flex-direction: row; /* جعل المحتوى أفقياً */
+        flex-direction: row;
         justify-content: space-around;
         align-items: center;
         text-align: right;
@@ -123,27 +111,26 @@
         width: 45%;
     }
 
-    /* 5. تحسين الهيرو (الواجهة الرئيسية) */
     .hero-content {
-        max-width: 50%; /* النص يأخذ نصف الشاشة فقط لجمالية أكثر */
-        text-align: right; /* محاذاة لليمين ليتناسب مع العربية */
-        margin-right: 10%; /* إزاحة قليلة */
+        max-width: 50%;
+        text-align: right;
+        margin-right: 10%;
     }
     
     .hero-title {
         font-size: 4em;
     }
 }
+
 /* ==========================================================================
    تغيير جذري وقسري لتصميم الحاسوب (Desktop Overhaul) - Force Override
    ========================================================================== */
 @media (min-width: 1024px) {
 
-    /* --- 1. إصلاح جذري لصفحة تفاصيل المنتج (Split Layout) --- */
-    
+    /* صفحة تفاصيل المنتج */
     .product-detail-card {
-        display: grid !important; /* استخدام الشبكة للتقسيم الصارم */
-        grid-template-columns: 450px 1fr !important; /* عمود للصورة وعمود للنص */
+        display: grid !important;
+        grid-template-columns: 450px 1fr !important;
         gap: 50px !important;
         align-items: start !important;
         text-align: right !important;
@@ -154,7 +141,6 @@
         box-shadow: 0 10px 40px rgba(0,0,0,0.08) !important;
     }
 
-    /* الصورة: تكبير وتثبيت الحجم */
     .detail-image {
         width: 100% !important;
         height: 450px !important;
@@ -165,7 +151,6 @@
         box-shadow: none !important;
     }
 
-    /* النصوص */
     .detail-info {
         display: flex !important;
         flex-direction: column !important;
@@ -177,20 +162,17 @@
         margin-bottom: 20px !important;
     }
 
-    /* --- 2. إصلاح أزرار صفحة التفاصيل (صغيرة وأنيقة) --- */
-
     .product-detail-card .product-actions {
-        flex-direction: row !important; /* إجبار الوضع الأفقي */
-        width: auto !important; /* إلغاء العرض الكامل */
+        flex-direction: row !important;
+        width: auto !important;
         justify-content: flex-start !important;
         gap: 15px !important;
         margin-top: 25px !important;
     }
 
-    /* زر أضف للسلة: تقليص الحجم */
     .product-detail-card .add-btn {
-        width: auto !important; /* إلغاء تمدد الزر */
-        min-width: 200px !important; /* عرض ثابت مناسب */
+        width: auto !important;
+        min-width: 200px !important;
         padding: 0 30px !important;
         height: 55px !important;
         font-size: 1.2em !important;
@@ -198,7 +180,6 @@
         margin: 0 !important;
     }
 
-    /* زر المفضلة في صفحة التفاصيل */
     .product-detail-card .add-to-wishlist-btn {
         width: 55px !important;
         height: 55px !important;
@@ -220,9 +201,6 @@
         font-size: 1.4em !important;
     }
 
-    /* --- 3. إصلاحات بطاقات المنتجات في الصفحة الرئيسية والأقسام (Grid View) --- */
-
-    /* إجبار زر "اختر النوع" على اللون البرتقالي */
     .product-item .product-actions .view-details-btn {
         background-color: var(--alridha-main-orange-red) !important;
         color: white !important;
@@ -232,19 +210,18 @@
         font-weight: bold !important;
     }
     .product-item .product-actions .view-details-btn:hover {
-        background-color: #cc3700 !important; /* لون أغمق عند التحويم */
+        background-color: #cc3700 !important;
         transform: translateY(-3px) !important;
     }
 
-    /* إصلاح زر القلب (المفضلة) في البطاقات: توسيط تام */
     .product-item .product-actions .add-to-wishlist-btn {
         width: 45px !important;
         height: 45px !important;
-        padding: 0 !important; /* إزالة الحشوة هي سر التوسيط */
+        padding: 0 !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        border-radius: 50% !important; /* دائرة كاملة */
+        border-radius: 50% !important;
         background-color: #f9f9f9 !important;
         border: 1px solid #ddd !important;
         color: #555 !important;
@@ -257,25 +234,24 @@
         border-color: var(--alridha-main-orange-red) !important;
     }
 
-    /* ضبط أيقونة القلب داخل الدائرة */
     .product-item .product-actions .add-to-wishlist-btn i {
-        margin: 0 !important; /* إزالة الهوامش الجانبية للأيقونة */
+        margin: 0 !important;
         padding: 0 !important;
         font-size: 1.1em !important;
         line-height: 1 !important;
         display: block !important;
-        transform: translateY(1px) !important; /* تعديل بصري دقيق جداً للمنتصف */
+        transform: translateY(1px) !important;
     }
 }
+
 /* ==========================================================================
-   إصلاحات نهائية للألوان (توحيد البرتقالي) - Orange Theme Unification
+   إصلاحات نهائية للألوان (توحيد البرتقالي)
    ========================================================================== */
 
-/* --- 1. زر "اختر النوع" (برتقالي دائماً) --- */
 .view-details-btn,
 .product-item .product-actions .view-details-btn,
 #products-list .view-details-btn {
-    background-color: var(--alridha-main-orange-red) !important; /* برتقالي */
+    background-color: var(--alridha-main-orange-red) !important;
     color: white !important;
     border: none !important;
     box-shadow: 0 4px 10px rgba(255, 69, 0, 0.2) !important;
@@ -286,21 +262,18 @@
 .view-details-btn:active,
 .product-item .product-actions .view-details-btn:hover,
 #products-list .view-details-btn:hover {
-    background-color: #e63e00 !important; /* برتقالي داكن عند التحويم */
+    background-color: #e63e00 !important;
     color: white !important;
     transform: translateY(-2px);
 }
 
-/* --- 2. زر "المفضلة" (توحيد التصميم في كل الموقع) --- */
-
-/* الوضع الافتراضي (غير مضاف): خلفية بيضاء، قلب رمادي */
 .add-to-wishlist-btn,
 .product-item .product-actions .add-to-wishlist-btn,
 .product-detail-card .add-to-wishlist-btn,
 #products-list .add-to-wishlist-btn {
     background-color: white !important;
     border: 1px solid #ddd !important;
-    color: #777 !important; /* لون القلب رمادي */
+    color: #777 !important;
     transition: all 0.3s ease;
     display: flex !important;
     align-items: center !important;
@@ -308,35 +281,30 @@
     box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important;
 }
 
-/* عند التحويم (Hover) - قبل الإضافة: يصبح القلب والإطار برتقالي */
 .add-to-wishlist-btn:hover,
 .product-item .product-actions .add-to-wishlist-btn:hover,
 .product-detail-card .add-to-wishlist-btn:hover {
     background-color: white !important;
-    color: var(--alridha-main-orange-red) !important; /* قلب برتقالي */
+    color: var(--alridha-main-orange-red) !important;
     border-color: var(--alridha-main-orange-red) !important;
 }
 
-/* --- الوضع النشط (Active) - عند الإضافة للمفضلة --- */
-/* هنا التغيير الجذري: يصبح مثل زر "اختر النوع" تماماً */
 .add-to-wishlist-btn.active,
 .product-item .product-actions .add-to-wishlist-btn.active,
 .product-detail-card .add-to-wishlist-btn.active,
 #products-list .add-to-wishlist-btn.active {
-    background-color: var(--alridha-main-orange-red) !important; /* خلفية برتقالية */
+    background-color: var(--alridha-main-orange-red) !important;
     border-color: var(--alridha-main-orange-red) !important;
-    color: white !important; /* قلب أبيض */
+    color: white !important;
     box-shadow: 0 4px 10px rgba(255, 69, 0, 0.3) !important;
     opacity: 1 !important;
 }
 
-/* عند التحويم على الزر النشط */
 .add-to-wishlist-btn.active:hover {
-    background-color: #e63e00 !important; /* برتقالي داكن */
+    background-color: #e63e00 !important;
     color: white !important;
 }
 
-/* ضبط حجم الأيقونة */
 .add-to-wishlist-btn i {
     margin: 0 !important;
     padding: 0 !important;
@@ -345,186 +313,38 @@
     display: block !important;
 }
 
-/* ==========================================================================
-   تنسيقات الحاسوب (Desktop) - الحفاظ على الهيكلية
-   ========================================================================== */
-@media (min-width: 1024px) {
-    /* أزرار البطاقة */
-    .product-item .product-actions .view-details-btn {
-        border-radius: 50px !important;
-        padding: 0 20px !important;
-        height: 45px !important;
-        font-weight: bold !important;
-    }
-
-    .product-item .product-actions .add-to-wishlist-btn {
-        width: 45px !important;
-        height: 45px !important;
-        border-radius: 50% !important; 
-        padding: 0 !important;
-    }
-
-    /* صفحة تفاصيل المنتج */
-    .product-detail-card {
-        display: grid !important;
-        grid-template-columns: 450px 1fr !important;
-        gap: 50px !important;
-        align-items: start !important;
-        text-align: right !important;
-        padding: 50px !important;
-        max-width: 1200px !important;
-        margin: 0 auto 40px auto !important;
-    }
-    
-    .detail-image {
-        width: 100% !important;
-        height: 450px !important;
-        max-width: 450px !important;
-        object-fit: contain !important;
-    }
-
-    /* زر المفضلة في صفحة التفاصيل (مربع بحواف ناعمة) */
-    .product-detail-card .add-to-wishlist-btn {
-        width: 55px !important;
-        height: 55px !important;
-        border-radius: 10px !important;
-    }
-    
-    .product-detail-card .product-actions {
-        flex-direction: row !important;
-        justify-content: flex-start !important;
-    }
-}
 /* =========================================
-   تنسيقات الماسح الضوئي الزجاجي (Glassmorphism)
+   تنسيقات الماسح الضوئي (محدث وشامل)
    ========================================= */
 
-/* 1. خلفية النافذة (الضبابية) */
+/* 1. خلفية النافذة */
 .scanner-modal {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
-    /* خلفية شبه شفافة داكنة */
-    background: rgba(0, 0, 0, 0.5);
-    /* هذا هو السر: تأثير تغبيش الخلفية خلف النافذة */
+    background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px); /* لدعم متصفح سفاري */
+    -webkit-backdrop-filter: blur(8px);
     z-index: 2000;
     display: flex; justify-content: center; align-items: center;
     padding: 20px;
     opacity: 1;
-    transition: all 0.4s ease-in-out; /* نعومة في الظهور والاختفاء */
-}
-
-/* إخفاء النافذة بنعومة */
-.scanner-modal.hidden {
-    opacity: 0;
-    pointer-events: none; /* لمنع الضغط عليها وهي مختفية */
-}
-
-/* 2. صندوق المحتوى (الصندوق الزجاجي) */
-.scanner-content {
-    /* خلفية بيضاء شبه شفافة */
-    background: rgba(255, 255, 255, 0.85);
-    /* تغبيش إضافي لداخل الصندوق */
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    /* حدود بيضاء رقيقة جداً لتعريف الحواف */
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    /* ظل ناعم وعميق */
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-    width: 100%; max-width: 500px;
-    border-radius: 25px; /* زوايا أكثر استدارة */
-    padding: 25px;
-    text-align: center;
-    position: relative;
-    transform: translateY(0);
     transition: all 0.4s ease-in-out;
 }
-/* حركة بسيطة عند الظهور */
-.scanner-modal.hidden .scanner-content {
-    transform: translateY(30px); /* ينزلق للأسفل قليلاً عند الاختفاء */
+
+.scanner-modal.hidden {
+    opacity: 0;
+    pointer-events: none;
 }
 
-/* 3. زر الإغلاق الزجاجي */
-/* --- زر الإغلاق الزجاجي (تصميم ثابت وأنيق) --- */
-.close-scanner {
-    position: absolute;
-    top: 15px; left: 15px;
-    /* زجاج شفاف وهادئ */
-    background: rgba(255, 255, 255, 0.35);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    /* حدود بيضاء ناعمة */
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    color: #333; /* لون الأيقونة */
-    width: 38px; height: 38px;
-    border-radius: 10px; /* مربع بزوايا ناعمة */
-    font-size: 1.1rem;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    z-index: 10;
-    /* انتقال ناعم للون فقط (بدون حركة) */
-    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-}
-
-.close-scanner:hover {
-    /* عند التحويم: يتحول للأحمر بوقار */
-    background: rgba(220, 53, 69, 0.9); /* أحمر */
-    color: white;
-    border-color: rgba(220, 53, 69, 0.5);
-    box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3); /* ظل خفيف جداً للأحمر */
-}
-/* 4. أزرار التبديل الزجاجية */
-.scan-mode-switch {
-    display: flex; gap: 10px; margin-bottom: 20px;
-    background: rgba(230, 230, 230, 0.5); /* خلفية زجاجية رمادية */
-    backdrop-filter: blur(5px);
-    padding: 6px; border-radius: 15px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-/* تعديل أزرار التبديل لتناسب الشاشات الصغيرة */
-.mode-btn {
-    flex: 1; 
-    border: none; 
-    padding: 10px 2px; /* تقليل الحواف الجانبية لأقصى حد */
-    border-radius: 12px;
-    background: transparent; 
-    color: #666; 
-    cursor: pointer;
-    font-weight: bold; 
-    font-family: inherit;
-    transition: all 0.3s ease;
-    
-    /* --- التعديلات الجديدة --- */
-    font-size: 0.85rem; /* تصغير الخط */
-    white-space: nowrap; /* منع النزول لسطر جديد نهائياً */
-    overflow: hidden; /* إخفاء أي نص زائد (للحماية) */
-    text-overflow: ellipsis;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.mode-btn.active {
-    /* لون برتقالي زجاجي متوهج */
-    background: rgba(230, 81, 0, 0.85);
-    color: white;
-    box-shadow: 0 5px 15px rgba(230, 81, 0, 0.3);
-}
-
-/* 5. منطقة النتائج */
-/* تعديل عرض الصندوق الزجاجي ليملأ الشاشة */
+/* 2. صندوق المحتوى */
 .scanner-content {
-    background: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-    
-    /* --- التعديل هنا: زيادة العرض --- */
-    width: 95%; /* يأخذ 95% من عرض شاشة الهاتف */
-    max-width: 500px; /* أقصى حد للكمبيوتر */
-    
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    width: 95%; 
+    max-width: 500px;
     border-radius: 25px;
     padding: 25px;
     text-align: center;
@@ -533,128 +353,190 @@
     transition: all 0.4s ease-in-out;
 }
 
-/* تعديل منطقة النص لتبقى في سطر واحد */
+.scanner-modal.hidden .scanner-content {
+    transform: translateY(30px);
+}
+
+/* 3. زر الإغلاق للماسح (X) */
+.close-scanner {
+    position: absolute;
+    top: 15px; left: 15px;
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    color: #333;
+    width: 38px; height: 38px;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 10;
+    transition: background-color 0.2s ease;
+}
+
+.close-scanner:hover {
+    background: rgba(220, 53, 69, 0.9);
+    color: white;
+}
+
+/* 4. أزرار التبديل (كاشف السعر / الحاسبة) - الإصلاح الجديد */
+.scan-mode-switch {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.05); /* خلفية خفيفة جداً */
+    padding: 5px;
+    border-radius: 50px;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.mode-btn {
+    flex: 1;
+    padding: 10px 15px;
+    border: none;
+    background: transparent; /* شفافة افتراضياً */
+    color: #555; /* نص غامق ليظهر على الخلفية الفاتحة */
+    border-radius: 50px;
+    cursor: pointer;
+    font-family: 'Tajawal', sans-serif;
+    font-weight: bold;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+/* الحالة النشطة: برتقالي */
+.mode-btn.active {
+    background: linear-gradient(135deg, #F09819 0%, #FF512F 100%) !important;
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(240, 152, 25, 0.3);
+}
+
+.mode-btn:hover:not(.active) {
+    background: rgba(0,0,0,0.05);
+}
+
+/* 5. منطقة النتائج */
 .scan-result {
     margin-top: 20px; 
-    padding: 12px 10px; /* تقليل الحواف الجانبية */
-    background: rgba(255, 255, 255, 0.65);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 12px;
     font-weight: 700; 
     color: #2c3e50;
     min-height: 45px;
     display: flex; align-items: center; justify-content: center;
-    
-    /* ضمان السطر الواحد */
     white-space: nowrap; 
     overflow: hidden;
     text-overflow: ellipsis;
-    
-    /* --- التعديل هنا: تصغير الخط قليلاً --- */
     font-size: 0.9rem; 
-    width: 100%; /* ضمان أن يأخذ العرض الكامل */
-    box-shadow: inset 0 2px 5px rgba(0,0,0,0.03);
-}
-/* 6. الشريط السفلي (الحاسبة) */
-.scanner-footer {
-    margin-top: 20px; padding-top: 20px;
-    border-top: 1px solid rgba(0, 0, 0, 0.08);
-    /* حركة انزلاق ناعمة */
-    animation: smoothSlideUp 0.5s ease-out forwards;
-}
-.scanner-footer.hidden { display: none; }
-
-.scanner-stats {
-    display: flex; justify-content: space-between; font-size: 1.1rem;
-    margin-bottom: 10px;
-    background: rgba(245, 245, 245, 0.7); /* زجاجي */
-    backdrop-filter: blur(5px);
-    padding: 12px; border-radius: 12px;
-}
-
-/* زر الطباعة */
-#print-scanned-btn {
-    width: 100%; margin-top: 10px;
-    background: rgba(44, 62, 80, 0.9); /* زجاجي داكن */
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white; padding: 14px;
-    border-radius: 12px; font-weight: bold; cursor: pointer;
-    transition: all 0.3s ease;
-}
-#print-scanned-btn:hover {
-    background: rgba(30, 45, 60, 1);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-}
-
-/* تعريف حركة الانزلاق */
-@keyframes smoothSlideUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-/* =========================================
-   تحديث: تنسيق أزرار الماسح الضوئي (الحاسبة)
-   ========================================= */
-
-/* الحاوية التي تجمع الأزرار */
-.scanner-action-buttons {
-    display: flex;
-    gap: 12px; /* مسافة متساوية بين الزرين */
-    margin-top: 15px;
     width: 100%;
 }
 
-/* تنسيق موحد للزرين (التفريغ والطباعة) */
-.scanner-action-buttons button {
-    flex: 1; /* جعل الزرين بنفس العرض تماماً */
-    display: flex;
+/* 6. إخفاء الأزرار غير المستخدمة نهائياً */
+.scanner-action-buttons, 
+#reset-scanned-btn, 
+#print-scanned-btn {
+    display: none !important;
+}
+
+/* 7. زر الإغلاق للنافذة المنبثقة: دائري، ثابت، بدون انميشن */
+#close-overlay-btn {
+    position: absolute;
+    top: -12px;
+    right: -12px;
+    width: 35px !important;
+    height: 35px !important;
+    min-width: 35px !important;
+    border-radius: 50% !important;
+    padding: 0 !important;
+    background: #e74c3c !important;
+    color: white !important;
+    border: 2px solid white !important;
+    display: flex !important;
     align-items: center;
     justify-content: center;
-    gap: 8px; /* مسافة بين الأيقونة والنص */
-    height: 48px; /* ارتفاع ثابت وموحد */
-    padding: 0 15px;
-    border-radius: 12px;
-    font-weight: bold;
-    font-size: 0.95rem;
-    border: none;
     cursor: pointer;
-    transition: all 0.2s ease-in-out;
-    margin: 0 !important; /* إلغاء أي هوامش خارجية قديمة */
-    width: auto !important; /* إلغاء العرض 100% القديم */
+    z-index: 10000;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: none !important;
+    transform: none !important;
+    animation: none !important;
 }
 
-/* ألوان خاصة لزر الطباعة */
-#print-scanned-btn {
-    background: #2c3e50 !important; /* لون داكن */
-    color: white;
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+#close-overlay-btn:hover {
+    transform: none !important;
+    background: #c0392b !important;
 }
 
-/* ألوان خاصة لزر التفريغ */
-#reset-scanned-btn {
-    background: #c0392b !important; /* لون أحمر */
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+/* 8. نافذة السعر المنبثقة: ثابتة في الوسط، ظهور فوري */
+#product-found-overlay {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 240px !important;
+    height: 240px !important;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    z-index: 9999;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: none !important;
+    animation: none !important;
 }
 
-/* تأثير عند الضغط أو التحويم */
-.scanner-action-buttons button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    opacity: 0.95;
+/* 9. تصميم الفوتر الجديد: زجاجي أبيض، هادئ */
+#scanner-footer {
+    background: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(240, 152, 25, 0.3);
+    padding: 12px 15px;
+    border-radius: 0 0 15px 15px;
+    margin-top: -5px;
+    position: relative;
+    z-index: 150;
+    text-align: center;
+    /* حركة انزلاق بسيطة للظهور */
+    animation: smoothSlideUp 0.3s ease-out forwards;
 }
 
-.scanner-action-buttons button:active {
-    transform: translateY(0);
+.scanner-stats {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    font-family: 'Tajawal', sans-serif;
 }
+
+.scanner-stats span {
+    font-size: 0.9rem;
+    color: #555 !important; 
+    font-weight: 500;
+}
+
+.scanner-stats b {
+    font-size: 1.2rem;
+    color: #e67e22 !important;
+    margin: 0 6px;
+    font-weight: 800;
+}
+
+@keyframes smoothSlideUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 /* =========================================
    تنسيقات شريط التنقل الجديد (تجربة الموبايل)
    ========================================= */
 @media (max-width: 991px) {
-    /* 1. ضبط حاوية العنوان لتكون في المنتصف تماماً */
     .brand-logo-container {
         position: absolute;
         left: 50%;
@@ -665,12 +547,10 @@
         z-index: 10;
     }
 
-    /* 2. إخفاء صورة الشعار القديمة (التي بجانب النص) */
     .brand-logo-container img {
         display: none !important;
     }
 
-    /* 3. تنسيق أيقونة الشعار الجديدة (الزجاجية - يسار) */
     .logo-btn-mobile {
         display: flex !important;
         padding: 0 !important;
@@ -687,7 +567,6 @@
         border-radius: 50%;
     }
 
-    /* 4. ضبط المسافات بين الأيقونات في الجهة اليسرى */
     .header-left {
         display: flex;
         align-items: center;
@@ -700,12 +579,12 @@
     }
 }
 
-/* إخفاء أيقونة الشعار الجديدة في شاشات الحاسبة */
 @media (min-width: 992px) {
     .logo-btn-mobile {
         display: none !important;
     }
 }
+
 /* =========================================
    تنسيقات تبويبات السلة (Cart Tabs)
    ========================================= */
@@ -747,7 +626,6 @@
     color: #333;
 }
 
-/* علامة مميزة لطلب السكنر في صفحة الطلبات */
 .scanner-order-badge {
     background: #e1f5fe;
     color: #0288d1;
@@ -761,71 +639,10 @@
     margin-top: 5px;
     border: 1px solid #b3e5fc;
 }
-/* تنسيق طبقة المنتج التي تغطي الكاميرا */
-.product-found-overlay {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: white;
-    border-radius: 15px;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    text-align: center;
-    animation: fadeIn 0.3s ease;
-}
 
-.product-found-overlay.hidden {
-    display: none;
-}
-
-.found-content img {
-    width: 150px;
-    height: 150px;
-    object-fit: contain;
-    margin-bottom: 15px;
-    filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));
-}
-
-.found-content h2 {
-    font-size: 1.4rem;
-    color: #2c3e50;
-    margin: 0 0 10px 0;
-}
-
-.found-price {
-    font-size: 2rem;
-    font-weight: 800;
-    color: #e65100; /* برتقالي */
-    margin-bottom: 15px;
-}
-
-.found-price::after {
-    content: ' د.ع';
-    font-size: 1rem;
-    font-weight: normal;
-    color: #777;
-}
-
-.found-badge {
-    background: #e8f5e9;
-    color: #2ecc71;
-    padding: 8px 20px;
-    border-radius: 50px;
-    font-weight: bold;
-    display: inline-block;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
-}
 /* =========================================================
    حل مشكلة تعليق الأزرار في الموبايل (Sticky Hover Fix)
    ========================================================= */
-
-/* 1. تطبيق تأثير الارتفاع (Hover) فقط على الأجهزة التي تملك ماوس (كمبيوتر) */
 @media (hover: hover) {
     .product-item:hover,
     .product:hover,
@@ -833,13 +650,11 @@
     .add-btn:hover,
     .view-details-btn:hover,
     .remove-from-wishlist-btn:hover {
-        /* هنا نضع تأثير الارتفاع الأصلي الخاص بك */
         transform: translateY(-5px); 
         box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
 }
 
-/* 2. في شاشات اللمس (الموبايل): إلغاء التعليق وإرجاع الزر لمكانه فوراً */
 @media (hover: none) {
     .product-item:hover,
     .product:hover,
@@ -847,120 +662,16 @@
     .add-btn:hover,
     .view-details-btn:hover,
     .remove-from-wishlist-btn:hover {
-        transform: none !important; /* إلغاء الارتفاع */
-        box-shadow: none !important; /* إلغاء ظل التحويم */
-        background-color: inherit !important; /* إلغاء تغيير اللون المعلق */
+        transform: none !important;
+        box-shadow: none !important;
+        background-color: inherit !important;
     }
 }
 
-/* 3. إضافة تأثير "الضغطة" (Active): يعمل لحظة وضع الإصبع ويختفي فور رفعه */
 button:active,
 .add-btn:active,
 .view-details-btn:active,
 .remove-from-wishlist-btn:active {
-    transform: scale(0.96) !important; /* تصغير الزر قليلاً ليعطي شعور الضغط */
+    transform: scale(0.96) !important;
     transition: transform 0.1s;
-}
-/* 1. إخفاء أزرار التفريغ والطباعة نهائياً وبقوة */
-.scanner-action-buttons, 
-#reset-scanned-btn, 
-#print-scanned-btn {
-    display: none !important;
-}
-
-/* 2. زر الإغلاق: دائري تماماً، ثابت، وبدون أي انميشن */
-#close-overlay-btn {
-    position: absolute;
-    top: -12px;
-    right: -12px;
-    width: 35px !important;       /* حجم مناسب للمس */
-    height: 35px !important;
-    min-width: 35px !important;
-    border-radius: 50% !important; /* دائرة كاملة */
-    padding: 0 !important;
-    
-    background: #e74c3c !important; /* أحمر هادئ */
-    color: white !important;
-    border: 2px solid white !important;
-    
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 10000; /* طبقة عالية جداً لضمان العمل */
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    
-    /* إلغاء أي حركة أو تفاعل */
-    transition: none !important;
-    transform: none !important;
-    animation: none !important;
-}
-
-/* التأكد من عدم وجود حركة عند المرور */
-#close-overlay-btn:hover {
-    transform: none !important;
-    background: #c0392b !important;
-}
-
-/* 3. نافذة السعر المنبثقة (ثابتة في الوسط، ظهور فوري بدون انزلاق) */
-#product-found-overlay {
-    position: absolute !important;
-    top: 50% !important;
-    left: 50% !important;
-    /* هذا السطر يضمن التوسط الدقيق أفقياً وعمودياً */
-    transform: translate(-50%, -50%) !important;
-    
-    width: 240px !important;
-    height: 240px !important;
-    border-radius: 20px;
-    background: rgba(255, 255, 255, 0.98);
-    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-    z-index: 9999; /* رقم عالي جداً لتظهر فوق كل شيء */
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    
-    /* إلغاء أي حركة أو انميشن نهائياً */
-    transition: none !important;
-    animation: none !important;
-}
-
-/* 4. تصميم الفوتر الجديد: زجاجي أبيض، هادئ وأنيق */
-#scanner-footer {
-    /* خلفية بيضاء شبه شفافة (زجاجية) */
-    background: rgba(255, 255, 255, 0.85) !important;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    
-    border-top: 1px solid rgba(240, 152, 25, 0.3); /* خط برتقالي خفيف جداً */
-    padding: 12px 15px;
-    border-radius: 0 0 15px 15px;
-    margin-top: -5px;
-    position: relative;
-    z-index: 150;
-    text-align: center;
-}
-
-.scanner-stats {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    font-family: 'Tajawal', sans-serif;
-}
-
-/* النصوص (المواد، المجموع) بلون رمادي هادئ */
-.scanner-stats span {
-    font-size: 0.9rem;
-    color: #555 !important; 
-    font-weight: 500;
-}
-
-/* الأرقام (السعر والعدد) بلون برتقالي جميل */
-.scanner-stats b {
-    font-size: 1.2rem;
-    color: #e67e22 !important; /* برتقالي هادئ */
-    margin: 0 6px;
-    font-weight: 800;
 }
