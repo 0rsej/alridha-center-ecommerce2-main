@@ -535,42 +535,42 @@ button:active,
     font-size: 0.9rem; font-weight: 800;
     font-family: 'Tajawal', sans-serif; margin-top: 5px;
 }
-/* =========================================
-   تحديثات نهائية للنافذة المنبثقة (إصلاح المسافات والتكرار)
-   (أضف هذا الكود في نهاية الملف)
-   ========================================= */
-
-/* 1. ضبط المسافات: تقريب الاسم من السعر */
-.found-content h2 {
-    margin-bottom: 0px !important; /* إلغاء المسافة السفلية للاسم */
-    padding-bottom: 2px !important;
-    line-height: 1.2 !important;
-}
-
+/* 3. السعر والعملة (تعديل ليكون في سطر منفصل) */
 .found-price {
-    margin-top: 0px !important;    /* إلغاء المسافة العلوية للسعر */
-    padding-top: 0px !important;
-    margin-bottom: 8px !important; /* مسافة بسيطة تحت السعر */
+    font-family: 'Tajawal', sans-serif;
+    font-size: 1.5rem !important; /* تكبير بسيط */
+    color: #e65100 !important;
+    font-weight: 800;
+    
+    /* التغيير هنا: جعل السعر يأخذ السطر بالكامل */
+    display: block !important; 
+    width: 100% !important;
+    text-align: center !important;
+    
+    margin-bottom: 15px !important; /* مسافة بين السعر وكلمة متوفر */
+    direction: rtl; 
 }
 
-/* 2. حل مشكلة التكرار: إخفاء النصوص القديمة */
-/* هذا سيخفي أي نص "متوفر" قديم مكتوب داخل وسم p */
-.found-content p {
-    display: none !important;
+/* 4. كلاس العملة */
+.currency-symbol {
+    font-size: 0.75em !important;
+    color: inherit !important;
+    font-weight: 600;
+    margin-right: 5px; /* مسافة صغيرة بين الرقم والعملة */
 }
 
-/* 3. ضمان ظهور زر "متوفر" الأخضر الجديد بشكل صحيح */
+/* 5. كلمة متوفر (تعديل المسافات) */
 .stock-status {
-    display: inline-flex !important; /* لضمان ظهوره */
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
+    /* ستبقى كما هي inline-flex لكن بما أن السعر فوقها block ستنزل للأسفل تلقائياً */
+    display: inline-flex !important; 
+    align-items: center; justify-content: center; gap: 6px;
     background-color: #e8f5e9 !important;
     color: #2e7d32 !important;
-    padding: 5px 20px;
+    padding: 8px 25px; /* تكبير الحشوة قليلاً */
     border-radius: 50px;
-    font-size: 0.9rem;
-    font-weight: 800;
+    font-size: 1rem; font-weight: 800;
     font-family: 'Tajawal', sans-serif;
-    margin-top: 5px;
+    
+    margin-top: 0 !important; /* المسافة نتحكم بها من السعر */
+    box-shadow: 0 4px 10px rgba(46, 125, 50, 0.1); /* ظل خفيف للجمالية */
 }
