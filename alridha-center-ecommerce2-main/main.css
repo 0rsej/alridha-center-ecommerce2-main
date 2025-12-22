@@ -861,76 +861,104 @@ button:active,
     transform: scale(0.96) !important; /* تصغير الزر قليلاً ليعطي شعور الضغط */
     transition: transform 0.1s;
 }
-/* 1. إخفاء أزرار الطباعة والتفريغ في سلة الحاسبة */
-.scanner-action-buttons {
-    display: none !important;
-}
-
-/* 2. تحسين شكل نافذة "كاشف السعر" لتكون مربعة وصغيرة فوق الكاميرا */
+/* --- 1. إصلاح ظهور النافذة المنبثقة (بدون انزلاق) --- */
 #product-found-overlay {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%); /* سنترتها في المنتصف */
-    width: 250px !important;  /* عرض ثابت صغير */
-    height: 250px !important; /* ارتفاع مساوٍ للعرض لتكون مربعة */
-    border-radius: 20px;
-    background: rgba(255, 255, 255, 0.95);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-    z-index: 100;
-    padding: 15px;
+    transform: translate(-50%, -50%) scale(0.9); /* نقطة البداية */
+    width: 260px !important;
+    height: 260px !important;
+    border-radius: 25px;
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+    z-index: 200;
+    padding: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    
+    /* الحركة الجديدة: ظهور وتكبير بسيط */
+    opacity: 0;
+    animation: popInEffect 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
-/* تنسيق محتوى النافذة المنبثقة ليتناسب مع الحجم الصغير */
-.found-content img {
-    width: 100px !important;
-    height: 100px !important;
-    object-fit: contain;
-    margin-bottom: 10px;
+@keyframes popInEffect {
+    from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 }
-.found-content h2 {
-    font-size: 1rem !important;
-    margin: 5px 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
-}
-.found-price {
-    font-size: 1.4rem !important;
-    font-weight: bold;
-    color: #e65100;
-}
-.found-badge { display: none; } /* إخفاء كلمة "متوفر" لتوفير المساحة */
 
-/* 3. زر الإغلاق الأحمر */
+/* --- 2. زر الإغلاق الزجاجي الجميل --- */
 #close-overlay-btn {
     position: absolute;
-    top: -10px;
-    right: -10px;
-    background: red !important;
-    color: white !important;
+    top: 10px;
+    right: 10px;
+    width: 35px;
+    height: 35px;
+    background: rgba(200, 50, 50, 0.15) !important; /* خلفية حمراء شفافة جداً */
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 0, 0, 0.2) !important;
     border-radius: 50%;
-    width: 30px;
-    height: 30px;
+    color: #c0392b !important;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid white !important;
     cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    font-size: 1.1rem;
+    transition: all 0.2s ease;
+    z-index: 201;
+    box-shadow: none !important;
 }
 
-/* 4. تنسيق شريط المجموع أسفل الماسح */
+#close-overlay-btn:hover {
+    background: #c0392b !important;
+    color: white !important;
+    transform: rotate(90deg);
+}
+
+/* --- 3. تقليل ارتفاع الكاميرا --- */
+#reader {
+    width: 100%;
+    height: 250px !important; /* تقليل الارتفاع */
+    border-radius: 15px;
+    overflow: hidden;
+    position: relative;
+    background: #000;
+}
+#reader video {
+    object-fit: cover; /* ملء المساحة بشكل جيد */
+    border-radius: 15px;
+}
+
+/* --- 4. تحسين نصوص وألوان الفوتر (الحاسبة) --- */
 #scanner-footer {
-    background: #2c3e50;
-    color: white;
-    padding: 10px;
-    border-radius: 0 0 10px 10px;
-    text-align: center;
-    font-size: 1.1rem;
+    background: linear-gradient(135deg, #2c1a12 0%, #3e2723 100%); /* لون المتجر الداكن */
+    padding: 15px;
+    border-radius: 0 0 15px 15px;
+    color: #fff;
+    margin-top: -5px; /* لإلصاقه بالكاميرا */
+    position: relative;
+    z-index: 150;
+    border-top: 2px solid #F09819; /* الخط البرتقالي المميز للمتجر */
+}
+
+.scanner-stats {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    font-family: 'Tajawal', sans-serif;
+}
+
+.scanner-stats span {
+    font-size: 0.95rem;
+    color: #ddd;
+}
+
+.scanner-stats b {
+    font-size: 1.3rem;
+    color: #F09819 !important; /* اللون البرتقالي للأرقام */
+    margin: 0 5px;
+    font-weight: 800;
 }
