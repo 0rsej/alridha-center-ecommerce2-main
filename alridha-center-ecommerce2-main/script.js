@@ -2022,17 +2022,17 @@ function downloadOrderPDF(order) {
         tabScannerCart.addEventListener('click', activateScannerTab);
     }
  // ============================================================
-//  نظام الماسح الضوئي (النسخة المحسنة النهائية) 📷
+//  نظام الماسح الضوئي (النسخة النهائية النظيفة) 📷
 // ============================================================
 
     // المتغيرات
     let isScanning = false;
     let currentScanMode = 'check'; 
     let html5QrCode = null; 
-    let lastScannedCode = null; // لتجنب تكرار نفس المنتج بسرعة
-    let scanLockTimer = null;   // مؤقت القفل
+    let lastScannedCode = null; 
+    let scanLockTimer = null;
 
-    // العناصر
+    // العناصر (تأكد من وجودها في كل الصفحات، والكود سيعمل)
     const scannerModal = document.getElementById('scanner-modal'); 
     const scanResultEl = document.getElementById('scan-result'); 
     const scanTotalEl = document.getElementById('scan-total'); 
@@ -2048,6 +2048,7 @@ function downloadOrderPDF(order) {
             e.target.classList.add('active');
             currentScanMode = e.target.getAttribute('data-mode');
 
+            // التحكم في ظهور الفوتر الزجاجي
             if (currentScanMode === 'cart') {
                 if(scannerFooter) scannerFooter.classList.remove('hidden'); 
                 if(scanResultEl) scanResultEl.innerHTML = '🛒 الوضع: حاسبة المشتريات';
@@ -2059,7 +2060,7 @@ function downloadOrderPDF(order) {
         });
     });
 
-    // 2. تحديث الأرقام
+    // 2. تحديث الأرقام (للفوتر الزجاجي الجديد)
     function updateScannerStats() {
         if (!scannerCart) scannerCart = [];
         let totalQty = 0;
@@ -2082,50 +2083,40 @@ function downloadOrderPDF(order) {
         if (scanTotalEl) scanTotalEl.textContent = totalPrice.toLocaleString();
     }
 
-    // 3. زر إغلاق النافذة المنبثقة
+    // 3. زر إغلاق النافذة المنبثقة (بدون انميشن نهائياً)
     if (closeOverlayBtn) {
         closeOverlayBtn.addEventListener('click', (e) => {
             e.preventDefault(); 
             e.stopPropagation(); 
-            if (productOverlay) {
-                // إضافة حركة خروج بسيطة قبل الإخفاء (اختياري)
-                productOverlay.style.opacity = '0';
-                productOverlay.style.transform = 'translate(-50%, -50%) scale(0.8)';
-                setTimeout(() => {
-                    productOverlay.classList.add('hidden');
-                    // إعادة ضبط الستايل للمرة القادمة
-                    productOverlay.style.opacity = '';
-                    productOverlay.style.transform = '';
-                }, 200);
-            }
             
-            // السماح بالمسح مرة أخرى بعد الإغلاق
+            // إخفاء فوري
+            if (productOverlay) productOverlay.classList.add('hidden');
+            
             setTimeout(() => { 
                 isScanning = false; 
-                lastScannedCode = null; // السماح بمسح نفس المنتج مجدداً بعد الإغلاق
+                lastScannedCode = null; 
             }, 500);
             
             if(scanResultEl) scanResultEl.innerHTML = 'جاهز...';
         });
     }
 
-    // 4. تشغيل الكاميرا (مع ضبط حجم المربع المستطيل)
+    // 4. تشغيل الكاميرا (مستطيل صغير)
     function startScanner() {
         if (html5QrCode) return;
 
         html5QrCode = new Html5Qrcode("reader");
         
-        // --- التعديل هنا: جعل المربع مستطيلاً صغيراً ---
         const config = { 
-            fps: 15, // زيادة عدد الإطارات لسرعة القراءة
-            qrbox: { width: 220, height: 100 }, // مستطيل عرضي صغير مناسب للباركود
+            fps: 15, 
+            qrbox: { width: 220, height: 100 }, // مستطيل صغير
             aspectRatio: 1.0 
         };
         
         html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess)
         .catch(err => {
-            console.error("خطأ الكاميرا:", err);
-            if(scanResultEl) scanResultEl.innerHTML = "يرجى السماح باستخدام الكاميرا";
+            console.error("Error:", err);
+            if(scanResultEl) scanResultEl.innerHTML = "يرجى تفعيل الكاميرا";
         });
     }
 
@@ -2156,14 +2147,12 @@ function downloadOrderPDF(order) {
         });
     }
 
-    // 7. منطق المسح (Logic)
+    // 7. منطق المسح (مع منع التكرار)
     const onScanSuccess = (decodedText, decodedResult) => {
-        // إذا كان النظام مشغولاً أو تم مسح نفس الكود قبل قليل جداً
         if (isScanning) return;
         
         const scannedCode = decodedText.trim();
-
-        // منطق منع التكرار السريع لنفس المنتج (Wait 2.5 seconds before same item)
+        // منع قراءة نفس الكود مرتين متتاليتين بسرعة
         if (scannedCode === lastScannedCode) return;
 
         const product = products.find(p => 
@@ -2171,23 +2160,21 @@ function downloadOrderPDF(order) {
         );
 
         if (product) {
-            // تشغيل الصوت فوراً
             const audio = new Audio('https://www.soundjay.com/buttons/beep-01a.mp3');
             audio.play().catch(e => {});
 
-            // قفل المسح وتخزين آخر كود
             isScanning = true;
             lastScannedCode = scannedCode;
 
             if (currentScanMode === 'check') {
-                // === كاشف السعر ===
+                // كاشف السعر
                 if (foundImg) foundImg.src = product.image;
                 if (foundName) foundName.textContent = product.name;
                 if (foundPrice) foundPrice.textContent = product.price.toLocaleString();
                 if (productOverlay) productOverlay.classList.remove('hidden');
 
             } else {
-                // === الحاسبة ===
+                // الحاسبة (إضافة مرة واحدة فقط)
                 const isSoldByPrice = ['spices', 'nuts'].includes(product.category);
                 
                 const exist = scannerCart.find(item => item.product.globalId === product.globalId);
@@ -2205,27 +2192,21 @@ function downloadOrderPDF(order) {
                 updateScannerStats(); 
                 
                 if (scanResultEl) {
-                    scanResultEl.innerHTML = `<span style="color:#2ecc71; font-weight:bold;">✔ ${product.name}</span>`;
+                    scanResultEl.innerHTML = `<span style="color:#27ae60; font-weight:bold;">✔ ${product.name}</span>`;
                 }
 
-                // فك القفل للسماح بمنتج مختلف، أو نفس المنتج بعد فترة
-                // هنا ننتظر 2 ثانية قبل السماح بالمسح التالي لضمان عدم التكرار بالخطأ
+                // انتظار 2 ثانية قبل السماح بمسح منتج آخر (أو نفس المنتج)
                 clearTimeout(scanLockTimer);
                 scanLockTimer = setTimeout(() => { 
                     isScanning = false; 
-                    lastScannedCode = null; // السماح بنفس المنتج مجدداً بعد انتهاء الوقت
+                    lastScannedCode = null; 
                     if(scanResultEl) scanResultEl.innerHTML = 'جاهز...'; 
                 }, 2000); 
             }
         } else {
-            // منتج غير موجود
             isScanning = true;
             if (scanResultEl) scanResultEl.innerHTML = `<span style="color:red;">❌ غير معروف</span>`;
-            
-            setTimeout(() => { 
-                isScanning = false; 
-                // لا نحفظ الكود الخاطئ في lastScannedCode للسماح بمحاولة مسحه مرة أخرى
-            }, 1500);
+            setTimeout(() => { isScanning = false; }, 1500);
         }
     };
 });
