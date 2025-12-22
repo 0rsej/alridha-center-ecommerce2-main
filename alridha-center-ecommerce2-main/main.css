@@ -861,3 +861,76 @@ button:active,
     transform: scale(0.96) !important; /* تصغير الزر قليلاً ليعطي شعور الضغط */
     transition: transform 0.1s;
 }
+/* 1. إخفاء أزرار الطباعة والتفريغ في سلة الحاسبة */
+.scanner-action-buttons {
+    display: none !important;
+}
+
+/* 2. تحسين شكل نافذة "كاشف السعر" لتكون مربعة وصغيرة فوق الكاميرا */
+#product-found-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* سنترتها في المنتصف */
+    width: 250px !important;  /* عرض ثابت صغير */
+    height: 250px !important; /* ارتفاع مساوٍ للعرض لتكون مربعة */
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    z-index: 100;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* تنسيق محتوى النافذة المنبثقة ليتناسب مع الحجم الصغير */
+.found-content img {
+    width: 100px !important;
+    height: 100px !important;
+    object-fit: contain;
+    margin-bottom: 10px;
+}
+.found-content h2 {
+    font-size: 1rem !important;
+    margin: 5px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+.found-price {
+    font-size: 1.4rem !important;
+    font-weight: bold;
+    color: #e65100;
+}
+.found-badge { display: none; } /* إخفاء كلمة "متوفر" لتوفير المساحة */
+
+/* 3. زر الإغلاق الأحمر */
+#close-overlay-btn {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: red !important;
+    color: white !important;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white !important;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* 4. تنسيق شريط المجموع أسفل الماسح */
+#scanner-footer {
+    background: #2c3e50;
+    color: white;
+    padding: 10px;
+    border-radius: 0 0 10px 10px;
+    text-align: center;
+    font-size: 1.1rem;
+}
