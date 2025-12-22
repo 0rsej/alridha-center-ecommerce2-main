@@ -2032,8 +2032,39 @@ function downloadOrderPDF(order) {
         tabScannerCart.addEventListener('click', activateScannerTab);
     }
  // ============================================================
-    // 2. كود الماسح الضوئي (مع سطر التحديث الناقص)
+    //  نظام الماسح الضوئي (النسخة النهائية والنظيفة)
     // ============================================================
+
+    // 1. تعريف العناصر
+    const scannerTriggerBtn = document.getElementById('barcodeTriggerBtn'); // زر الفتح
+    const scannerModal = document.getElementById('scanner-modal');          // النافذة
+    const closeScannerBtn = document.getElementById('close-scanner-btn');   // زر الإغلاق
+
+    // 2. دالة تشغيل الزر (لفتح النافذة)
+    if (scannerTriggerBtn && scannerModal) {
+        scannerTriggerBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            scannerModal.classList.remove('hidden'); // إظهار النافذة
+            
+            // تشغيل القارئ فقط عند فتح النافذة
+            startScanner(); 
+        });
+    }
+
+    // 3. دالة إغلاق النافذة
+    function closeScanner() {
+        if (scannerModal) scannerModal.classList.add('hidden');
+        // إيقاف الكاميرا لتوفير البطارية
+        if (typeof html5QrcodeScanner !== 'undefined' && html5QrcodeScanner) {
+            try { html5QrcodeScanner.clear(); } catch(e) {}
+        }
+    }
+
+    if (closeScannerBtn) {
+        closeScannerBtn.addEventListener('click', closeScanner);
+    }
+
+    // 4. دالة نجاح المسح (onScanSuccess)
     window.onScanSuccess = function(decodedText) {
         if (isScanning) return;
         
@@ -2044,21 +2075,22 @@ function downloadOrderPDF(order) {
             audio.play().catch(e => {});
 
             if (currentScanMode === 'check') {
-                // وضع الكشف (كما هو)
+                // --- وضع كاشف السعر ---
                 isScanning = true;
                 if (foundImg) foundImg.src = product.image;
                 if (foundName) foundName.textContent = product.name;
                 if (foundPrice) foundPrice.textContent = product.price;
+                
                 if (productOverlay) productOverlay.classList.remove('hidden');
-                if (scanResultEl) scanResultEl.innerHTML = '✔ انظر التفاصيل';
+                if (scanResultEl) scanResultEl.innerHTML = '✔ انظر تفاصيل المنتج';
 
             } else {
-                // وضع السلة
+                // --- وضع سلة الماسح (الحاسبة) ---
                 isScanning = true; 
                 const isSoldByPrice = ['spices', 'nuts'].includes(product.category);
                 
-                // الإضافة للسلة
                 const exist = scannerCart.find(item => item.product.globalId === product.globalId);
+                
                 if (exist) {
                     exist.quantity += (isSoldByPrice ? 1000 : 1);
                 } else {
@@ -2070,13 +2102,11 @@ function downloadOrderPDF(order) {
                 }
                 saveScannerCart();
 
-                // 👇👇 هذا هو السطر المهم جداً الذي كان ناقصاً 👇👇
-                // هذا السطر يقوم بتحديث الجدول فوراً لتظهر المنتجات
+                // تحديث الواجهة فوراً
                 if (typeof updateCartUI === 'function') updateCartUI(); 
-                // 👆👆 ------------------------------------- 👆👆
 
                 if (productOverlay) productOverlay.classList.add('hidden');
-                if (scanResultEl) scanResultEl.innerHTML = `<span style="color:green;">✔ أضيف: ${product.name}</span>`;
+                if (scanResultEl) scanResultEl.innerHTML = `<span style="color: green; font-weight: bold;">✔ تمت إضافة: ${product.name}</span>`;
 
                 setTimeout(() => { isScanning = false; }, 800); 
             }
@@ -2087,113 +2117,33 @@ function downloadOrderPDF(order) {
         }
     };
 
-    // تشغيل الكاميرا
-    if (document.getElementById('reader')) {
-        html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
-        html5QrcodeScanner.render(onScanSuccess);
+    // 5. دالة بدء تشغيل الماسح
+    function startScanner() {
+        if (document.getElementById('reader')) {
+            // تنظيف أي نسخة سابقة
+            if (typeof html5QrcodeScanner !== 'undefined' && html5QrcodeScanner) {
+                try { html5QrcodeScanner.clear(); } catch(e) {}
+            }
+            // إنشاء نسخة جديدة
+            html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
+            html5QrcodeScanner.render(onScanSuccess);
+        }
     }
-// ==========================================
-    // تفعيل زر إغلاق نافذة المنتج والماسح الضوئي (مصحح)
+
     // ==========================================
-
-    // ملاحظة: المتغيرات closeOverlayBtn و productOverlay و scanResultEl معرفة في أعلى الملف
-    // لذلك نستخدمها مباشرة هنا بدون كلمة const لتجنب خطأ Redeclaration
-
+    // تفعيل زر إغلاق نافذة المنتج المنبثقة (Overlay)
+    // ==========================================
     if (typeof closeOverlayBtn !== 'undefined' && closeOverlayBtn) {
         closeOverlayBtn.addEventListener('click', () => {
-            // إخفاء النافذة
             if (typeof productOverlay !== 'undefined' && productOverlay) {
                 productOverlay.classList.add('hidden');
             }
-            
-            // إعادة تفعيل المسح
             isScanning = false; 
-            
-            // تحديث النص
             if(typeof scanResultEl !== 'undefined' && scanResultEl) {
                 scanResultEl.innerHTML = 'جاهز للمسح...';
             }
         });
     }
 
-    // دالة معالجة الباركود
-    window.onScanSuccess = function(decodedText) {
-        if (isScanning) return;
-        
-        // البحث عن المنتج
-        const product = products.find(p => p.id == decodedText || p.globalId == decodedText || p.barcode == decodedText);
-
-        if (product) {
-            const audio = new Audio('https://www.soundjay.com/buttons/beep-01a.mp3');
-            audio.play().catch(e => {});
-
-            if (currentScanMode === 'check') {
-                // --- وضع كاشف السعر ---
-                isScanning = true;
-
-                // تعبئة البيانات
-                if (foundImg) foundImg.src = product.image;
-                if (foundName) foundName.textContent = product.name;
-                if (foundPrice) foundPrice.textContent = product.price;
-
-                // إظهار النافذة
-                if (productOverlay) productOverlay.classList.remove('hidden');
-                if (scanResultEl) scanResultEl.innerHTML = '✔ انظر تفاصيل المنتج';
-
-            } else {
-                // --- وضع سلة الماسح (الحاسبة) ---
-                isScanning = true; 
-
-                // إضافة المنتج لسلة الماسح
-                const isSoldByPrice = ['spices', 'nuts'].includes(product.category);
-                const exist = scannerCart.find(item => item.product.globalId === product.globalId);
-                
-                if (exist) {
-                    exist.quantity += (isSoldByPrice ? 1000 : 1);
-                } else {
-                    scannerCart.push({
-                        product: product,
-                        quantity: (isSoldByPrice ? 1000 : 1),
-                        isSoldByPrice: isSoldByPrice
-                    });
-                }
-                saveScannerCart();
-
-                // إخفاء النافذة
-                if (productOverlay) productOverlay.classList.add('hidden');
-
-                // كتابة النص تحت القارئ
-                if(scanResultEl) {
-                    scanResultEl.innerHTML = `<span style="color: green; font-weight: bold;">✔ تمت إضافة: ${product.name}</span>`;
-                }
-
-                // تحديث الجدول فوراً
-                if (typeof updateCartUI === 'function') updateCartUI(); 
-
-                // السماح بالمسح التالي بسرعة
-                setTimeout(() => { 
-                    isScanning = false; 
-                }, 800); 
-            }
-        } else {
-            // المنتج غير موجود
-            isScanning = true;
-            if(scanResultEl) scanResultEl.innerHTML = `<span style="color:red;">❌ المنتج غير موجود</span>`;
-            setTimeout(() => { isScanning = false; }, 2000);
-        }
-    };
-
-    // تشغيل الكاميرا إذا كان العنصر موجوداً
-    if (document.getElementById('reader')) {
-        // تنظيف أي ماسح سابق
-        if (typeof html5QrcodeScanner !== 'undefined' && html5QrcodeScanner) {
-            try { html5QrcodeScanner.clear(); } catch(e) {}
-        }
-        
-        // تشغيل الماسح الجديد
-        // ملاحظة: html5QrcodeScanner معرف في بداية الملف كـ let، لذا نستخدمه مباشرة
-        html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
-        html5QrcodeScanner.render(onScanSuccess);
-    }
 
 });
