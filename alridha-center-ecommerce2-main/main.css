@@ -294,77 +294,128 @@ button:active,
 }
 
 /* =========================================
-   نافذة السعر المنبثقة (التعديلات المطلوبة)
+   نافذة السعر المنبثقة (تحديث التصميم الجديد)
    ========================================= */
 
-/* 1. الحاوية الأساسية للنافذة (أسفل المنتصف قليلاً) */
+/* 1. الحاوية الأساسية للنافذة */
 #product-found-overlay {
     position: absolute !important;
-    top: 60% !important; /* للأسفل قليلاً */
+    top: 55% !important; /* رفعناها قليلاً لتتوسط الشاشة */
     left: 50% !important;
     transform: translate(-50%, -50%) !important;
     
     width: 85% !important;
-    max-width: 280px !important;
+    max-width: 320px !important; /* عرض مناسب */
     height: auto !important;
-    min-height: 250px;
+    min-height: 280px;
     
-    border-radius: 25px;
-    background: rgba(255, 255, 255, 0.98);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.5); /* ظل قوي لتبدو عائمة */
-    z-index: 10000; /* أعلى من أي شيء آخر */
-    padding: 20px;
+    border-radius: 30px; /* زوايا أكثر استدارة */
+    background: rgba(255, 255, 255, 0.95); /* خلفية بيضاء شبه شفافة */
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    z-index: 10000;
+    padding: 30px 20px; /* زيادة الحشوة الداخلية لاستيعاب الزر */
     
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    
-    /* إلغاء الحركات */
-    transition: none !important;
-    animation: none !important;
+    text-align: center;
 }
 
-/* 2. زر الإغلاق (دائري هندسي 100%) */
+/* 2. زر الإغلاق (زجاجي أحمر متوهج - داخل النافذة) */
 #close-overlay-btn {
     position: absolute !important;
-    top: -15px !important;      /* بارز للأعلى */
-    right: -15px !important;    /* بارز لليمين */
+    top: 15px !important;    /* داخل النافذة من الأعلى */
+    right: 15px !important;  /* داخل النافذة من اليمين */
     
-    width: 45px !important;       /* حجم أكبر قليلاً للمس */
-    height: 45px !important;
-    min-width: 45px !important;   /* يمنع الانبعاج تماماً */
-    min-height: 45px !important;
+    width: 35px !important;
+    height: 35px !important;
+    min-width: 35px !important;
     
-    border-radius: 50% !important; /* دائرة كاملة */
-    aspect-ratio: 1/1 !important;  /* ضمان النسبة */
+    border-radius: 50% !important;
     
-    background: #ff4757 !important; /* أحمر جذاب */
-    color: white !important;
-    border: 3px solid white !important; /* إطار أبيض */
+    /* الستايل الزجاجي الأحمر المتوهج */
+    background: rgba(255, 0, 0, 0.1) !important; /* خلفية حمراء شفافة */
+    backdrop-filter: blur(5px); /* تأثير الزجاج */
+    border: 1px solid rgba(255, 0, 0, 0.3) !important; /* حدود خفيفة */
+    color: #ff3b30 !important; /* لون أيقونة الإغلاق أحمر */
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.2) !important; /* توهج أحمر خفيف */
     
     display: flex !important;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    z-index: 10001; /* أعلى من النافذة نفسها */
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    
-    /* إلغاء الحركات */
-    transition: none !important;
-    transform: none !important;
-    animation: none !important;
+    z-index: 10001;
+    transition: all 0.3s ease !important;
 }
 
 #close-overlay-btn i {
-    font-size: 1.4rem !important; /* حجم الأيقونة */
-    line-height: 1 !important;
-    pointer-events: none; /* لضمان أن الضغط يقع على الزر دائماً */
+    font-size: 1rem !important;
+    font-weight: bold !important;
 }
 
 #close-overlay-btn:hover {
-    background: #e04050 !important;
-    transform: none !important;
+    background: rgba(255, 0, 0, 0.2) !important;
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.4) !important; /* زيادة التوهج عند اللمس */
+    transform: scale(1.1);
+}
+
+/* 3. محتوى النافذة والصورة */
+.found-content img {
+    width: 140px !important; 
+    height: 140px !important; 
+    object-fit: contain !important; 
+    margin-bottom: 15px !important;
+    filter: drop-shadow(0 5px 15px rgba(0,0,0,0.1));
+}
+
+.found-content h2 {
+    font-family: 'Tajawal', sans-serif;
+    font-size: 1.2rem !important; 
+    margin: 5px 0 10px 0 !important; 
+    color: #333;
+    font-weight: 700;
+}
+
+/* 4. السعر (مع إضافة د.ع) */
+.found-price {
+    font-family: 'Tajawal', sans-serif;
+    font-size: 1.8rem !important; 
+    color: #e65100; /* برتقالي غامق للسعر */
+    font-weight: 800;
+    margin-bottom: 10px;
+    display: inline-block;
+    direction: rtl; /* لضمان ظهور العملة بشكل صحيح */
+}
+
+/* إضافة "د.ع" تلقائياً بعد السعر */
+.found-price::after {
+    content: " د.ع";
+    font-size: 0.6em; /* حجم أصغر للعملة */
+    color: #777;
+    margin-right: 5px;
+    font-weight: 600;
+}
+
+/* 5. شارة "متوفر" (باللون الأخضر) */
+/* ملاحظة: تأكد من أن عنصر الحالة في HTML يحمل الكلاس .stock-status */
+.stock-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #e8f5e9 !important; /* خلفية خضراء فاتحة جداً */
+    color: #2e7d32 !important; /* نص أخضر غامق */
+    padding: 6px 16px;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    font-family: 'Tajawal', sans-serif;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+/* أيقونة الصح داخل شارة الحالة */
+.stock-status i {
+    font-size: 1rem;
 }
 
 /* 3. محتوى النافذة */
