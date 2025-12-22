@@ -2161,7 +2161,7 @@ function downloadOrderPDF(order) {
             });
         }
 
-    // 7. منطق المسح الناجح (المعدل لمنع التكرار)
+    // 7. منطق المسح الناجح (المحدث)
         const onScanSuccessHandler = (decodedText, decodedResult) => {
             if (isScanning) return;
             
@@ -2180,35 +2180,43 @@ function downloadOrderPDF(order) {
                 lastScannedCode = scannedCode;
 
                 if (currentScanMode === 'check') {
-                    // تحديث الصورة والاسم
+                    // ==========================================
+                    //  تعديل كاشف السعر (تنظيف وتحديث)
+                    // ==========================================
+                    
                     if (overlayImg) overlayImg.src = product.image;
                     if (overlayName) overlayName.textContent = product.name;
                     
-                    // تحديث السعر مع العملة المصغرة
+                    // تنسيق السعر
                     if (overlayPrice) {
                         overlayPrice.innerHTML = `${product.price.toLocaleString()} <span class="currency-symbol">د.ع</span>`;
                     }
 
-                    // --- الحل الجذري لمشكلة التكرار ---
+                    // تنظيف وإضافة علامة "متوفر"
                     const foundContent = document.querySelector('.found-content');
                     if (foundContent) {
-                        // 1. احذف أي عنصر حالة قديم (يمنع التكرار)
-                        const existingStatus = foundContent.querySelectorAll('.stock-status');
-                        existingStatus.forEach(el => el.remove());
+                        // 1. حذف أي علامة حالة قديمة (خضراء)
+                        const oldStatus = foundContent.querySelectorAll('.stock-status');
+                        oldStatus.forEach(el => el.remove());
 
-                        // 2. أنشئ العنصر الجديد
+                        // 2. حذف أي نصوص عشوائية قديمة (السوداء)
+                        // نقوم بحذف أي عنصر P لا يحوي كلاس السعر
+                        const oldTexts = foundContent.querySelectorAll('p:not(.found-price)');
+                        oldTexts.forEach(el => el.remove());
+
+                        // 3. إنشاء العنصر الجديد (الأخضر فقط)
                         const statusDiv = document.createElement('div');
                         statusDiv.className = 'stock-status';
                         statusDiv.innerHTML = '<i class="fas fa-check-circle"></i> متوفر';
                         
-                        // 3. أضفه للقائمة
+                        // إضافته
                         foundContent.appendChild(statusDiv);
                     }
 
                     if (overlay) overlay.classList.remove('hidden');
 
                 } else {
-                    // (كود الحاسبة يبقى كما هو)
+                    // (الكود الخاص بالحاسبة كما هو بدون تغيير)
                     const isSoldByPrice = ['spices', 'nuts'].includes(product.category);
                     if (typeof scannerCart === 'undefined') scannerCart = [];
                     const exist = scannerCart.find(item => item.product.globalId === product.globalId);

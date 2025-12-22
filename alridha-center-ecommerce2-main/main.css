@@ -311,24 +311,6 @@ button:active,
     align-items: center; justify-content: center; text-align: center;
 }
 
-/* =========================================
-   نافذة السعر المنبثقة (التصميم النهائي المعدل)
-   ========================================= */
-
-#product-found-overlay {
-    position: fixed !important;
-    top: 50% !important; left: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    width: 85% !important; max-width: 320px !important;
-    border-radius: 30px;
-    background: rgba(255, 255, 255, 0.98);
-    box-shadow: 0 25px 50px rgba(0,0,0,0.25);
-    z-index: 10000;
-    padding: 35px 20px 25px 20px;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center; text-align: center;
-}
-
 /* 1. زر الإغلاق الدائري تماماً */
 #close-overlay-btn {
     position: absolute !important;
@@ -384,6 +366,19 @@ button:active,
     font-size: 0.9rem; font-weight: 800;
     font-family: 'Tajawal', sans-serif; margin-top: 5px;
 }
+
+/* 3. محتوى النافذة */
+.found-content img {
+    width: 120px !important; height: 120px !important; 
+    object-fit: contain !important; margin-bottom: 10px !important;
+}
+.found-content h2 {
+    font-size: 1.1rem !important; margin: 5px 0 !important; color: #333;
+}
+.found-price {
+    font-size: 1.6rem !important; color: #e65100; font-weight: 800;
+}
+
 /* 4. إخفاء مربع الباركود عند التوقف (Pause) */
 /* عند إضافة كلاس scan-paused للماسح، يتم إخفاء المربع الملون */
 #reader.scan-paused div {
@@ -474,4 +469,69 @@ button:active,
     border-radius: 50px; font-size: 0.8rem; font-weight: bold;
     display: inline-flex; align-items: center; gap: 5px;
     margin-top: 5px; border: 1px solid #b3e5fc;
+}
+/* =========================================
+   تعديلات النافذة المنبثقة واللمعان (main.css)
+   ========================================= */
+
+/* 1. تعديل موقع النافذة (للأسفل قليلاً) */
+#product-found-overlay {
+    position: fixed !important;
+    top: 56% !important; /* قمنا بزيادتها لتنزل للأسفل */
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 85% !important; max-width: 320px !important;
+    border-radius: 30px;
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+    z-index: 10000;
+    padding: 35px 20px 25px 20px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center;
+}
+
+/* 2. تصميم اسم المنتج (لون + لمعان) */
+.found-content h2 {
+    font-family: 'Tajawal', sans-serif;
+    font-size: 1.6rem !important;
+    margin: 10px 0 15px 0 !important;
+    font-weight: 900 !important;
+    
+    /* التدرج اللوني الذهبي/البرتقالي */
+    background: linear-gradient(to right, #b45309 0%, #f59e0b 25%, #ffd700 50%, #f59e0b 75%, #b45309 100%);
+    background-size: 200% auto;
+    
+    /* قص الخلفية على شكل النص */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent; /* متصفحات قديمة */
+    
+    /* حركة اللمعان */
+    animation: shineText 3s linear infinite;
+}
+
+/* تعريف حركة اللمعان */
+@keyframes shineText {
+    to {
+        background-position: 200% center;
+    }
+}
+
+/* 3. إخفاء أي نص "متوفر" قديم (باللون الأسود) */
+/* هذا الكود سيخفي أي عنصر span أو p داخل النافذة ليس له كلاس محدد */
+.found-content p:not(.found-price), 
+.found-content span:not(.found-price):not(.currency-symbol):not(.stock-status) {
+    display: none !important;
+}
+
+/* التأكد من ظهور السعر والعلامة الخضراء فقط */
+.stock-status {
+    display: inline-flex !important; /* ضمان الظهور */
+    align-items: center; justify-content: center; gap: 6px;
+    background-color: #e8f5e9 !important;
+    color: #2e7d32 !important;
+    padding: 6px 20px; border-radius: 50px;
+    font-size: 0.9rem; font-weight: 800;
+    font-family: 'Tajawal', sans-serif; margin-top: 5px;
 }
