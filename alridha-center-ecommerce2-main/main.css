@@ -70,7 +70,7 @@ button:active,
 /* =========================================
    تحسينات الحاسوب (Desktop)
    ========================================= */
-@media (min-width: 992px) {
+@media (min-width: 960px) {
     .container, .main-container, .navbar {
         max-width: 1200px;
         margin-left: auto !important;
@@ -790,89 +790,4 @@ button:active,
     font-size: 0.8em !important;
     margin-left: 5px;
     box-shadow: 0 2px 5px rgba(230, 81, 0, 0.3);
-}
-/* ==========================================================================
-   إصلاح وضع سطح المكتب في الموبايل (Desktop Mode Fix)
-   هذا الكود يضمن ظهور تنسيق الحاسبة عند تفعيل خيار Desktop Site في الموبايل
-   حيث يقوم المتصفح بمحاكاة عرض 980px تقريباً.
-   ========================================================================== */
-
-@media (min-width: 960px) {
-
-    /* 1. ضبط الحاويات والهيدر */
-    .container, .main-container, .navbar {
-        max-width: 1200px;
-        margin-left: auto !important;
-        margin-right: auto !important;
-        padding-left: 0; padding-right: 0;
-    }
-
-    .navbar {
-        width: 100%; max-width: 100%; padding: 0 50px;
-        display: flex; justify-content: space-between;
-    }
-    
-    .navbar .nav-links { gap: 30px; }
-
-    /* 2. تحويل القوائم إلى شبكة (Grid) */
-    .products-display-area, .categories-grid {
-        display: grid !important;
-        grid-template-columns: repeat(4, 1fr) !important;
-        gap: 30px !important;
-    }
-
-    /* 3. تنسيقات الجدول للحاسبة */
-    .cart table {
-        font-size: 1.1em; width: 100%; box-shadow: 0 0 20px rgba(0,0,0,0.05);
-    }
-    
-    .cart th {
-        background-color: var(--alridha-main-orange-red); color: white; padding: 15px;
-    }
-    
-    .cart td { padding: 15px; vertical-align: middle; }
-    
-    /* إعادة زر الحذف لوضعه الطبيعي */
-    .cart td.action-cell {
-        display: table-cell !important;
-        text-align: center !important;
-    }
-    
-    .remove-btn {
-        width: 45px !important;
-        height: 45px !important;
-        font-size: 1.2rem !important;
-        margin: 0 auto !important;
-    }
-
-    /* 4. تنسيقات تفاصيل المنتج (فرض العرض الجانبي) */
-    .product-detail-card {
-        display: grid !important;
-        grid-template-columns: 450px 1fr !important;
-        gap: 50px !important;
-        align-items: start !important;
-        text-align: right !important;
-        padding: 50px !important;
-        max-width: 1200px !important;
-        margin: 0 auto 40px auto !important;
-    }
-
-    .detail-image {
-        width: 100% !important; height: 450px !important;
-        max-width: 450px !important; 
-        margin: 0 !important;
-    }
-
-    .detail-info {
-        display: flex !important; flex-direction: column !important;
-        padding-top: 20px !important;
-    }
-
-    .product-detail-card .product-actions {
-        flex-direction: row !important; width: auto !important;
-        justify-content: flex-start !important;
-    }
-
-    /* 5. إخفاء عناصر الموبايل */
-    .logo-btn-mobile { display: none !important; }
 }
