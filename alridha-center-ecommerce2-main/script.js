@@ -1659,7 +1659,218 @@ updateCartUI();
     // تشغيل الدالة
     initializeApp();
 // ============================================================
-// 1. وظيفة عرض الطلبات (تم التعديل: تصميم مرتب ومنع التداخل)
+// بداية نظام إدارة الطلبات المتطور (تم التحديث: إصلاح الترتيب والتكرار)
+// ============================================================
+
+// 1. وظيفة عرض الطلبات (تم التعديل: ترتيب الأحدث للأقدم)
+function displayOrders() {
+    if (!ordersListEl) return;
+
+    // رأس القائمة (البحث وزر الحذف)
+    let head = `
+        <div style="margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px;">
+            <input type="text" id="order-search" placeholder="🔍 ابحث برقم الطلب أو اسم الزبون..." 
+                   style="width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ddd;">
+            <button id="del-all-btn" style="background: #fff; color: #d63031; border: 1px solid #d63031; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                <i class="fas fa-trash-sweep"></i> مسح جميع الطلبات
+            </button>
+        </div>`;
+
+    if (orders.length === 0) {
+        ordersListEl.innerHTML = head + '<div class="card" style="text-align: center; padding: 20px; color: #777;"><p>لا توجد طلبات سابقة حتى الآن.</p></div>';
+    } else {
+        let html = head;
+        
+        // --- إصلاح الترتيب: فرز المصفوفة بحيث يظهر الأحدث (أكبر ID) أولاً ---
+        const sortedOrders = orders.slice().sort((a, b) => b.orderId - a.orderId);
+
+        sortedOrders.forEach((order) => {
+            // التأكد من وجود البيانات
+            const displayTime = order.time || 'غير محدد';
+            const displayDate = order.date || 'غير محدد';
+            const displayName = order.customerName || 'زبون';
+            const displayPhone = order.phone || 'لا يوجد';
+
+            // تحديد لون الحالة
+            const isSent = order.status === 'تم الإرسال';
+            const statusColor = isSent ? '#27ae60' : '#f39c12'; 
+            const statusBg = isSent ? '#e8f8f5' : '#fef9e7';
+            // === 1. أضف هذا المقطع هنا ===
+    // هذا الكود يحدد النص واللون بناءً على مصدر الطلب
+    const sourceText = (order.orderSource === 'scanner') ? '(من سلة الماسح)' : '(من سلة التطبيق)';
+    const sourceColor = (order.orderSource === 'scanner') ? '#8e44ad' : '#2980b9';
+    // ============================
+
+            html += `
+            <div class="card order-item" style="padding: 15px; margin-bottom: 15px; border-radius: 12px; border-right: 6px solid ${statusColor}; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h3 style="margin: 0; color: #333; font-size: 1.1rem;">#${order.orderId}</h3>
+                    <span style="background: ${statusBg}; color: ${statusColor}; padding: 4px 10px; border-radius: 20px; font-size: 0.8em; font-weight: bold;">${order.status}</span>
+                </div>
+                
+                <div style="font-size: 0.95rem; color: #555; margin-top: 10px; line-height: 1.8;">
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 8px;">
+    <span style="font-weight:bold; color:#2c3e50;">👤 ${order.customerName || 'زبون'}</span>
+    <span style="color: #d35400; font-weight: bold;">${order.total} د.ع</span>
+</div>
+
+<p style="margin: 0; font-size: 0.85em; color: ${sourceColor}; font-weight: bold;">${sourceText}</p>
+<p style="margin: 0;"><i class="fas fa-phone fa-fw"></i> ${order.phone}</p>
+                        <span style="font-weight:bold; color:#2c3e50;">👤 ${displayName}</span>
+                        <span style="color: #d35400; font-weight: bold;">${order.total} د.ع</span>
+                    </div>
+                    
+                    <p style="margin: 0;"><i class="fas fa-phone fa-fw"></i> ${displayPhone}</p>
+                    <p style="margin: 0;"><i class="fas fa-map-marker-alt fa-fw"></i> ${order.location || 'الموقع غير محدد'}</p>
+                    
+                    <div style="display: flex; gap: 15px; margin-top: 8px; font-size: 0.85em; color: #777; background: #f9f9f9; padding: 5px; border-radius: 5px;">
+                        <span><i class="far fa-calendar-alt"></i> ${displayDate}</span>
+                        <span><i class="far fa-clock"></i> ${displayTime}</span>
+                    </div>
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 15px;">
+                    <button class="wa-btn" data-id="${order.orderId}" style="background: #25D366; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <i class="fab fa-whatsapp" style="font-size: 1.2em;"></i> إرسال واتساب
+                    </button>
+                    
+                    <button class="pdf-btn" data-id="${order.orderId}" style="background: #0984e3; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <i class="fas fa-print"></i> طباعة الفاتورة (PDF)
+                    </button>
+                    
+                    <button class="del-btn" data-id="${order.orderId}" style="background: #fff; color: #d63031; border: 1px solid #ffccd5; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <i class="fas fa-trash"></i> حذف الطلب
+                    </button>
+                </div>
+            </div>`;
+        });
+        ordersListEl.innerHTML = html;
+
+        // تفعيل الأزرار
+        document.getElementById('order-search').addEventListener('input', (e) => {
+            const val = e.target.value.toLowerCase();
+            const cards = ordersListEl.querySelectorAll('.order-item');
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                card.style.display = text.includes(val) ? 'block' : 'none';
+            });
+        });
+
+        document.getElementById('del-all-btn').addEventListener('click', () => {
+            if (confirm('سيتم مسح جميع سجلات الطلبات نهائياً، هل أنت متأكد؟')) {
+                orders = [];
+                saveOrders();
+                displayOrders();
+                showNotification('تم مسح السجل بالكامل', 'error');
+            }
+        });
+
+        ordersListEl.querySelectorAll('.wa-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const orderId = parseInt(btn.getAttribute('data-id'));
+                const order = orders.find(o => o.orderId === orderId);
+                if(order) sendOrderToWhatsApp(order);
+            });
+        });
+
+        ordersListEl.querySelectorAll('.pdf-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const orderId = parseInt(btn.getAttribute('data-id'));
+                const order = orders.find(o => o.orderId === orderId);
+                if(order) downloadOrderPDF(order);
+            });
+        });
+
+        ordersListEl.querySelectorAll('.del-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const orderId = parseInt(btn.getAttribute('data-id'));
+                if (confirm('هل تريد حذف سجل هذا الطلب؟')) {
+                    orders = orders.filter(o => o.orderId !== orderId);
+                    saveOrders();
+                    displayOrders();
+                    showNotification('تم حذف السجل', 'error');
+                }
+            });
+        });
+    }
+}
+
+// 2. وظيفة المساعدة: إرسال واتساب
+function sendOrderToWhatsApp(order) {
+    const customerName = order.customerName || "زبون";
+    let message = `*📦 طلب جديد من: ${customerName}*\n`;
+    message += `*📱 رقم الهاتف:* ${order.phone}\n\n`;
+    message += `*رقم الطلب:* ${order.orderId}\n`;
+    message += `*📅 التاريخ:* ${order.date}\n`;
+    message += `*⏰ الوقت:* ${order.time}\n`;
+    message += `*📍 الموقع:* ${order.location}\n`;
+    message += `\n*🛒 تفاصيل المنتجات:*\n`;
+
+    order.items.forEach(item => {
+        if (item.isSoldByPrice) {
+            message += `- ${item.name}: ${item.quantity} د.ع\n`;
+        } else {
+            message += `- ${item.name}: ${item.quantity} × ${item.price} د.ع\n`;
+        }
+    });
+
+    message += `\n*💰 المجموع الكلي: ${order.total} د.ع*`;
+    message += `\n\n*بانتظار تأكيد الطلب...*`;
+    
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/9647816780645?text=${encodedMessage}`;
+    
+    order.status = 'تم الإرسال';
+    saveOrders();
+    displayOrders(); 
+    window.open(whatsappUrl, '_blank');
+}
+
+// 3. وظيفة المساعدة: طباعة PDF
+function downloadOrderPDF(order) {
+    const printWindow = window.open('', '_blank');
+    const itemsHtml = order.items.map(item => `
+        <tr>
+            <td style="border: 1px solid #ddd; padding: 8px;">${item.name}</td>
+            <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">
+                ${item.isSoldByPrice ? item.quantity + ' د.ع' : item.quantity}
+            </td>
+            <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">
+                ${item.isSoldByPrice ? item.quantity : item.price * item.quantity} د.ع
+            </td>
+        </tr>`).join('');
+
+    const content = `
+        <div dir="rtl" style="font-family: Arial, sans-serif; padding: 20px;">
+            <h2 style="text-align: center; margin-bottom: 5px;">سنتر الرضا</h2>
+            <p style="text-align: center; margin-top: 0; color: #666;">فاتورة طلب</p>
+            <hr style="border: 1px dashed #ccc;">
+            <p><strong>الاسم:</strong> ${order.customerName || 'زبون'}</p>
+            <p><strong>الهاتف:</strong> ${order.phone}</p> 
+            <p><strong>رقم الفاتورة:</strong> #${order.orderId}</p>
+            <p><strong>التاريخ:</strong> ${order.date} | <strong>الوقت:</strong> ${order.time}</p>
+            <p><strong>العنوان:</strong> ${order.location}</p>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+                <thead><tr style="background: #f1f1f1;">
+                    <th style="border: 1px solid #ddd; padding: 8px;">المنتج</th>
+                    <th style="border: 1px solid #ddd; padding: 8px;">الكمية</th>
+                    <th style="border: 1px solid #ddd; padding: 8px;">السعر</th>
+                </tr></thead>
+                <tbody>${itemsHtml}</tbody>
+            </table>
+            <h3 style="text-align: left; margin-top: 20px;">المجموع النهائي: ${order.total} د.ع</h3>
+            <p style="text-align: center; margin-top: 50px; font-size: 12px;">شكراً لتسوقكم معنا</p>
+        </div>`;
+
+    printWindow.document.write(content);
+    printWindow.document.close();
+    printWindow.print();
+}
+
+// ============================================================
+// 1. وظيفة عرض الطلبات (التصميم الكلاسيكي: الاسم مقابل السعر)
 // ============================================================
 function displayOrders() {
     if (!ordersListEl) return;
@@ -1679,69 +1890,63 @@ function displayOrders() {
     } else {
         let html = head;
         
-        // فرز المصفوفة: الأحدث أولاً
+        // فرز المصفوفة: الأحدث أولاً (حسب الكود القديم)
         const sortedOrders = orders.slice().sort((a, b) => b.orderId - a.orderId);
 
         sortedOrders.forEach((order) => {
             // بيانات العرض
             const displayTime = order.time || 'غير محدد';
             const displayDate = order.date || 'غير محدد';
+            const displayName = order.customerName || 'زبون'; // التأكد من وجود الاسم
+            const displayPhone = order.phone || 'لا يوجد';     // التأكد من وجود الهاتف
             
             // ألوان الحالة
             const isSent = order.status === 'تم الإرسال';
             const statusColor = isSent ? '#27ae60' : '#f39c12'; 
             const statusBg = isSent ? '#e8f8f5' : '#fef9e7';
 
-            // تحديد مصدر الطلب (الماسح أم التطبيق) والألوان
-            const sourceText = (order.orderSource === 'scanner') ? 'سلة الماسح' : 'سلة التطبيق';
-            const sourceBadgeColor = (order.orderSource === 'scanner') ? '#e65100' : '#2980b9'; // برتقالي للماسح، أزرق للتطبيق
+            // تحديد مصدر الطلب (للحفاظ على ميزة الماسح)
+            const sourceText = (order.orderSource === 'scanner') ? '(من سلة الماسح)' : '(من سلة التطبيق)';
+            const sourceColor = (order.orderSource === 'scanner') ? '#8e44ad' : '#2980b9';
 
             html += `
             <div class="card order-item" style="padding: 15px; margin-bottom: 15px; border-radius: 12px; border-right: 6px solid ${statusColor}; box-shadow: 0 4px 10px rgba(0,0,0,0.05); background: white;">
                 
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px;">
-                    <h3 style="margin: 0; color: #333; font-size: 1.2rem;">#${order.orderId}</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h3 style="margin: 0; color: #333; font-size: 1.1rem;">#${order.orderId}</h3>
                     <span style="background: ${statusBg}; color: ${statusColor}; padding: 4px 10px; border-radius: 20px; font-size: 0.8em; font-weight: bold;">${order.status}</span>
                 </div>
                 
-                <div style="text-align: right;">
-                    <div style="margin-bottom: 8px;">
-                        <span style="background:${sourceBadgeColor}; color:white; padding: 4px 10px; border-radius: 6px; font-size: 0.85em; display: inline-block;">
-                           <i class="fas ${order.orderSource === 'scanner' ? 'fa-barcode' : 'fa-shopping-basket'}"></i> ${sourceText}
-                        </span>
+                <div style="font-size: 0.95rem; color: #555; margin-top: 10px; line-height: 1.8;">
+                    
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 8px;">
+                        <span style="font-weight:bold; color:#2c3e50;">👤 ${displayName}</span>
+                        <span style="color: #d35400; font-weight: bold;">${order.total} د.ع</span>
                     </div>
 
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <h4 style="margin: 0; color: #2c3e50; font-size: 1.1em;">
-                            <i class="fas fa-user-circle" style="color:#bdc3c7;"></i> ${order.customerName || 'زبون'}
-                        </h4>
-                        <h4 style="margin: 0; color: #d35400; font-size: 1.3em; font-weight: 800;">
-                            ${order.total} د.ع
-                        </h4>
-                    </div>
+                    <p style="margin: 0; font-size: 0.85em; color: ${sourceColor}; font-weight: bold;">${sourceText}</p>
                     
-                    <div style="color: #555; font-size: 0.95em; line-height: 1.6;">
-                        <p style="margin: 0;"><i class="fas fa-phone fa-fw" style="color:#7f8c8d;"></i> ${order.phone}</p>
-                        <p style="margin: 4px 0 0 0;"><i class="fas fa-map-marker-alt fa-fw" style="color:#7f8c8d;"></i> ${order.location || 'غير محدد'}</p>
+                    <p style="margin: 0;"><i class="fas fa-phone fa-fw"></i> ${displayPhone}</p>
+                    
+                    <p style="margin: 0;"><i class="fas fa-map-marker-alt fa-fw"></i> ${order.location || 'الموقع غير محدد'}</p>
+                    
+                    <div style="display: flex; gap: 15px; margin-top: 8px; font-size: 0.85em; color: #777; background: #f9f9f9; padding: 5px; border-radius: 5px;">
+                        <span><i class="far fa-calendar-alt"></i> ${displayDate}</span>
+                        <span><i class="far fa-clock"></i> ${displayTime}</span>
                     </div>
                 </div>
                 
-                <div style="margin-top: 15px; padding-top: 10px; border-top: 1px dashed #eee; display: flex; gap: 15px; font-size: 0.85em; color: #95a5a6;">
-                    <span><i class="far fa-calendar-alt"></i> ${displayDate}</span>
-                    <span><i class="far fa-clock"></i> ${displayTime}</span>
-                </div>
-
-                <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
+                <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 15px;">
                     <button class="wa-btn" data-id="${order.orderId}" style="background: #25D366; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px;">
                         <i class="fab fa-whatsapp" style="font-size: 1.2em;"></i> إرسال واتساب
                     </button>
                     
                     <div style="display: flex; gap: 10px;">
-                        <button class="pdf-btn" data-id="${order.orderId}" style="background: #0984e3; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; flex: 1; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                        <button class="pdf-btn" data-id="${order.orderId}" style="background: #0984e3; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; flex: 1; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px;">
                             <i class="fas fa-print"></i> طباعة
                         </button>
                         
-                        <button class="del-btn" data-id="${order.orderId}" style="background: #fff; color: #d63031; border: 1px solid #ffccd5; padding: 10px; border-radius: 8px; cursor: pointer; flex: 1; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                        <button class="del-btn" data-id="${order.orderId}" style="background: #fff; color: #d63031; border: 1px solid #ffccd5; padding: 12px; border-radius: 8px; cursor: pointer; flex: 1; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px;">
                             <i class="fas fa-trash"></i> حذف
                         </button>
                     </div>
@@ -1797,166 +2002,6 @@ function displayOrders() {
             });
         });
     }
-}
-
-// 2. وظيفة المساعدة: إرسال واتساب (محدثة)
-function sendOrderToWhatsApp(order) {
-    const sourceText = (order.orderSource === 'scanner') ? 'سلة الماسح' : 'سلة التطبيق';
-    const customerName = order.customerName || "زبون";
-    
-    let message = `*📦 طلب جديد (${sourceText})*\n`; // تمت إضافة المصدر هنا
-    message += `*👤 الاسم:* ${customerName}\n`;
-    message += `*📱 رقم الهاتف:* ${order.phone}\n\n`;
-    message += `*رقم الطلب:* ${order.orderId}\n`;
-    message += `*📅 التاريخ:* ${order.date}\n`;
-    message += `*⏰ الوقت:* ${order.time}\n`;
-    message += `*📍 الموقع:* ${order.location}\n`;
-    message += `\n*🛒 تفاصيل المنتجات:*\n`;
-
-    order.items.forEach(item => {
-        // نستخدم الاسم المحفوظ لضمان عدم ظهور undefined
-        const itemName = item.name || 'منتج';
-        if (item.isSoldByPrice) {
-            message += `- ${itemName}: ${item.quantity} د.ع\n`;
-        } else {
-            message += `- ${itemName}: ${item.quantity} × ${item.price} د.ع\n`;
-        }
-    });
-
-    message += `\n*💰 المجموع الكلي: ${order.total} د.ع*`;
-    message += `\n\n*بانتظار تأكيد الطلب...*`;
-    
-    const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/9647816780645?text=${encodedMessage}`;
-    
-    order.status = 'تم الإرسال';
-    saveOrders();
-    displayOrders(); 
-    window.open(whatsappUrl, '_blank');
-}
-
-// 3. وظيفة المساعدة: طباعة PDF (محدثة)
-function downloadOrderPDF(order) {
-    const sourceText = (order.orderSource === 'scanner') ? 'سلة الماسح' : 'سلة التطبيق';
-    const printWindow = window.open('', '_blank');
-    
-    const itemsHtml = order.items.map(item => `
-        <tr>
-            <td style="border: 1px solid #ddd; padding: 8px;">${item.name || 'غير معروف'}</td>
-            <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">
-                ${item.isSoldByPrice ? item.quantity + ' د.ع' : item.quantity}
-            </td>
-            <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">
-                ${item.isSoldByPrice ? item.quantity : item.price * item.quantity} د.ع
-            </td>
-        </tr>`).join('');
-
-    const content = `
-        <div dir="rtl" style="font-family: Arial, sans-serif; padding: 20px;">
-            <h2 style="text-align: center; margin-bottom: 5px;">سنتر الرضا</h2>
-            <p style="text-align: center; margin-top: 0; color: #666; font-size: 14px;">فاتورة طلب - (${sourceText})</p>
-            <hr style="border: 1px dashed #ccc;">
-            <p><strong>الاسم:</strong> ${order.customerName || 'زبون'}</p>
-            <p><strong>الهاتف:</strong> ${order.phone}</p> 
-            <p><strong>رقم الفاتورة:</strong> #${order.orderId}</p>
-            <p><strong>التاريخ:</strong> ${order.date} | <strong>الوقت:</strong> ${order.time}</p>
-            <p><strong>العنوان:</strong> ${order.location}</p>
-            <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
-                <thead><tr style="background: #f1f1f1;">
-                    <th style="border: 1px solid #ddd; padding: 8px;">المنتج</th>
-                    <th style="border: 1px solid #ddd; padding: 8px;">الكمية</th>
-                    <th style="border: 1px solid #ddd; padding: 8px;">السعر</th>
-                </tr></thead>
-                <tbody>${itemsHtml}</tbody>
-            </table>
-            <h3 style="text-align: left; margin-top: 20px;">المجموع النهائي: ${order.total} د.ع</h3>
-            <p style="text-align: center; margin-top: 50px; font-size: 12px;">شكراً لتسوقكم معنا</p>
-        </div>`;
-
-    printWindow.document.write(content);
-    printWindow.document.close();
-    printWindow.print();
-}
-
-// ============================================================
-// 4. إصلاح زر تأكيد الطلب (مهم جداً لحفظ الأسماء والمصدر)
-// ============================================================
-const checkoutConfirmBtn = document.getElementById('confirm-btn');
-
-if (checkoutConfirmBtn && checkoutConfirmBtn.parentNode) {
-    
-    // استنساخ الزر لتنظيف الأحداث القديمة
-    const newConfirmBtn = checkoutConfirmBtn.cloneNode(true);
-    checkoutConfirmBtn.parentNode.replaceChild(newConfirmBtn, checkoutConfirmBtn);
-
-    newConfirmBtn.addEventListener('click', () => {
-        // معرفة السلة الحالية والمصدر
-        const isScanner = (typeof currentCartView !== 'undefined' && currentCartView === 'scanner');
-        const targetCart = isScanner ? scannerCart : cart;
-        const sourceLabel = isScanner ? 'scanner' : 'app';
-
-        // قراءة البيانات
-        const phoneVal = document.getElementById('phone').value.trim();
-        const locVal = document.getElementById('location').value.trim();
-        const notesVal = document.getElementById('notes').value.trim();
-        const nameEl = document.getElementById('customer-name');
-        const nameVal = (nameEl && nameEl.value.trim() !== "") ? nameEl.value.trim() : "زبون";
-
-        // التحقق
-        if (!targetCart || targetCart.length === 0) {
-            showNotification('السلة فارغة!', 'error'); return;
-        }
-        if (!phoneVal.startsWith('07') || phoneVal.length < 11) {
-            showNotification('رقم الهاتف غير صحيح.', 'error'); return;
-        }
-        if (!locVal) {
-            showNotification('يرجى كتابة العنوان.', 'error'); return;
-        }
-
-        // الحفظ
-        newConfirmBtn.textContent = 'جاري الحفظ...';
-        newConfirmBtn.disabled = true;
-
-        const now = new Date();
-        const order = {
-            orderId: Date.now(),
-            orderSource: sourceLabel, // حفظ المصدر (scanner أو app)
-            customerName: nameVal,
-            phone: phoneVal,
-            location: locVal,
-            notes: notesVal,
-            date: now.toLocaleDateString('en-GB'),
-            time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }).replace('AM', 'ص').replace('PM', 'م'),
-            // حفظ تفاصيل المنتجات بشكل صريح (الاسم والسعر)
-            items: targetCart.map(item => ({
-                id: item.product.id,
-                name: item.product.name, // حفظ الاسم هنا
-                price: item.product.price,
-                quantity: item.quantity,
-                isSoldByPrice: item.isSoldByPrice || false,
-                variantName: item.variant ? item.variant.value : ''
-            })),
-            total: document.getElementById('cart-total').textContent,
-            status: 'قيد المراجعة'
-        };
-
-        orders.unshift(order);
-        saveOrders();
-
-        // تفريغ السلة وتحديث الصفحة
-        if (isScanner) { scannerCart = []; saveScannerCart(); } 
-        else { cart = []; saveCart(); }
-
-        updateCartUI();
-        showNotification('تم إرسال الطلب بنجاح!', 'success');
-
-        setTimeout(() => {
-            document.querySelector('.checkout').classList.add('hidden');
-            newConfirmBtn.textContent = 'تأكيد الطلب';
-            newConfirmBtn.disabled = false;
-            window.location.href = 'orders.html';
-        }, 1500);
-    });
 }
     // إصلاح زر البحث (فتح/إغلاق النافذة المنبثقة)
     // ==========================================
