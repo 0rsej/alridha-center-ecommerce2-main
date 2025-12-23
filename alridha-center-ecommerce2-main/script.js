@@ -854,6 +854,26 @@ function updateNavbarCartCount() {
             return item.product.globalId === globalProductId &&
                    (selectedVariant ? (item.variant && item.variant.value === selectedVariant.value) : !item.variant);
         });
+        // --- بداية التعديل: التحقق من القيود ---
+let newTotalQuantity = actualQuantity;
+if (existingItem) {
+    newTotalQuantity += existingItem.quantity;
+}
+
+if (isSoldByPrice) {
+    // الحد الأقصى للوزن/القيمة: 25,000 د.ع
+    if (newTotalQuantity > 25000) {
+        showNotification('عفواً، الحد الأقصى لهذا المنتج هو 25,000 د.ع.', 'error');
+        return; 
+    }
+} else {
+    // الحد الأقصى للعدد: 50 قطعة
+    if (newTotalQuantity > 50) {
+        showNotification('عفواً، الحد الأقصى لهذا المنتج هو 50 قطعة.', 'error');
+        return;
+    }
+}
+// --- نهاية التعديل ---
 
         if (existingItem) {
             if (isSoldByPrice) {
@@ -923,9 +943,9 @@ function updateCartUI() {
                     </td>
                     <td>${displayPricePerUnit} د.ع</td>
                     <td>${itemSubtotal} د.ع</td>
-                    <td>
-                        <button data-index="${index}" class="remove-btn"><i class="fas fa-trash-alt"></i></button>
-                    </td>
+                  <td class="action-cell">
+    <button data-index="${index}" class="remove-btn"><i class="fas fa-trash-alt"></i></button>
+</td>
                 `;
                 cartTableBody.appendChild(tr);
             });
@@ -954,22 +974,22 @@ function updateCartUI() {
 
         cartTableBody.querySelectorAll('.cart-quantity-input').forEach(input => {
             input.addEventListener('change', (e) => {
-                const idx = parseInt(e.target.getAttribute('data-index'));
-                let val = parseFloat(e.target.value);
-                const item = targetCart[idx];
+             const idx = parseInt(e.target.getAttribute('data-index'));
+let val = parseFloat(e.target.value);
+const item = targetCart[idx];
 
-                if (item.isSoldByPrice) {
-                    if (isNaN(val) || val < 250) val = 250;
-                    if (val % 250 !== 0) {
-                        val = Math.round(val / 250) * 250;
-                        if (val === 0) val = 250;
-                        showNotification('تم تعديل القيمة لأقرب مضاعف لـ 250.', 'info');
-                    }
-                } else {
-                    if (isNaN(val) || val < 1) val = 1;
-                }
-                item.quantity = val;
-                updateCartUI();
+if (item.isSoldByPrice) {
+    if (isNaN(val) || val < 250) val = 250;
+    // التعديل هنا: إضافة الحد الأقصى للسعر
+    if (val > 25000) { val = 25000; showNotification('الحد الأقصى 25,000 د.ع', 'error'); }
+    if (val % 250 !== 0) val = Math.round(val / 250) * 250;
+} else {
+    if (isNaN(val) || val < 1) val = 1;
+    // التعديل هنا: إضافة الحد الأقصى للعدد
+    if (val > 50) { val = 50; showNotification('الحد الأقصى 50 قطعة', 'error'); }
+}
+item.quantity = val;
+updateCartUI();
             });
         });
 
@@ -1680,6 +1700,11 @@ function displayOrders() {
             const isSent = order.status === 'تم الإرسال';
             const statusColor = isSent ? '#27ae60' : '#f39c12'; 
             const statusBg = isSent ? '#e8f8f5' : '#fef9e7';
+            // === 1. أضف هذا المقطع هنا ===
+    // هذا الكود يحدد النص واللون بناءً على مصدر الطلب
+    const sourceText = (order.orderSource === 'scanner') ? '(من سلة الماسح)' : '(من سلة التطبيق)';
+    const sourceColor = (order.orderSource === 'scanner') ? '#8e44ad' : '#2980b9';
+    // ============================
 
             html += `
             <div class="card order-item" style="padding: 15px; margin-bottom: 15px; border-radius: 12px; border-right: 6px solid ${statusColor}; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
@@ -1691,6 +1716,13 @@ function displayOrders() {
                 
                 <div style="font-size: 0.95rem; color: #555; margin-top: 10px; line-height: 1.8;">
                     <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 8px;">
+    <span style="font-weight:bold; color:#2c3e50;">👤 ${order.customerName || 'زبون'}</span>
+    <span style="color: #d35400; font-weight: bold;">${order.total} د.ع</span>
+</div>
+
+<p style="margin: 0; font-size: 0.85em; color: ${sourceColor}; font-weight: bold;">${sourceText}</p>
+<p style="margin: 0;"><i class="fas fa-phone fa-fw"></i> ${order.phone}</p>
                         <span style="font-weight:bold; color:#2c3e50;">👤 ${displayName}</span>
                         <span style="color: #d35400; font-weight: bold;">${order.total} د.ع</span>
                     </div>
@@ -1892,7 +1924,17 @@ function downloadOrderPDF(order) {
                 notes: notesVal,
                 date: now.toLocaleDateString('en-GB'),
                 time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }).replace('AM', 'ص').replace('PM', 'م'),
-                items: targetCart,
+               // --- بداية التعديل: حفظ نسخة صريحة من البيانات ---
+items: targetCart.map(item => ({
+    id: item.product.id,
+    name: item.product.name, // حفظ الاسم كنص ثابت لضمان عدم ضياعه
+    price: item.product.price,
+    quantity: item.quantity,
+    isSoldByPrice: item.isSoldByPrice || false,
+    variantName: item.variant ? item.variant.value : '' // حفظ اسم النوع إن وجد
+})),
+// --- نهاية التعديل ---
+orderSource: sourceLabel, // حفظنا المصدر هنا
                 total: document.getElementById('cart-total').textContent, // نأخذ المجموع المعروض مباشرة
                 status: 'قيد المراجعة'
             };
@@ -2022,229 +2064,264 @@ function downloadOrderPDF(order) {
         tabScannerCart.addEventListener('click', activateScannerTab);
     }
 // ============================================================
-    //  نظام الماسح الضوئي (النسخة النهائية الآمنة) 📷
-    // ============================================================
-    { // بداية النطاق المحصور لمنع الأخطاء
-        
-        let isScanning = false;
-        let currentScanMode = 'check'; 
-        let html5QrCode = null; 
-        let lastScannedCode = null; 
-        let scanLockTimer = null;
+//  نظام الماسح الضوئي (النسخة النهائية الآمنة والمحدثة) 📷
+// ============================================================
+{ // بداية النطاق المحصور لمنع الأخطاء
 
-        // تعريف العناصر داخل الدالة لضمان وجودها
-        const scannerModal = document.getElementById('scanner-modal');
-        const scannerTriggerBtn = document.getElementById('barcodeTriggerBtn');
-        const closeScannerBtn = document.getElementById('close-scanner-btn');
-        
-        const scanResultEl = document.getElementById('scan-result');
-        const scanTotalEl = document.getElementById('scan-total');
-        const scanCountEl = document.getElementById('scan-count');
-        const scannerFooter = document.getElementById('scanner-footer');
-        
-        // عناصر النافذة المنبثقة
-        const overlay = document.getElementById('product-found-overlay');
-        const closeOverlayBtn = document.getElementById('close-overlay-btn');
-        const overlayImg = document.getElementById('found-img');
-        const overlayName = document.getElementById('found-name');
-        const overlayPrice = document.getElementById('found-price');
+    let isScanning = false;
+    let currentScanMode = 'check'; 
+    let html5QrCode = null; 
+    let lastScannedCode = null; 
+    let scanLockTimer = null;
 
-        // 1. منطق أزرار التبديل (حاسبة / كاشف)
-        const modeBtns = document.querySelectorAll('.mode-btn');
-        if(modeBtns) {
-            modeBtns.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    modeBtns.forEach(b => b.classList.remove('active'));
-                    e.target.classList.add('active');
-                    currentScanMode = e.target.getAttribute('data-mode');
+    // تعريف العناصر داخل الدالة لضمان وجودها
+    const scannerModal = document.getElementById('scanner-modal');
+    const scannerTriggerBtn = document.getElementById('barcodeTriggerBtn');
+    const closeScannerBtn = document.getElementById('close-scanner-btn');
+    
+    const scanResultEl = document.getElementById('scan-result');
+    const scanTotalEl = document.getElementById('scan-total');
+    const scanCountEl = document.getElementById('scan-count');
+    const scannerFooter = document.getElementById('scanner-footer');
+    
+    // عناصر النافذة المنبثقة
+    const overlay = document.getElementById('product-found-overlay');
+    const closeOverlayBtn = document.getElementById('close-overlay-btn');
+    const overlayImg = document.getElementById('found-img');
+    const overlayName = document.getElementById('found-name');
+    const overlayPrice = document.getElementById('found-price');
 
-                    if (currentScanMode === 'cart') {
-                        if(scannerFooter) scannerFooter.classList.remove('hidden'); 
-                        if(scanResultEl) scanResultEl.innerHTML = '🛒 الوضع: حاسبة المشتريات';
-                        updateLocalScannerStats();
-                    } else {
-                        if(scannerFooter) scannerFooter.classList.add('hidden');
-                        if(scanResultEl) scanResultEl.innerHTML = '🔍 الوضع: كاشف السعر';
-                    }
-                });
-            });
-        }
+    // عنصر جديد لعرض عدد العناصر في الماسح
+    const scannerCounterBadge = document.createElement('div');
+    scannerCounterBadge.id = 'scanner-counter-badge';
+    scannerCounterBadge.style.cssText = "position: absolute; top: 15px; right: 60px; background: #e65100; color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.9em; z-index: 100; display: none; box-shadow: 0 2px 5px rgba(0,0,0,0.2);";
+    scannerCounterBadge.innerHTML = '<i class="fas fa-shopping-basket"></i> <span id="scanner-badge-count">0</span>';
 
-        // 2. تحديث الأرقام
-        function updateLocalScannerStats() {
-            if (typeof scannerCart === 'undefined') return;
-            
-            let totalQty = 0;
-            let totalPrice = 0;
+    // إضافته للنافذة
+    if (scannerModal && scannerModal.querySelector('.scanner-content')) {
+         scannerModal.querySelector('.scanner-content').appendChild(scannerCounterBadge);
+    }
 
-            scannerCart.forEach(item => {
-                let itemPrice = item.product.price;
-                if (item.variant && item.variant.price_modifier) itemPrice += item.variant.price_modifier;
-                
-                if (item.isSoldByPrice) {
-                    totalPrice += item.quantity;
-                    totalQty += 1; 
+    // 1. منطق أزرار التبديل (حاسبة / كاشف)
+    const modeBtns = document.querySelectorAll('.mode-btn');
+    if(modeBtns) {
+        modeBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                modeBtns.forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                currentScanMode = e.target.getAttribute('data-mode');
+
+                if (currentScanMode === 'cart') {
+                    if(scannerFooter) scannerFooter.classList.remove('hidden'); 
+                    if(scanResultEl) scanResultEl.innerHTML = '🛒 الوضع: حاسبة المشتريات';
+                    // إظهار العداد
+                    if(scannerCounterBadge) scannerCounterBadge.style.display = 'flex';
+                    updateLocalScannerStats();
                 } else {
-                    totalPrice += (itemPrice * item.quantity);
-                    totalQty += item.quantity;
+                    if(scannerFooter) scannerFooter.classList.add('hidden');
+                    // إخفاء العداد
+                    if(scannerCounterBadge) scannerCounterBadge.style.display = 'none';
+                    if(scanResultEl) scanResultEl.innerHTML = '🔍 الوضع: كاشف السعر';
                 }
             });
+        });
+    }
 
-            if (scanCountEl) scanCountEl.textContent = totalQty;
-            if (scanTotalEl) scanTotalEl.textContent = totalPrice.toLocaleString();
-        }
+    // 2. تحديث الأرقام
+    function updateLocalScannerStats() {
+        if (typeof scannerCart === 'undefined') return;
+        
+        let totalQty = 0;
+        let totalPrice = 0;
 
-        // 3. زر إغلاق النافذة المنبثقة
-        if (closeOverlayBtn && overlay) {
-            closeOverlayBtn.addEventListener('click', (e) => {
-                e.preventDefault(); 
-                e.stopPropagation(); 
-                
-                overlay.classList.add('hidden');
-                
-                setTimeout(() => { 
-                    isScanning = false; 
-                    lastScannedCode = null; 
-                }, 500);
-                
-                if(scanResultEl) scanResultEl.innerHTML = 'جاهز...';
-            });
-        }
-
-        // 4. تشغيل الكاميرا
-        function startScannerLogic() {
-            // التأكد من أن المكتبة محملة
-            if (typeof Html5Qrcode === 'undefined') {
-                alert('جاري تحميل ماسح الباركود، يرجى الانتظار قليلاً والمحاولة مرة أخرى.');
-                return;
+        scannerCart.forEach(item => {
+            let itemPrice = item.product.price;
+            if (item.variant && item.variant.price_modifier) itemPrice += item.variant.price_modifier;
+            
+            if (item.isSoldByPrice) {
+                totalPrice += item.quantity;
+                totalQty += 1; // نحسب عدد المواد المختلفة للوزن
+            } else {
+                totalPrice += (itemPrice * item.quantity);
+                totalQty += item.quantity;
             }
+        });
 
-            if (html5QrCode) return; // الكاميرا تعمل بالفعل
+        // تحديث الفوتر
+        if (scanCountEl) scanCountEl.textContent = scannerCart.length; // عدد المواد المختلفة
+        if (scanTotalEl) scanTotalEl.textContent = totalPrice.toLocaleString();
+        
+        // تحديث شارة العداد العلوية
+        const badgeCount = document.getElementById('scanner-badge-count');
+        if(badgeCount) badgeCount.textContent = scannerCart.length;
+    }
 
-            html5QrCode = new Html5Qrcode("reader");
+    // 3. زر إغلاق النافذة المنبثقة
+    if (closeOverlayBtn && overlay) {
+        closeOverlayBtn.addEventListener('click', (e) => {
+            e.preventDefault(); 
+            e.stopPropagation(); 
             
-            const config = { 
-                fps: 15, 
-                qrbox: { width: 220, height: 100 }, 
-                aspectRatio: 1.0 
-            };
+            overlay.classList.add('hidden');
             
-            html5QrCode.start({ facingMode: "environment" }, config, onScanSuccessHandler)
-            .catch(err => {
-                console.error("Error starting scanner:", err);
-                if(scanResultEl) scanResultEl.innerHTML = "خطأ: لا يمكن الوصول للكاميرا";
-            });
+            setTimeout(() => { 
+                isScanning = false; 
+                lastScannedCode = null; 
+            }, 500);
+            
+            if(scanResultEl) scanResultEl.innerHTML = 'جاهز...';
+        });
+    }
+
+    // 4. تشغيل الكاميرا
+    function startScannerLogic() {
+        if (typeof Html5Qrcode === 'undefined') {
+            alert('جاري تحميل ماسح الباركود، يرجى الانتظار قليلاً والمحاولة مرة أخرى.');
+            return;
         }
 
-        // 5. زر فتح الماسح (الذي كان لا يعمل)
-        if (scannerTriggerBtn && scannerModal) {
-            scannerTriggerBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                scannerModal.classList.remove('hidden');
-                startScannerLogic();
-                updateLocalScannerStats();
-            });
-        }
+        if (html5QrCode) return; 
 
-        // 6. زر إغلاق الماسح بالكامل
-        if (closeScannerBtn) {
-            closeScannerBtn.addEventListener('click', () => {
-                if (scannerModal) scannerModal.classList.add('hidden');
-                if (html5QrCode) {
-                    html5QrCode.stop().then(() => {
-                        html5QrCode.clear();
-                        html5QrCode = null;
-                    }).catch(err => console.log(err));
+        html5QrCode = new Html5Qrcode("reader");
+        
+        const config = { 
+            fps: 15, 
+            qrbox: { width: 220, height: 100 }, 
+            aspectRatio: 1.0 
+        };
+        
+        html5QrCode.start({ facingMode: "environment" }, config, onScanSuccessHandler)
+        .catch(err => {
+            console.error("Error starting scanner:", err);
+            if(scanResultEl) scanResultEl.innerHTML = "خطأ: لا يمكن الوصول للكاميرا";
+        });
+    }
+
+    // 5. زر فتح الماسح
+    if (scannerTriggerBtn && scannerModal) {
+        scannerTriggerBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            scannerModal.classList.remove('hidden');
+            startScannerLogic();
+            updateLocalScannerStats();
+        });
+    }
+
+    // 6. زر إغلاق الماسح
+    if (closeScannerBtn) {
+        closeScannerBtn.addEventListener('click', () => {
+            if (scannerModal) scannerModal.classList.add('hidden');
+            if (html5QrCode) {
+                html5QrCode.stop().then(() => {
+                    html5QrCode.clear();
+                    html5QrCode = null;
+                }).catch(err => console.log(err));
+            }
+            isScanning = false;
+            lastScannedCode = null;
+        });
+    }
+
+    // 7. منطق المسح الناجح (المحدث بالقيود)
+    const onScanSuccessHandler = (decodedText, decodedResult) => {
+        if (isScanning) return;
+        
+        const scannedCode = decodedText.trim();
+        if (scannedCode === lastScannedCode) return; 
+
+        const product = products.find(p => 
+            p.id == scannedCode || p.globalId == scannedCode || (p.barcode && p.barcode.trim() == scannedCode)
+        );
+
+        if (product) {
+            const audio = new Audio('https://www.soundjay.com/buttons/beep-01a.mp3');
+            audio.play().catch(e => {});
+
+            isScanning = true;
+            lastScannedCode = scannedCode;
+
+            if (currentScanMode === 'check') {
+                // منطق كاشف السعر (كما هو)
+                if (overlayImg) overlayImg.src = product.image;
+                if (overlayName) overlayName.textContent = product.name;
+                if (overlayPrice) {
+                    overlayPrice.innerHTML = `${product.price.toLocaleString()} <span class="currency-symbol">د.ع</span>`;
                 }
-                isScanning = false;
-                lastScannedCode = null;
-            });
-        }
 
-    // 7. منطق المسح الناجح (تنظيف التكرار + ضبط المسافات)
-        const onScanSuccessHandler = (decodedText, decodedResult) => {
-            if (isScanning) return;
-            
-            const scannedCode = decodedText.trim();
-            if (scannedCode === lastScannedCode) return; 
-
-            const product = products.find(p => 
-                p.id == scannedCode || p.globalId == scannedCode || (p.barcode && p.barcode.trim() == scannedCode)
-            );
-
-            if (product) {
-                const audio = new Audio('https://www.soundjay.com/buttons/beep-01a.mp3');
-                audio.play().catch(e => {});
-
-                isScanning = true;
-                lastScannedCode = scannedCode;
-
-                if (currentScanMode === 'check') {
-                    // تحديث البيانات الأساسية
-                    if (overlayImg) overlayImg.src = product.image;
-                    if (overlayName) overlayName.textContent = product.name;
-                    
-                    if (overlayPrice) {
-                        overlayPrice.innerHTML = `${product.price.toLocaleString()} <span class="currency-symbol">د.ع</span>`;
-                    }
-
-                    // --- الحل الجذري لإزالة "متوفر" السوداء ---
-                    const foundContent = document.querySelector('.found-content');
-                    if (foundContent) {
-                        // 1. تنظيف ذكي: إخفاء أي عنصر قديم يحتوي على كلمة "متوفر" وليس الزر الجديد
-                        Array.from(foundContent.children).forEach(child => {
-                            // إذا كان العنصر ليس الصورة ولا الاسم ولا السعر ولا زر الإغلاق
-                            if (child.tagName !== 'IMG' && child.tagName !== 'H2' && !child.classList.contains('found-price') && child.id !== 'close-overlay-btn') {
-                                // وإذا كان لا يحتوي على كلاس الحالة الجديد
-                                if (!child.classList.contains('stock-status')) {
-                                    child.style.display = 'none'; // أخفِه فوراً
-                                }
+                const foundContent = document.querySelector('.found-content');
+                if (foundContent) {
+                    Array.from(foundContent.children).forEach(child => {
+                        if (child.tagName !== 'IMG' && child.tagName !== 'H2' && !child.classList.contains('found-price') && child.id !== 'close-overlay-btn') {
+                            if (!child.classList.contains('stock-status')) {
+                                child.style.display = 'none'; 
                             }
-                        });
+                        }
+                    });
+                    const oldGreenStatus = foundContent.querySelectorAll('.stock-status');
+                    oldGreenStatus.forEach(el => el.remove());
 
-                        // 2. حذف أي زر حالة أخضر سابق (لمنع تكرار الأخضر أيضاً)
-                        const oldGreenStatus = foundContent.querySelectorAll('.stock-status');
-                        oldGreenStatus.forEach(el => el.remove());
+                    const statusDiv = document.createElement('div');
+                    statusDiv.className = 'stock-status';
+                    statusDiv.innerHTML = '<i class="fas fa-check-circle"></i> متوفر';
+                    foundContent.appendChild(statusDiv);
+                }
+                if (overlay) overlay.classList.remove('hidden');
 
-                        // 3. إنشاء الزر الأخضر الجديد وإضافته
-                        const statusDiv = document.createElement('div');
-                        statusDiv.className = 'stock-status';
-                        statusDiv.innerHTML = '<i class="fas fa-check-circle"></i> متوفر';
-                        
-                        foundContent.appendChild(statusDiv);
+            } else {
+                // --- وضع الحاسبة (تم التحديث لإضافة القيود) ---
+                const isSoldByPrice = ['spices', 'nuts'].includes(product.category);
+                if (typeof scannerCart === 'undefined') scannerCart = [];
+                
+                const exist = scannerCart.find(item => item.product.globalId === product.globalId);
+                
+                // تحديد الكمية التي ستضاف
+                let qtyToAdd = isSoldByPrice ? 1000 : 1;
+                let currentQty = exist ? exist.quantity : 0;
+                let newQty = currentQty + qtyToAdd;
+                let limitReached = false;
+
+                // التحقق من القيود
+                if (isSoldByPrice) {
+                    if (newQty > 25000) { 
+                        limitReached = true; 
+                        if(scanResultEl) scanResultEl.innerHTML = `<span style="color:red; font-weight:bold;">❌ الحد الأقصى 25 ألف</span>`; 
                     }
-
-                    if (overlay) overlay.classList.remove('hidden');
-
                 } else {
-                    // (كود الحاسبة كما هو بدون تغيير)
-                    const isSoldByPrice = ['spices', 'nuts'].includes(product.category);
-                    if (typeof scannerCart === 'undefined') scannerCart = [];
-                    const exist = scannerCart.find(item => item.product.globalId === product.globalId);
+                    if (newQty > 50) { 
+                        limitReached = true; 
+                        if(scanResultEl) scanResultEl.innerHTML = `<span style="color:red; font-weight:bold;">❌ الحد الأقصى 50 قطعة</span>`; 
+                    }
+                }
+
+                // التنفيذ إذا لم يتم تجاوز الحد
+                if (!limitReached) {
                     if (exist) {
-                        exist.quantity += (isSoldByPrice ? 1000 : 1);
+                        exist.quantity += qtyToAdd;
                     } else {
                         scannerCart.push({
                             product: product,
-                            quantity: (isSoldByPrice ? 1000 : 1),
+                            quantity: qtyToAdd,
                             isSoldByPrice: isSoldByPrice
                         });
                     }
                     if (typeof saveScannerCart === 'function') saveScannerCart();
                     updateLocalScannerStats(); 
                     if (scanResultEl) scanResultEl.innerHTML = `<span style="color:#27ae60; font-weight:bold;">✔ ${product.name}</span>`;
-                    clearTimeout(scanLockTimer);
-                    scanLockTimer = setTimeout(() => { 
-                        isScanning = false; 
-                        lastScannedCode = null; 
-                        if(scanResultEl) scanResultEl.innerHTML = 'جاهز...'; 
-                    }, 2000); 
                 }
-            } else {
-                isScanning = true;
-                if (scanResultEl) scanResultEl.innerHTML = `<span style="color:red;">❌ غير معروف</span>`;
-                setTimeout(() => { isScanning = false; }, 1500);
+                
+                // إعادة تعيين الماسح
+                clearTimeout(scanLockTimer);
+                scanLockTimer = setTimeout(() => { 
+                    isScanning = false; 
+                    lastScannedCode = null; 
+                    if(scanResultEl) scanResultEl.innerHTML = 'جاهز...'; 
+                }, 1500); 
             }
-        };
-    } // نهاية النطاق المحصور
+        } else {
+            isScanning = true;
+            if (scanResultEl) scanResultEl.innerHTML = `<span style="color:red;">❌ غير معروف</span>`;
+            setTimeout(() => { isScanning = false; }, 1500);
+        }
+    };
+} // نهاية النطاق المحصور
 });

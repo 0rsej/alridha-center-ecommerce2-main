@@ -590,3 +590,61 @@ button:active,
     margin-top: 0 !important; /* المسافة نتحكم بها من السعر */
     box-shadow: 0 4px 10px rgba(46, 125, 50, 0.1); /* ظل خفيف للجمالية */
 }
+/* --- تحديثات زر الحذف (جديد) --- */
+
+/* تنسيق الخلية التي تحتوي الزر لتوسيطه */
+.cart td.action-cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    min-height: 60px; /* لضمان وجود ارتفاع كافٍ للتوسيط */
+    border-bottom: 0; /* لأن الحدود تأتي من الـ tr */
+}
+
+/* تنسيق الزر نفسه */
+.remove-btn {
+    background-color: #ffebee; /* خلفية حمراء فاتحة جداً */
+    color: #c0392b;
+    border: 1px solid #ffcdd2;
+    border-radius: 8px; /* حواف ناعمة */
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.remove-btn:hover {
+    background-color: #ffcdd2;
+    transform: scale(1.05); /* تكبير بسيط عند التحويم */
+}
+
+/* في الشاشات الكبيرة (الحاسبة) */
+@media (min-width: 992px) {
+    .remove-btn {
+        width: 45px;
+        height: 45px;
+        font-size: 1.2rem; /* أيقونة أكبر */
+        border-radius: 10px;
+    }
+    
+    /* توسيط المحتوى في الحاسبة */
+    .cart td {
+        vertical-align: middle;
+    }
+}
+
+/* في الموبايل */
+@media (max-width: 768px) {
+    .cart td.action-cell {
+        display: block; /* العودة للوضع الطبيعي في الجدول المتجاوب */
+        text-align: center;
+        border: none;
+    }
+    .remove-btn {
+        width: 100%; /* زر عريض في الموبايل لسهولة اللمس */
+        margin-top: 5px;
+    }
+}
