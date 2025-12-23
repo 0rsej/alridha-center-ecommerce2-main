@@ -1,7 +1,17 @@
 // في ملف script.js (استبدل الملف بالكامل بهذا الكود)
 
 document.addEventListener('DOMContentLoaded', () => {
-
+// ==========================================
+// تسجيل Service Worker (لجعل الموقع تطبيق PWA)
+// ==========================================
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js')
+            .then(reg => console.log('✅ Service Worker مسجل:', reg.scope))
+            .catch(err => console.log('❌ فشل تسجيل Service Worker:', err));
+    });
+}
+// ==========================================
     let products = []; // سيتم تخزين جميع المنتجات هنا بعد دمجها من ملفات JSON المختلفة
     let cart = [];
     let scannerCart = []; // سلة الماسح
