@@ -25,27 +25,17 @@ function validatePhone(phone) {
     const foundName = document.getElementById('found-name');
     const foundPrice = document.getElementById('found-price');
 
-// ==========================================
-    // تحسين 1: دالة تأخير التنفيذ (Debounce) لتقليل الحفظ المتكرر
-    // ==========================================
-    function debounce(func, wait) {
-        let timeout;
-        return function(...args) {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => func.apply(this, args), wait);
-        };
-    }
-
-    // دوال الحفظ المحسنة (تأخير 500ms)
-    const saveCartDebounced = debounce(() => { localStorage.setItem('spiceShopCart', JSON.stringify(cart)); }, 500);
-    const saveScannerCartDebounced = debounce(() => { localStorage.setItem('spiceShopScannerCart', JSON.stringify(scannerCart)); }, 500);
-
-    // دوال الحفظ والتحميل (تم ربطها بالنسخ المحسنة)
-    function saveScannerCart() { saveScannerCartDebounced(); }
+    // دوال الحفظ والتحميل لسلة الماسح
+    function saveScannerCart() { localStorage.setItem('spiceShopScannerCart', JSON.stringify(scannerCart)); }
     function loadScannerCart() { const saved = localStorage.getItem('spiceShopScannerCart'); if (saved) scannerCart = JSON.parse(saved); }
-    
-    // يجب تحديث دالة saveCart الموجودة بالأسفل لاحقاً، أو يمكنك تعريفها هنا:
-    function saveCart() { saveCartDebounced(); }
+    let orders = [];
+    let wishlist = [];
+    let categoryNames = {};
+    let currentCategory = null;
+    let currentGlobalProductId = null; // نستخدم globalId الآن
+    let currentWishlistFilterCategory = 'all';
+    let currentSelectedVariant = null;
+
     // قائمة بملفات JSON لكل قسم (يجب تحديثها إذا أضفت/حذفت أقسام جديدة)
     const CATEGORY_JSON_FILES = [
         'spices.json',
@@ -905,30 +895,31 @@ if (isSoldByPrice) {
             updateCartUI();
         }
     }
-// ==========================================
-    // تحسين 4: تحديث واجهة السلة (سريع وخفيف)
-    // ==========================================
-    function updateCartUI() {
+// وظيفة تحديث واجهة السلة (في cart.html)
+function updateCartUI() {
         if (!cartTableBody) return;
 
+        // اختيار المصفوفة الصحيحة
         const targetCart = (typeof currentCartView !== 'undefined' && currentCartView === 'scanner') ? scannerCart : cart;
-        
+
         cartTableBody.innerHTML = '';
         let total = 0;
 
         if (targetCart.length === 0) {
             const emptyMsg = (currentCartView === 'scanner') ? 'سلة الماسح فارغة حالياً.' : 'سلة المشتريات فارغة حالياً.';
             cartTableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px;">${emptyMsg}</td></tr>`;
+            // التعديل: لا تخفِ السلة بالكامل هنا لكي تظل التبويبات ظاهرة
             if (checkoutSection) checkoutSection.classList.add('hidden');
         } else {
-            const fragment = document.createDocumentFragment();
-            
             targetCart.forEach((item, index) => {
+                // تأكد من وجود كائن المنتج لتجنب توقف السكربت
                 if (!item.product) return; 
 
                 let itemSubtotal;
+                let displayName = item.product.name;
                 let displayPricePerUnit = item.product.price;
 
+                // حساب المجموع الفرعي
                 if (item.isSoldByPrice) {
                     itemSubtotal = item.quantity;
                 } else {
@@ -942,7 +933,7 @@ if (isSoldByPrice) {
                 tr.innerHTML = `
                     <td>
                         <div style="display:flex; align-items:center; justify-content: flex-end;">
-                            <span>${item.product.name} ${item.variant ? `(${item.variant.value})` : ''}</span>
+                            <span>${displayName}</span>
                             <img src="${item.variant?.image || item.product.image}" style="width: 50px; height: 50px; border-radius: 5px; margin-right: 10px; object-fit: cover;">
                         </div>
                     </td>
@@ -951,29 +942,28 @@ if (isSoldByPrice) {
                     </td>
                     <td>${displayPricePerUnit} د.ع</td>
                     <td>${itemSubtotal} د.ع</td>
-                    <td class="action-cell">
-                        <button data-index="${index}" class="remove-btn"><i class="fas fa-trash-alt"></i></button>
-                    </td>
+                  <td class="action-cell">
+    <button data-index="${index}" class="remove-btn"><i class="fas fa-trash-alt"></i></button>
+</td>
                 `;
-                fragment.appendChild(tr);
+                cartTableBody.appendChild(tr);
             });
-            
-            cartTableBody.appendChild(fragment);
             if (cartEl) cartEl.classList.remove('hidden');
         }
         
         if (cartTotalEl) cartTotalEl.textContent = total.toLocaleString();
         
-        // الحفظ باستخدام الدالة المؤجلة (Debounced)
+        // الحفظ
         if (currentCartView === 'scanner') {
-            saveScannerCartDebounced();
+            if (typeof saveScannerCart === 'function') saveScannerCart();
         } else {
-            saveCartDebounced();
+            saveCart();
         }
 
         bindCartEvents();
         updateNavbarCartCount();
     }
+
     // وظيفة ربط أحداث السلة (تغيير الكمية، حذف)
     function bindCartEvents() {
         if (!cartTableBody) return;
@@ -1233,29 +1223,46 @@ updateCartUI();
             wishlistProductsListEl.style.setProperty('margin-top', '25px', 'important');
         }
 
-// ==========================================
-    // تحسين 5: تنسيق المفضلة بدون إرهاق المعالج
-    // ==========================================
-    function applyWishlistResponsiveStyles() {
-        if (!wishlistProductsListEl) return;
+        // دالة لتطبيق أنماط الـ Media Query عبر JavaScript
+        function applyWishlistResponsiveStyles() {
+            if (!wishlistProductsListEl) return;
 
-        // تطبيق الخصائص الأساسية مرة واحدة فقط
-        if (!wishlistProductsListEl.dataset.styled) {
-            wishlistProductsListEl.style.display = 'flex';
-            wishlistProductsListEl.style.flexDirection = 'column';
-            wishlistProductsListEl.style.alignItems = 'center';
-            wishlistProductsListEl.style.gap = '20px';
-            wishlistProductsListEl.style.width = '100%';
-            wishlistProductsListEl.dataset.styled = "true";
-        }
+            const productItems = wishlistProductsListEl.querySelectorAll('.product-item');
+            productItems.forEach(item => {
+                item.style.setProperty('text-align', 'center', 'important');
+                item.style.setProperty('align-items', 'center', 'important');
 
-        // تعديل بسيط بناءً على حجم الشاشة
-        if (window.innerWidth <= 768) {
-            wishlistProductsListEl.style.padding = '0 5px';
-        } else {
-            wishlistProductsListEl.style.padding = '0 20px';
+                const productTextInfo = item.querySelector('.product-text-info');
+                if (productTextInfo) {
+                    productTextInfo.style.setProperty('align-items', 'center', 'important');
+                    productTextInfo.style.setProperty('text-align', 'center', 'important');
+                }
+                const productActions = item.querySelector('.product-actions');
+                if (productActions) {
+                    productActions.style.setProperty('align-items', 'center', 'important');
+                }
+            });
+
+            if (window.innerWidth <= 768) {
+                wishlistProductsListEl.style.setProperty('gap', '15px', 'important');
+                wishlistProductsListEl.style.setProperty('padding', '0 5px', 'important');
+                productItems.forEach(item => {
+                    item.style.setProperty('max-width', '100%', 'important'); 
+                });
+            } else if (window.innerWidth <= 480) {
+                 wishlistProductsListEl.style.setProperty('gap', '10px', 'important');
+                 wishlistProductsListEl.style.setProperty('padding', '0', 'important');
+                 productItems.forEach(item => {
+                    item.style.setProperty('max-width', '100%', 'important');
+                });
+            } else {
+                wishlistProductsListEl.style.setProperty('gap', '20px', 'important');
+                wishlistProductsListEl.style.setProperty('padding', '0 10px', 'important');
+                productItems.forEach(item => {
+                    item.style.setProperty('max-width', '600px', 'important');
+                });
+            }
         }
-    }
         window.addEventListener('resize', applyWishlistResponsiveStyles);
 
         if (clearWishlistBtn) {
@@ -1476,9 +1483,6 @@ updateCartUI();
 // ============================================================
     // دالة عرض المنتجات (تم إصلاح مشكلة الثقل والتعليق)
     // ============================================================
-   // ==========================================
-    // تحسين 2: عرض المنتجات باستخدام DocumentFragment (أسرع بـ 50 مرة)
-    // ==========================================
     function displayProducts(productsToShow) {
         if (!productsListEl) return;
 
@@ -1491,9 +1495,6 @@ updateCartUI();
             return;
         }
 
-        // إنشاء حاوية مؤقتة
-        const fragment = document.createDocumentFragment();
-
         filteredProducts.forEach(p => {
             const div = document.createElement('div');
             div.className = 'product';
@@ -1505,7 +1506,7 @@ updateCartUI();
             div.innerHTML = `
                 <a href="product-details.html?globalId=${p.globalId}" class="product-link" aria-label="عرض تفاصيل المنتج ${p.name}">
                     <div class="product-info">
-                        <img src="${p.image}" alt="${p.name}" class="product-thumb" loading="lazy" onerror="this.onerror=null; this.src='logo.png';">
+                        <img src="${p.image}" alt="${p.name}" class="product-thumb" loading="lazy" onerror="this.onerror=null; this.src='logo.png';"> 
                         <div class="product-text-content">
                             <strong>(${p.id}) ${p.name}</strong>
                             <span class="product-price-inline">السعر: ${p.price} د.ع / ${isSoldByPriceCurrent ? 'كيلو' : 'قطعة'}</span>
@@ -1527,73 +1528,31 @@ updateCartUI();
                     </button>
                 </div>
             `;
-            fragment.appendChild(div);
+            productsListEl.appendChild(div);
         });
 
-        // إضافة العناصر للصفحة دفعة واحدة
-        productsListEl.appendChild(fragment);
-    }
-    // ==========================================
-    // تحسين 3: معالجة نقرات الأزرار في القائمة الرئيسية (مرة واحدة فقط)
-    // ==========================================
-    if (productsListEl) {
-        // نستخدم cloneNode لإزالة أي مستمعات قديمة عالقة
-        const newProductsListEl = productsListEl.cloneNode(false);
-        productsListEl.parentNode.replaceChild(newProductsListEl, productsListEl);
+        // --- إعادة تفعيل الأزرار ---
+        productsListEl.querySelectorAll('.add-to-wishlist-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const globalProductId = e.currentTarget.getAttribute('data-global-id');
+                if(typeof toggleWishlist === 'function') toggleWishlist(globalProductId, e.currentTarget);
+            });
+        });
         
-        // إعادة تعريف المتغير ليشير للعنصر الجديد النظيف
-        // ملاحظة: بما أن productsListEl معرف بـ const في بداية الملف، سنستخدم newProductsListEl لإضافة الحدث
-        // أو الأفضل، سنضيف الحدث للعنصر الجديد مباشرة:
-        
-        newProductsListEl.addEventListener('click', (e) => {
-            // 1. زر الإضافة للسلة
-            const addBtn = e.target.closest('.add-btn');
-            if (addBtn) {
-                const globalProductId = addBtn.getAttribute('data-global-id');
+        productsListEl.querySelectorAll('button.add-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const globalProductId = e.currentTarget.getAttribute('data-global-id');
                 const product = products.find(p => p.globalId === globalProductId);
-                if (product) {
-                    const isSoldByPriceCurrent = ['spices', 'nuts'].includes(product.category);
-                    addToCart(globalProductId, isSoldByPriceCurrent ? 1000 : 1, isSoldByPriceCurrent);
-                }
-                return;
-            }
-
-            // 2. زر المفضلة
-            const wishBtn = e.target.closest('.add-to-wishlist-btn');
-            if (wishBtn) {
-                const globalProductId = wishBtn.getAttribute('data-global-id');
-                toggleWishlist(globalProductId, wishBtn);
-                return;
-            }
-
-            // 3. زر التفاصيل
-            const detailsBtn = e.target.closest('.view-details-btn');
-            if (detailsBtn) {
-                const globalProductId = detailsBtn.getAttribute('data-global-id');
-                window.location.href = `product-details.html?globalId=${globalProductId}`;
-                return;
-            }
+                const isSoldByPriceCurrent = ['spices', 'nuts'].includes(product.category);
+                if(typeof addToCart === 'function') addToCart(globalProductId, isSoldByPriceCurrent ? 1000 : 1, isSoldByPriceCurrent);
+            });
         });
-        
-        // إعادة تعيين المتغير العام ليشير للعنصر الجديد (لتجنب الأخطاء في باقي الكود)
-        // ملاحظة: لا يمكن إعادة تعيين const، لذا سنعتمد على id لجلب العنصر الجديد عند الحاجة
-        // أو الأفضل في هيكلية ملفك: لا تستخدم cloneNode إذا كنت تستخدم const،
-        // بل ببساطة أضف الـ Listener وتأكد من عدم تكراره.
-        
-        // **الخيار الآمن لكودك الحالي (انسخ هذا فقط بدلاً من الجزء المعقد أعلاه):**
-        productsListEl.addEventListener('click', (e) => {
-             const addBtn = e.target.closest('.add-btn');
-             if (addBtn) {
-                const gid = addBtn.dataset.globalId;
-                const prod = products.find(p => p.globalId === gid);
-                if(prod) addToCart(gid, ['spices','nuts'].includes(prod.category)?1000:1, ['spices','nuts'].includes(prod.category));
-             }
-             
-             const wishBtn = e.target.closest('.add-to-wishlist-btn');
-             if (wishBtn) toggleWishlist(wishBtn.dataset.globalId, wishBtn);
-             
-             const detBtn = e.target.closest('.view-details-btn');
-             if (detBtn) window.location.href = `product-details.html?globalId=${detBtn.dataset.globalId}`;
+
+        productsListEl.querySelectorAll('button.view-details-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const globalProductId = e.currentTarget.getAttribute('data-global-id');
+                window.location.href = `product-details.html?globalId=${globalProductId}`;
+            });
         });
     }
     // ============================================================
