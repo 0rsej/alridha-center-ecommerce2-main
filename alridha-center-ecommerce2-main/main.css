@@ -70,11 +70,7 @@ button:active,
 /* =========================================
    تحسينات الحاسوب (Desktop)
    ========================================= */
-/* =========================================
-   تحسينات الحاسوب (Desktop)
-   تم تعديل العرض إلى 850px لضمان عمل زر "سطح المكتب" في الموبايل
-   ========================================= */
-@media (min-width: 850px) {
+@media (min-width: 960px) {
     .container, .main-container, .navbar {
         max-width: 1200px;
         margin-left: auto !important;
@@ -84,21 +80,10 @@ button:active,
 
     .navbar {
         width: 100%; max-width: 100%; padding: 0 50px;
-        display: flex !important; 
-        justify-content: space-between !important;
-        flex-direction: row !important; /* لضمان عدم تراكم العناصر فوق بعضها */
-        align-items: center !important;
+        display: flex; justify-content: space-between;
     }
     
-    .navbar .nav-links { 
-        gap: 30px; 
-        display: flex !important; /* ضمان ظهور الروابط */
-    }
-
-    /* إخفاء زر قائمة الموبايل عند تفعيل وضع سطح المكتب */
-    .logo-btn-mobile, #menuToggle {
-        display: none !important;
-    }
+    .navbar .nav-links { gap: 30px; }
 
     .products-display-area, .categories-grid {
         display: grid !important;
@@ -114,18 +99,13 @@ button:active,
 
     .cart table {
         font-size: 1.1em; width: 100%; box-shadow: 0 0 20px rgba(0,0,0,0.05);
-        display: table !important; /* ضمان ظهور الجدول */
     }
     
     .cart th {
         background-color: var(--alridha-main-orange-red); color: white; padding: 15px;
-        display: table-cell !important;
     }
     
-    .cart td { 
-        padding: 15px; 
-        display: table-cell !important;
-    }
+    .cart td { padding: 15px; }
 
     .contact-section {
         display: flex; flex-direction: row; justify-content: space-around;
@@ -136,6 +116,7 @@ button:active,
     .hero-content { max-width: 50%; text-align: right; margin-right: 10%; }
     .hero-title { font-size: 4em; }
 }
+
 /* =========================================
    تنسيقات تفاصيل المنتج (Desktop Force)
    ========================================= */
@@ -453,7 +434,7 @@ button:active,
     .header-left { display: flex; align-items: center; gap: 8px; z-index: 20; }
     .header-right { z-index: 20; }
 }
-@media (min-width: 992px) { .logo-btn-mobile { display: none !important; } }
+@media (min-width: 960px) { .logo-btn-mobile { display: none !important; } }
 
 /* =========================================
    تنسيقات تبويبات السلة
@@ -640,7 +621,7 @@ button:active,
 }
 
 /* في الشاشات الكبيرة (الحاسبة) */
-@media (min-width: 992px) {
+@media (min-width: 960px) {
     .remove-btn {
         width: 45px;
         height: 45px;
