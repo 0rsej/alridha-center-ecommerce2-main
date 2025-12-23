@@ -2472,70 +2472,114 @@ if (checkoutConfirmBtn && checkoutConfirmBtn.parentNode) {
     };
 }
 // ==========================================
-// 🚀 نظام التثبيت الإجباري (PWA Enforcer) - النسخة النهائية
+// 🚀 نظام تعليمات التثبيت الزجاجي (Glass Modal System) - النسخة المصححة
 // ==========================================
 
-// تعريف المتغير خارج الدوال لضمان التقاطه فوراً
-let deferredPrompt = null;
+// ملاحظة: نضع الكود في دالة فورية لضمان عدم تداخل المتغيرات
+(function() {
+    window.addEventListener('DOMContentLoaded', () => {
+        console.log('💎 Glass Modal System Loaded');
 
-// 1. التقاط حدث التثبيت فور انطلاق الموقع (قبل تحميل أي شيء آخر)
-window.addEventListener('beforeinstallprompt', (e) => {
-    // منع المتصفح من إظهار الشريط الافتراضي فوراً
-    e.preventDefault();
-    // حفظ الحدث لاستخدامه عند ضغط الزر
-    deferredPrompt = e;
-    console.log('✅ تم التقاط حدث التثبيت جاهز للاستخدام.');
-    
-    // إظهار زر التثبيت إذا كان مخفياً
-    const installBtn = document.getElementById('install-btn');
-    if (installBtn) installBtn.style.display = 'flex';
-});
+        // تعريف العناصر
+        const installOverlay = document.getElementById('install-overlay');
+        const installBtn = document.getElementById('install-btn');
+        const instructionsModal = document.getElementById('manual-instructions-modal');
+        const closeInstBtn = document.getElementById('close-inst-btn');
+        const gotItBtn = document.getElementById('got-it-btn');
+        
+        // عناصر المحتوى
+        const deviceIcon = document.getElementById('device-icon');
+        const instTitle = document.getElementById('inst-title');
+        const instSteps = document.getElementById('inst-steps');
 
-document.addEventListener('DOMContentLoaded', () => {
-    const installOverlay = document.getElementById('install-overlay');
-    const installBtn = document.getElementById('install-btn');
-    const iosInstructions = document.getElementById('ios-instructions');
+        // 1. فحص هل التطبيق مثبت مسبقاً؟
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                             window.navigator.standalone === true;
 
-    // 2. التحقق: هل التطبيق مثبت بالفعل؟
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
-                         window.navigator.standalone === true || 
-                         document.referrer.includes('android-app://');
+        if (isStandalone) {
+            console.log('📲 App is standalone. Hiding overlays.');
+            if (installOverlay) installOverlay.style.display = 'none';
+            if (instructionsModal) instructionsModal.classList.add('hidden');
+            return; 
+        } else {
+            // إظهار شاشة الترحيب إذا لم يكن مثبتاً
+            if (installOverlay) installOverlay.classList.remove('hidden');
+        }
 
-    if (isStandalone) {
-        // ✅ التطبيق مثبت ومفتوح => إخفاء الشاشة والسماح بالدخول
-        if(installOverlay) installOverlay.classList.add('hidden');
-        console.log('✅ التطبيق يعمل في وضع Standalone');
-        return; 
-    } else {
-        // ❌ التطبيق غير مثبت => التأكد من ظهور الشاشة
-        if(installOverlay) installOverlay.classList.remove('hidden');
-        console.log('⚠️ الموقع مفتوح في المتصفح - بانتظار التثبيت');
-    }
-
-    // 3. التحقق من نوع الجهاز (آيفون أم أندرويد)
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-
-    if (isIOS) {
-        // الآيفون لا يدعم الزر البرمجي -> نخفي الزر ونظهر التعليمات
-        if (installBtn) installBtn.style.display = 'none';
-        if (iosInstructions) iosInstructions.classList.remove('hidden');
-    } else {
-        // أندرويد وحاسوب -> نجهز الزر
+        // 2. معالجة الضغط على زر "تثبيت التطبيق الآن"
         if (installBtn) {
-            installBtn.addEventListener('click', async () => {
-                if (deferredPrompt) {
-                    // تشغيل نافذة التثبيت الأصلية
-                    deferredPrompt.prompt();
-                    // انتظار رد المستخدم
-                    const { outcome } = await deferredPrompt.userChoice;
-                    console.log(`User response to install prompt: ${outcome}`);
-                    deferredPrompt = null; // تصفير المتغير لأنه يستخدم مرة واحدة
-                } else {
-                    // إذا لم يعمل الزر (مثلاً المتصفح لا يدعم أو تم رفضه سابقاً)
-                    alert('للتثبيت يدوياً: \n1. اضغط على خيارات المتصفح (⋮) في الأعلى \n2. اختر "تثبيت التطبيق" أو "Install App"');
+            installBtn.addEventListener('click', (e) => {
+                e.preventDefault(); // منع أي سلوك افتراضي
+                console.log('🖱️ Install button clicked!');
+
+                // التأكد من وجود النافذة الزجاجية
+                if (!instructionsModal) {
+                    console.error('❌ Error: manual-instructions-modal not found in HTML');
+                    return;
                 }
+
+                // تحديد نوع الجهاز
+                const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+                const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
+                const isAndroid = /android/i.test(userAgent);
+
+                console.log(`📱 Device detected: iOS=${isIOS}, Android=${isAndroid}`);
+
+                // تخصيص المحتوى حسب الجهاز
+                if (isIOS) {
+                    if (deviceIcon) deviceIcon.innerHTML = '<i class="fab fa-apple"></i>';
+                    if (instTitle) instTitle.textContent = 'تثبيت على الآيفون';
+                    if (instSteps) instSteps.innerHTML = `
+                        <p>1. اضغط على زر <strong>المشاركة</strong> <img src="https://img.icons8.com/ios/20/ffffff/share-3.png" style="vertical-align:middle; filter: invert(1);"> في الأسفل.</p>
+                        <p>2. اسحب القائمة واختر <strong>"إضافة إلى الصفحة الرئيسية"</strong>.</p>
+                        <p>3. اضغط <strong>"إضافة"</strong> في الزاوية العلوية.</p>
+                    `;
+                } else if (isAndroid) {
+                    if (deviceIcon) deviceIcon.innerHTML = '<i class="fab fa-android"></i>';
+                    if (instTitle) instTitle.textContent = 'تثبيت على أندرويد';
+                    if (instSteps) instSteps.innerHTML = `
+                        <p>1. اضغط على <strong>الثلاث نقاط (⋮)</strong> في أعلى المتصفح.</p>
+                        <p>2. اختر <strong>"تثبيت التطبيق"</strong> أو <strong>"Install App"</strong>.</p>
+                        <p>3. اضغط <strong>"تثبيت"</strong> في النافذة التي ستظهر.</p>
+                    `;
+                } else {
+                    // للحاسوب
+                    if (deviceIcon) deviceIcon.innerHTML = '<i class="fas fa-laptop"></i>';
+                    if (instTitle) instTitle.textContent = 'تثبيت على الحاسوب';
+                    if (instSteps) instSteps.innerHTML = `
+                        <p>1. انظر إلى شريط العنوان في أعلى المتصفح.</p>
+                        <p>2. ستجد أيقونة <strong>شاشة صغيرة</strong> <i class="fas fa-desktop"></i> أو كلمة <strong>"تثبيت"</strong>.</p>
+                        <p>3. اضغط عليها لتثبيت التطبيق.</p>
+                    `;
+                }
+
+                // إظهار النافذة الزجاجية
+                instructionsModal.classList.remove('hidden');
+                instructionsModal.style.display = 'flex'; // تأكيد العرض
+            });
+        } else {
+            console.error('❌ Install button not found!');
+        }
+
+        // 3. وظيفة الإغلاق
+        const closeFunc = () => {
+            console.log('❌ Closing modal');
+            if (instructionsModal) {
+                instructionsModal.classList.add('hidden');
+                instructionsModal.style.display = 'none'; // تأكيد الإخفاء
+            }
+        };
+
+        if (closeInstBtn) closeInstBtn.addEventListener('click', closeFunc);
+        if (gotItBtn) gotItBtn.addEventListener('click', closeFunc);
+        
+        // إغلاق عند الضغط خارج الصندوق (اختياري)
+        if (instructionsModal) {
+            instructionsModal.addEventListener('click', (e) => {
+                if (e.target === instructionsModal) closeFunc();
             });
         }
-    }
-});
+    });
+})(); 
+// END of Script
 });
