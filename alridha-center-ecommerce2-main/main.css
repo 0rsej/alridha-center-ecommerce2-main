@@ -670,7 +670,7 @@ button:active,
 /* 3. تنسيق وموقع العداد (الرقم الأحمر) */
 #navScannerCount {
     position: absolute !important;
-    top: -5px !important;        /* يرتفع للأعلى خارج الأيقونة */
+    top: -4px !important;        /* يرتفع للأعلى خارج الأيقونة */
     right: -5px !important;      /* يزاح لليمين خارج الأيقونة */
     
     background-color: #e65100 !important; /* لون برتقالي غامق مميز */
@@ -690,4 +690,38 @@ button:active,
     border: 2px solid white !important; /* إطار أبيض لفصل الرقم عن الأيقونة */
     z-index: 100 !important;
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+/* =========================================
+   تحديثات الشريط السفلي (ألوان وتنسيقات منفصلة)
+   ========================================= */
+/* 2. تنسيق عداد "سلة التطبيق" فقط (ليشبه سلة الماسح تماماً) */
+#navCartCount { 
+    position: absolute !important;
+    top: -5px !important;    /* رفع الرقم للأعلى */
+    right: -8px !important;  /* إزاحة لليمين */
+    
+    background-color: #e65100 !important; 
+    color: white !important;
+    border: 2px solid white !important; /* الإطار الأبيض */
+    
+    min-width: 18px !important; /* حجم ثابت للدائرة */
+    height: 18px !important;
+    border-radius: 50% !important;
+    padding: 0 !important;
+    
+    font-size: 0.7rem !important;
+    font-weight: bold !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    z-index: 100 !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* 3. تنسيق عداد "المفضلة" فقط (تغيير اللون فقط) */
+/* لن نغير الـ top/right/width/height كما طلبت */
+#navWishlistCount {
+    background-color: #e65100 !important; /* تغيير اللون للبرتقالي */
+    color: white !important;
+    /* سيحافظ على حجمه وموقعه القديم */
 }
