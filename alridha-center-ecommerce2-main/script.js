@@ -129,45 +129,40 @@ function validatePhone(phone) {
     }
 
 function updateNavbarCartCount() {
-        // 1. الموبايل (كما هو)
-        const totalCartItems = cart.length; 
-        if (navCartCountEl) {
-            navCartCountEl.textContent = totalCartItems;
-            navCartCountEl.style.display = totalCartItems > 0 ? 'flex' : 'none';
-        }
-        
-        const totalWishlistItems = wishlist.length;
-        if (navWishlistCountEl) {
-            navWishlistCountEl.textContent = totalWishlistItems;
-            navWishlistCountEl.style.display = totalWishlistItems > 0 ? 'inline-block' : 'none';
-        }
-
-        // 2. الحاسوب (تعديل: رقم فقط بدون أقواس)
-        const desktopCartCountEl = document.getElementById('desktopCartCount');
-        const desktopWishlistCountEl = document.getElementById('desktopWishlistCount');
-
-        // السلة
-        if (desktopCartCountEl) {
-            desktopCartCountEl.textContent = totalCartItems; // رقم فقط
-            // إظهار الرقم فقط اذا كان اكبر من صفر
-            if (totalCartItems > 0) {
-                desktopCartCountEl.style.display = 'inline-block';
-            } else {
-                desktopCartCountEl.style.display = 'none';
-            }
-        }
-
-        // المفضلة
-        if (desktopWishlistCountEl) {
-            desktopWishlistCountEl.textContent = totalWishlistItems; // رقم فقط
-            if (totalWishlistItems > 0) {
-                desktopWishlistCountEl.style.display = 'inline-block';
-            } else {
-                desktopWishlistCountEl.style.display = 'none';
-            }
-        }
+    // 1. تحديث سلة التطبيق العادية
+    const totalCartItems = cart.length; 
+    if (navCartCountEl) {
+        navCartCountEl.textContent = totalCartItems;
+        navCartCountEl.style.display = totalCartItems > 0 ? 'flex' : 'none';
+    }
+    
+    // 2. تحديث سلة الماسح (الجديد في الشريط العلوي)
+    const totalScannerItems = scannerCart.length; // تأكد أن scannerCart معرفة عالمياً
+    const navScannerCountEl = document.getElementById('navScannerCount');
+    if (navScannerCountEl) {
+        navScannerCountEl.textContent = totalScannerItems;
+        navScannerCountEl.style.display = totalScannerItems > 0 ? 'flex' : 'none';
     }
 
+    // 3. تحديث المفضلة
+    const totalWishlistItems = wishlist.length;
+    if (navWishlistCountEl) {
+        navWishlistCountEl.textContent = totalWishlistItems;
+        navWishlistCountEl.style.display = totalWishlistItems > 0 ? 'inline-block' : 'none';
+    }
+
+    // تحديث عدادات الحاسوب (Desktop)
+    const desktopCartCountEl = document.getElementById('desktopCartCount');
+    const desktopWishlistCountEl = document.getElementById('desktopWishlistCount');
+    if (desktopCartCountEl) {
+        desktopCartCountEl.textContent = totalCartItems;
+        desktopCartCountEl.style.display = totalCartItems > 0 ? 'inline-block' : 'none';
+    }
+    if (desktopWishlistCountEl) {
+        desktopWishlistCountEl.textContent = totalWishlistItems;
+        desktopWishlistCountEl.style.display = totalWishlistItems > 0 ? 'inline-block' : 'none';
+    }
+}
     // وظيفة عرض المنتجات في القوائم (صفحة الأقسام)
     function displayProducts(productsToShow) {
         if (!productsListEl) return;
@@ -1664,10 +1659,8 @@ updateCartUI();
     // تشغيل الدالة
     initializeApp();
 // ============================================================
-// بداية نظام إدارة الطلبات المتطور (تم التحديث: إصلاح الترتيب والتكرار)
+// 1. وظيفة عرض الطلبات (تم التعديل: تصميم مرتب ومنع التداخل)
 // ============================================================
-
-// 1. وظيفة عرض الطلبات (تم التعديل: ترتيب الأحدث للأقدم)
 function displayOrders() {
     if (!ordersListEl) return;
 
@@ -1686,68 +1679,72 @@ function displayOrders() {
     } else {
         let html = head;
         
-        // --- إصلاح الترتيب: فرز المصفوفة بحيث يظهر الأحدث (أكبر ID) أولاً ---
+        // فرز المصفوفة: الأحدث أولاً
         const sortedOrders = orders.slice().sort((a, b) => b.orderId - a.orderId);
 
         sortedOrders.forEach((order) => {
-            // التأكد من وجود البيانات
+            // بيانات العرض
             const displayTime = order.time || 'غير محدد';
             const displayDate = order.date || 'غير محدد';
-            const displayName = order.customerName || 'زبون';
-            const displayPhone = order.phone || 'لا يوجد';
-
-            // تحديد لون الحالة
+            
+            // ألوان الحالة
             const isSent = order.status === 'تم الإرسال';
             const statusColor = isSent ? '#27ae60' : '#f39c12'; 
             const statusBg = isSent ? '#e8f8f5' : '#fef9e7';
-            // === 1. أضف هذا المقطع هنا ===
-    // هذا الكود يحدد النص واللون بناءً على مصدر الطلب
-    const sourceText = (order.orderSource === 'scanner') ? '(من سلة الماسح)' : '(من سلة التطبيق)';
-    const sourceColor = (order.orderSource === 'scanner') ? '#8e44ad' : '#2980b9';
-    // ============================
+
+            // تحديد مصدر الطلب (الماسح أم التطبيق) والألوان
+            const sourceText = (order.orderSource === 'scanner') ? 'سلة الماسح' : 'سلة التطبيق';
+            const sourceBadgeColor = (order.orderSource === 'scanner') ? '#e65100' : '#2980b9'; // برتقالي للماسح، أزرق للتطبيق
 
             html += `
-            <div class="card order-item" style="padding: 15px; margin-bottom: 15px; border-radius: 12px; border-right: 6px solid ${statusColor}; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+            <div class="card order-item" style="padding: 15px; margin-bottom: 15px; border-radius: 12px; border-right: 6px solid ${statusColor}; box-shadow: 0 4px 10px rgba(0,0,0,0.05); background: white;">
                 
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <h3 style="margin: 0; color: #333; font-size: 1.1rem;">#${order.orderId}</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px;">
+                    <h3 style="margin: 0; color: #333; font-size: 1.2rem;">#${order.orderId}</h3>
                     <span style="background: ${statusBg}; color: ${statusColor}; padding: 4px 10px; border-radius: 20px; font-size: 0.8em; font-weight: bold;">${order.status}</span>
                 </div>
                 
-                <div style="font-size: 0.95rem; color: #555; margin-top: 10px; line-height: 1.8;">
-                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 8px;">
-                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 8px;">
-    <span style="font-weight:bold; color:#2c3e50;">👤 ${order.customerName || 'زبون'}</span>
-    <span style="color: #d35400; font-weight: bold;">${order.total} د.ع</span>
-</div>
+                <div style="text-align: right;">
+                    <div style="margin-bottom: 8px;">
+                        <span style="background:${sourceBadgeColor}; color:white; padding: 4px 10px; border-radius: 6px; font-size: 0.85em; display: inline-block;">
+                           <i class="fas ${order.orderSource === 'scanner' ? 'fa-barcode' : 'fa-shopping-basket'}"></i> ${sourceText}
+                        </span>
+                    </div>
 
-<p style="margin: 0; font-size: 0.85em; color: ${sourceColor}; font-weight: bold;">${sourceText}</p>
-<p style="margin: 0;"><i class="fas fa-phone fa-fw"></i> ${order.phone}</p>
-                        <span style="font-weight:bold; color:#2c3e50;">👤 ${displayName}</span>
-                        <span style="color: #d35400; font-weight: bold;">${order.total} د.ع</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <h4 style="margin: 0; color: #2c3e50; font-size: 1.1em;">
+                            <i class="fas fa-user-circle" style="color:#bdc3c7;"></i> ${order.customerName || 'زبون'}
+                        </h4>
+                        <h4 style="margin: 0; color: #d35400; font-size: 1.3em; font-weight: 800;">
+                            ${order.total} د.ع
+                        </h4>
                     </div>
                     
-                    <p style="margin: 0;"><i class="fas fa-phone fa-fw"></i> ${displayPhone}</p>
-                    <p style="margin: 0;"><i class="fas fa-map-marker-alt fa-fw"></i> ${order.location || 'الموقع غير محدد'}</p>
-                    
-                    <div style="display: flex; gap: 15px; margin-top: 8px; font-size: 0.85em; color: #777; background: #f9f9f9; padding: 5px; border-radius: 5px;">
-                        <span><i class="far fa-calendar-alt"></i> ${displayDate}</span>
-                        <span><i class="far fa-clock"></i> ${displayTime}</span>
+                    <div style="color: #555; font-size: 0.95em; line-height: 1.6;">
+                        <p style="margin: 0;"><i class="fas fa-phone fa-fw" style="color:#7f8c8d;"></i> ${order.phone}</p>
+                        <p style="margin: 4px 0 0 0;"><i class="fas fa-map-marker-alt fa-fw" style="color:#7f8c8d;"></i> ${order.location || 'غير محدد'}</p>
                     </div>
                 </div>
                 
-                <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 15px;">
+                <div style="margin-top: 15px; padding-top: 10px; border-top: 1px dashed #eee; display: flex; gap: 15px; font-size: 0.85em; color: #95a5a6;">
+                    <span><i class="far fa-calendar-alt"></i> ${displayDate}</span>
+                    <span><i class="far fa-clock"></i> ${displayTime}</span>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
                     <button class="wa-btn" data-id="${order.orderId}" style="background: #25D366; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px;">
                         <i class="fab fa-whatsapp" style="font-size: 1.2em;"></i> إرسال واتساب
                     </button>
                     
-                    <button class="pdf-btn" data-id="${order.orderId}" style="background: #0984e3; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                        <i class="fas fa-print"></i> طباعة الفاتورة (PDF)
-                    </button>
-                    
-                    <button class="del-btn" data-id="${order.orderId}" style="background: #fff; color: #d63031; border: 1px solid #ffccd5; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                        <i class="fas fa-trash"></i> حذف الطلب
-                    </button>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="pdf-btn" data-id="${order.orderId}" style="background: #0984e3; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; flex: 1; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                            <i class="fas fa-print"></i> طباعة
+                        </button>
+                        
+                        <button class="del-btn" data-id="${order.orderId}" style="background: #fff; color: #d63031; border: 1px solid #ffccd5; padding: 10px; border-radius: 8px; cursor: pointer; flex: 1; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                            <i class="fas fa-trash"></i> حذف
+                        </button>
+                    </div>
                 </div>
             </div>`;
         });
@@ -1802,10 +1799,13 @@ function displayOrders() {
     }
 }
 
-// 2. وظيفة المساعدة: إرسال واتساب
+// 2. وظيفة المساعدة: إرسال واتساب (محدثة)
 function sendOrderToWhatsApp(order) {
+    const sourceText = (order.orderSource === 'scanner') ? 'سلة الماسح' : 'سلة التطبيق';
     const customerName = order.customerName || "زبون";
-    let message = `*📦 طلب جديد من: ${customerName}*\n`;
+    
+    let message = `*📦 طلب جديد (${sourceText})*\n`; // تمت إضافة المصدر هنا
+    message += `*👤 الاسم:* ${customerName}\n`;
     message += `*📱 رقم الهاتف:* ${order.phone}\n\n`;
     message += `*رقم الطلب:* ${order.orderId}\n`;
     message += `*📅 التاريخ:* ${order.date}\n`;
@@ -1814,10 +1814,12 @@ function sendOrderToWhatsApp(order) {
     message += `\n*🛒 تفاصيل المنتجات:*\n`;
 
     order.items.forEach(item => {
+        // نستخدم الاسم المحفوظ لضمان عدم ظهور undefined
+        const itemName = item.name || 'منتج';
         if (item.isSoldByPrice) {
-            message += `- ${item.name}: ${item.quantity} د.ع\n`;
+            message += `- ${itemName}: ${item.quantity} د.ع\n`;
         } else {
-            message += `- ${item.name}: ${item.quantity} × ${item.price} د.ع\n`;
+            message += `- ${itemName}: ${item.quantity} × ${item.price} د.ع\n`;
         }
     });
 
@@ -1833,12 +1835,14 @@ function sendOrderToWhatsApp(order) {
     window.open(whatsappUrl, '_blank');
 }
 
-// 3. وظيفة المساعدة: طباعة PDF
+// 3. وظيفة المساعدة: طباعة PDF (محدثة)
 function downloadOrderPDF(order) {
+    const sourceText = (order.orderSource === 'scanner') ? 'سلة الماسح' : 'سلة التطبيق';
     const printWindow = window.open('', '_blank');
+    
     const itemsHtml = order.items.map(item => `
         <tr>
-            <td style="border: 1px solid #ddd; padding: 8px;">${item.name}</td>
+            <td style="border: 1px solid #ddd; padding: 8px;">${item.name || 'غير معروف'}</td>
             <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">
                 ${item.isSoldByPrice ? item.quantity + ' د.ع' : item.quantity}
             </td>
@@ -1850,7 +1854,7 @@ function downloadOrderPDF(order) {
     const content = `
         <div dir="rtl" style="font-family: Arial, sans-serif; padding: 20px;">
             <h2 style="text-align: center; margin-bottom: 5px;">سنتر الرضا</h2>
-            <p style="text-align: center; margin-top: 0; color: #666;">فاتورة طلب</p>
+            <p style="text-align: center; margin-top: 0; color: #666; font-size: 14px;">فاتورة طلب - (${sourceText})</p>
             <hr style="border: 1px dashed #ccc;">
             <p><strong>الاسم:</strong> ${order.customerName || 'زبون'}</p>
             <p><strong>الهاتف:</strong> ${order.phone}</p> 
@@ -1875,92 +1879,85 @@ function downloadOrderPDF(order) {
 }
 
 // ============================================================
-    // 1. إصلاح زر تأكيد الطلب (هذا الكود يمنع الخطأ في باقي الصفحات)
-    // ============================================================
-    const checkoutConfirmBtn = document.getElementById('confirm-btn');
-
-    // الشرط: ننفذ الكود فقط إذا وجدنا الزر في الصفحة الحالية
-    if (checkoutConfirmBtn && checkoutConfirmBtn.parentNode) {
-        
-        // استنساخ الزر لتنظيف الأحداث القديمة
-        const newConfirmBtn = checkoutConfirmBtn.cloneNode(true);
-        checkoutConfirmBtn.parentNode.replaceChild(newConfirmBtn, checkoutConfirmBtn);
-
-        newConfirmBtn.addEventListener('click', () => {
-            // معرفة السلة الحالية (ماسح أم تطبيق)
-            const isScanner = (typeof currentCartView !== 'undefined' && currentCartView === 'scanner');
-            const targetCart = isScanner ? scannerCart : cart;
-            const sourceLabel = isScanner ? 'scanner' : 'app';
-
-            // قراءة البيانات
-            const phoneVal = document.getElementById('phone').value.trim();
-            const locVal = document.getElementById('location').value.trim();
-            const notesVal = document.getElementById('notes').value.trim();
-            const nameEl = document.getElementById('customer-name');
-            const nameVal = (nameEl && nameEl.value.trim() !== "") ? nameEl.value.trim() : "زبون";
-
-            // التحقق
-            if (!targetCart || targetCart.length === 0) {
-                showNotification('السلة فارغة!', 'error'); return;
-            }
-            if (!phoneVal.startsWith('07') || phoneVal.length < 11) {
-                showNotification('رقم الهاتف غير صحيح.', 'error'); return;
-            }
-            if (!locVal) {
-                showNotification('يرجى كتابة العنوان.', 'error'); return;
-            }
-
-            // الحفظ
-            newConfirmBtn.textContent = 'جاري الحفظ...';
-            newConfirmBtn.disabled = true;
-
-            const now = new Date();
-            const order = {
-                orderId: Date.now(),
-                orderSource: sourceLabel,
-                customerName: nameVal,
-                phone: phoneVal,
-                location: locVal,
-                notes: notesVal,
-                date: now.toLocaleDateString('en-GB'),
-                time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }).replace('AM', 'ص').replace('PM', 'م'),
-               // --- بداية التعديل: حفظ نسخة صريحة من البيانات ---
-items: targetCart.map(item => ({
-    id: item.product.id,
-    name: item.product.name, // حفظ الاسم كنص ثابت لضمان عدم ضياعه
-    price: item.product.price,
-    quantity: item.quantity,
-    isSoldByPrice: item.isSoldByPrice || false,
-    variantName: item.variant ? item.variant.value : '' // حفظ اسم النوع إن وجد
-})),
-// --- نهاية التعديل ---
-orderSource: sourceLabel, // حفظنا المصدر هنا
-                total: document.getElementById('cart-total').textContent, // نأخذ المجموع المعروض مباشرة
-                status: 'قيد المراجعة'
-            };
-
-            orders.unshift(order);
-            saveOrders();
-
-            // تفريغ السلة وتحديث الصفحة
-            if (isScanner) { scannerCart = []; saveScannerCart(); } 
-            else { cart = []; saveCart(); }
-
-            updateCartUI();
-            showNotification('تم إرسال الطلب بنجاح!', 'success');
-
-            setTimeout(() => {
-                document.querySelector('.checkout').classList.add('hidden');
-                newConfirmBtn.textContent = 'تأكيد الطلب';
-                newConfirmBtn.disabled = false;
-                window.location.href = 'orders.html';
-            }, 1500);
-        });
-    }
+// 4. إصلاح زر تأكيد الطلب (مهم جداً لحفظ الأسماء والمصدر)
 // ============================================================
-// نهاية كود إدارة الطلبات المتطور
-// ============================================================
-// ==========================================
+const checkoutConfirmBtn = document.getElementById('confirm-btn');
+
+if (checkoutConfirmBtn && checkoutConfirmBtn.parentNode) {
+    
+    // استنساخ الزر لتنظيف الأحداث القديمة
+    const newConfirmBtn = checkoutConfirmBtn.cloneNode(true);
+    checkoutConfirmBtn.parentNode.replaceChild(newConfirmBtn, checkoutConfirmBtn);
+
+    newConfirmBtn.addEventListener('click', () => {
+        // معرفة السلة الحالية والمصدر
+        const isScanner = (typeof currentCartView !== 'undefined' && currentCartView === 'scanner');
+        const targetCart = isScanner ? scannerCart : cart;
+        const sourceLabel = isScanner ? 'scanner' : 'app';
+
+        // قراءة البيانات
+        const phoneVal = document.getElementById('phone').value.trim();
+        const locVal = document.getElementById('location').value.trim();
+        const notesVal = document.getElementById('notes').value.trim();
+        const nameEl = document.getElementById('customer-name');
+        const nameVal = (nameEl && nameEl.value.trim() !== "") ? nameEl.value.trim() : "زبون";
+
+        // التحقق
+        if (!targetCart || targetCart.length === 0) {
+            showNotification('السلة فارغة!', 'error'); return;
+        }
+        if (!phoneVal.startsWith('07') || phoneVal.length < 11) {
+            showNotification('رقم الهاتف غير صحيح.', 'error'); return;
+        }
+        if (!locVal) {
+            showNotification('يرجى كتابة العنوان.', 'error'); return;
+        }
+
+        // الحفظ
+        newConfirmBtn.textContent = 'جاري الحفظ...';
+        newConfirmBtn.disabled = true;
+
+        const now = new Date();
+        const order = {
+            orderId: Date.now(),
+            orderSource: sourceLabel, // حفظ المصدر (scanner أو app)
+            customerName: nameVal,
+            phone: phoneVal,
+            location: locVal,
+            notes: notesVal,
+            date: now.toLocaleDateString('en-GB'),
+            time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }).replace('AM', 'ص').replace('PM', 'م'),
+            // حفظ تفاصيل المنتجات بشكل صريح (الاسم والسعر)
+            items: targetCart.map(item => ({
+                id: item.product.id,
+                name: item.product.name, // حفظ الاسم هنا
+                price: item.product.price,
+                quantity: item.quantity,
+                isSoldByPrice: item.isSoldByPrice || false,
+                variantName: item.variant ? item.variant.value : ''
+            })),
+            total: document.getElementById('cart-total').textContent,
+            status: 'قيد المراجعة'
+        };
+
+        orders.unshift(order);
+        saveOrders();
+
+        // تفريغ السلة وتحديث الصفحة
+        if (isScanner) { scannerCart = []; saveScannerCart(); } 
+        else { cart = []; saveCart(); }
+
+        updateCartUI();
+        showNotification('تم إرسال الطلب بنجاح!', 'success');
+
+        setTimeout(() => {
+            document.querySelector('.checkout').classList.add('hidden');
+            newConfirmBtn.textContent = 'تأكيد الطلب';
+            newConfirmBtn.disabled = false;
+            window.location.href = 'orders.html';
+        }, 1500);
+    });
+}
     // إصلاح زر البحث (فتح/إغلاق النافذة المنبثقة)
     // ==========================================
     const searchTriggerBtn = document.getElementById('searchTriggerBtn'); // زر الموبايل
@@ -2064,25 +2061,21 @@ orderSource: sourceLabel, // حفظنا المصدر هنا
         tabScannerCart.addEventListener('click', activateScannerTab);
     }
 // ============================================================
-//  نظام الماسح الضوئي (النسخة النهائية الآمنة والمحدثة) 📷
+//  نظام الماسح الضوئي (النسخة الخفيفة والسريعة) 📷
 // ============================================================
-{ // بداية النطاق المحصور لمنع الأخطاء
-
+{ 
     let isScanning = false;
     let currentScanMode = 'check'; 
     let html5QrCode = null; 
     let lastScannedCode = null; 
     let scanLockTimer = null;
 
-    // تعريف العناصر داخل الدالة لضمان وجودها
+    // تعريف العناصر
     const scannerModal = document.getElementById('scanner-modal');
     const scannerTriggerBtn = document.getElementById('barcodeTriggerBtn');
     const closeScannerBtn = document.getElementById('close-scanner-btn');
-    
     const scanResultEl = document.getElementById('scan-result');
-    const scanTotalEl = document.getElementById('scan-total');
-    const scanCountEl = document.getElementById('scan-count');
-    const scannerFooter = document.getElementById('scanner-footer');
+    const scannerFooter = document.getElementById('scanner-footer'); // الفوتر السفلي فقط
     
     // عناصر النافذة المنبثقة
     const overlay = document.getElementById('product-found-overlay');
@@ -2091,18 +2084,7 @@ orderSource: sourceLabel, // حفظنا المصدر هنا
     const overlayName = document.getElementById('found-name');
     const overlayPrice = document.getElementById('found-price');
 
-    // عنصر جديد لعرض عدد العناصر في الماسح
-    const scannerCounterBadge = document.createElement('div');
-    scannerCounterBadge.id = 'scanner-counter-badge';
-    scannerCounterBadge.style.cssText = "position: absolute; top: 15px; right: 60px; background: #e65100; color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.9em; z-index: 100; display: none; box-shadow: 0 2px 5px rgba(0,0,0,0.2);";
-    scannerCounterBadge.innerHTML = '<i class="fas fa-shopping-basket"></i> <span id="scanner-badge-count">0</span>';
-
-    // إضافته للنافذة
-    if (scannerModal && scannerModal.querySelector('.scanner-content')) {
-         scannerModal.querySelector('.scanner-content').appendChild(scannerCounterBadge);
-    }
-
-    // 1. منطق أزرار التبديل (حاسبة / كاشف)
+    // 1. أزرار التبديل
     const modeBtns = document.querySelectorAll('.mode-btn');
     if(modeBtns) {
         modeBtns.forEach(btn => {
@@ -2114,20 +2096,16 @@ orderSource: sourceLabel, // حفظنا المصدر هنا
                 if (currentScanMode === 'cart') {
                     if(scannerFooter) scannerFooter.classList.remove('hidden'); 
                     if(scanResultEl) scanResultEl.innerHTML = '🛒 الوضع: حاسبة المشتريات';
-                    // إظهار العداد
-                    if(scannerCounterBadge) scannerCounterBadge.style.display = 'flex';
                     updateLocalScannerStats();
                 } else {
                     if(scannerFooter) scannerFooter.classList.add('hidden');
-                    // إخفاء العداد
-                    if(scannerCounterBadge) scannerCounterBadge.style.display = 'none';
                     if(scanResultEl) scanResultEl.innerHTML = '🔍 الوضع: كاشف السعر';
                 }
             });
         });
     }
 
-    // 2. تحديث الأرقام
+    // 2. تحديث الأرقام (والشريط العلوي)
     function updateLocalScannerStats() {
         if (typeof scannerCart === 'undefined') return;
         
@@ -2140,60 +2118,58 @@ orderSource: sourceLabel, // حفظنا المصدر هنا
             
             if (item.isSoldByPrice) {
                 totalPrice += item.quantity;
-                totalQty += 1; // نحسب عدد المواد المختلفة للوزن
+                totalQty += 1; 
             } else {
                 totalPrice += (itemPrice * item.quantity);
                 totalQty += item.quantity;
             }
         });
 
-        // تحديث الفوتر
-        if (scanCountEl) scanCountEl.textContent = scannerCart.length; // عدد المواد المختلفة
+        // تحديث الفوتر السفلي للماسح
+        const scanTotalEl = document.getElementById('scan-total');
+        const scanCountEl = document.getElementById('scan-count');
+        if (scanCountEl) scanCountEl.textContent = scannerCart.length; 
         if (scanTotalEl) scanTotalEl.textContent = totalPrice.toLocaleString();
         
-        // تحديث شارة العداد العلوية
-        const badgeCount = document.getElementById('scanner-badge-count');
-        if(badgeCount) badgeCount.textContent = scannerCart.length;
+        // **هام:** تحديث الرقم في الشريط العلوي (Navbar)
+        updateNavbarCartCount();
     }
 
-    // 3. زر إغلاق النافذة المنبثقة
+    // 3. إغلاق النافذة المنبثقة
     if (closeOverlayBtn && overlay) {
         closeOverlayBtn.addEventListener('click', (e) => {
-            e.preventDefault(); 
-            e.stopPropagation(); 
-            
+            e.preventDefault(); e.stopPropagation(); 
             overlay.classList.add('hidden');
-            
-            setTimeout(() => { 
-                isScanning = false; 
-                lastScannedCode = null; 
-            }, 500);
-            
+            setTimeout(() => { isScanning = false; lastScannedCode = null; }, 500);
             if(scanResultEl) scanResultEl.innerHTML = 'جاهز...';
         });
     }
 
-    // 4. تشغيل الكاميرا
+    // 4. تشغيل الكاميرا (محسّن للسرعة)
     function startScannerLogic() {
         if (typeof Html5Qrcode === 'undefined') {
-            alert('جاري تحميل ماسح الباركود، يرجى الانتظار قليلاً والمحاولة مرة أخرى.');
+            if(scanResultEl) scanResultEl.innerHTML = "جاري تحميل المكتبة...";
             return;
         }
 
-        if (html5QrCode) return; 
+        if (html5QrCode) return; // الكاميرا تعمل مسبقاً
 
         html5QrCode = new Html5Qrcode("reader");
         
+        // تقليل FPS إلى 10 يزيد الأداء ويقلل التأخير
         const config = { 
-            fps: 15, 
-            qrbox: { width: 220, height: 100 }, 
-            aspectRatio: 1.0 
+            fps: 10, 
+            qrbox: { width: 250, height: 150 }, // تكبير مربع المسح قليلاً لسرعة الالتقاط
+            aspectRatio: 1.0,
+            disableFlip: false 
         };
         
         html5QrCode.start({ facingMode: "environment" }, config, onScanSuccessHandler)
         .catch(err => {
-            console.error("Error starting scanner:", err);
-            if(scanResultEl) scanResultEl.innerHTML = "خطأ: لا يمكن الوصول للكاميرا";
+            console.error("Error:", err);
+            if(scanResultEl) scanResultEl.innerHTML = "تعذر فتح الكاميرا (تأكد من الصلاحيات)";
+            // محاولة إعادة المحاولة في حال الفشل البسيط
+            html5QrCode = null;
         });
     }
 
@@ -2202,8 +2178,11 @@ orderSource: sourceLabel, // حفظنا المصدر هنا
         scannerTriggerBtn.addEventListener('click', (e) => {
             e.preventDefault();
             scannerModal.classList.remove('hidden');
-            startScannerLogic();
-            updateLocalScannerStats();
+            // تأخير بسيط جداً لضمان رسم النافذة قبل طلب الكاميرا
+            requestAnimationFrame(() => {
+                startScannerLogic();
+                updateLocalScannerStats();
+            });
         });
     }
 
@@ -2215,14 +2194,14 @@ orderSource: sourceLabel, // حفظنا المصدر هنا
                 html5QrCode.stop().then(() => {
                     html5QrCode.clear();
                     html5QrCode = null;
-                }).catch(err => console.log(err));
+                }).catch(err => { console.log(err); html5QrCode = null; });
             }
             isScanning = false;
             lastScannedCode = null;
         });
     }
 
-    // 7. منطق المسح الناجح (المحدث بالقيود)
+    // 7. منطق المسح الناجح
     const onScanSuccessHandler = (decodedText, decodedResult) => {
         if (isScanning) return;
         
@@ -2241,81 +2220,56 @@ orderSource: sourceLabel, // حفظنا المصدر هنا
             lastScannedCode = scannedCode;
 
             if (currentScanMode === 'check') {
-                // منطق كاشف السعر (كما هو)
                 if (overlayImg) overlayImg.src = product.image;
                 if (overlayName) overlayName.textContent = product.name;
-                if (overlayPrice) {
-                    overlayPrice.innerHTML = `${product.price.toLocaleString()} <span class="currency-symbol">د.ع</span>`;
-                }
-
+                if (overlayPrice) overlayPrice.innerHTML = `${product.price.toLocaleString()} <span class="currency-symbol">د.ع</span>`;
+                
+                // تنظيف وإظهار زر "متوفر"
                 const foundContent = document.querySelector('.found-content');
                 if (foundContent) {
                     Array.from(foundContent.children).forEach(child => {
-                        if (child.tagName !== 'IMG' && child.tagName !== 'H2' && !child.classList.contains('found-price') && child.id !== 'close-overlay-btn') {
-                            if (!child.classList.contains('stock-status')) {
-                                child.style.display = 'none'; 
-                            }
+                        if (!['IMG','H2'].includes(child.tagName) && !child.classList.contains('found-price') && child.id !== 'close-overlay-btn') {
+                            if (!child.classList.contains('stock-status')) child.style.display = 'none';
                         }
                     });
-                    const oldGreenStatus = foundContent.querySelectorAll('.stock-status');
-                    oldGreenStatus.forEach(el => el.remove());
-
-                    const statusDiv = document.createElement('div');
-                    statusDiv.className = 'stock-status';
+                    const oldStatus = foundContent.querySelectorAll('.stock-status'); oldStatus.forEach(el => el.remove());
+                    const statusDiv = document.createElement('div'); statusDiv.className = 'stock-status';
                     statusDiv.innerHTML = '<i class="fas fa-check-circle"></i> متوفر';
                     foundContent.appendChild(statusDiv);
                 }
                 if (overlay) overlay.classList.remove('hidden');
 
             } else {
-                // --- وضع الحاسبة (تم التحديث لإضافة القيود) ---
+                // وضع الحاسبة
                 const isSoldByPrice = ['spices', 'nuts'].includes(product.category);
                 if (typeof scannerCart === 'undefined') scannerCart = [];
                 
                 const exist = scannerCart.find(item => item.product.globalId === product.globalId);
-                
-                // تحديد الكمية التي ستضاف
                 let qtyToAdd = isSoldByPrice ? 1000 : 1;
                 let currentQty = exist ? exist.quantity : 0;
                 let newQty = currentQty + qtyToAdd;
                 let limitReached = false;
 
-                // التحقق من القيود
                 if (isSoldByPrice) {
-                    if (newQty > 25000) { 
-                        limitReached = true; 
-                        if(scanResultEl) scanResultEl.innerHTML = `<span style="color:red; font-weight:bold;">❌ الحد الأقصى 25 ألف</span>`; 
-                    }
+                    if (newQty > 25000) { limitReached = true; if(scanResultEl) scanResultEl.innerHTML = `<span style="color:red; font-weight:bold;">❌ الحد الأقصى 25 ألف</span>`; }
                 } else {
-                    if (newQty > 50) { 
-                        limitReached = true; 
-                        if(scanResultEl) scanResultEl.innerHTML = `<span style="color:red; font-weight:bold;">❌ الحد الأقصى 50 قطعة</span>`; 
-                    }
+                    if (newQty > 50) { limitReached = true; if(scanResultEl) scanResultEl.innerHTML = `<span style="color:red; font-weight:bold;">❌ الحد الأقصى 50 قطعة</span>`; }
                 }
 
-                // التنفيذ إذا لم يتم تجاوز الحد
                 if (!limitReached) {
-                    if (exist) {
-                        exist.quantity += qtyToAdd;
-                    } else {
-                        scannerCart.push({
-                            product: product,
-                            quantity: qtyToAdd,
-                            isSoldByPrice: isSoldByPrice
-                        });
-                    }
+                    if (exist) { exist.quantity += qtyToAdd; }
+                    else { scannerCart.push({ product: product, quantity: qtyToAdd, isSoldByPrice: isSoldByPrice }); }
+                    
                     if (typeof saveScannerCart === 'function') saveScannerCart();
+                    
+                    // تحديث الأرقام والعداد العلوي
                     updateLocalScannerStats(); 
+                    
                     if (scanResultEl) scanResultEl.innerHTML = `<span style="color:#27ae60; font-weight:bold;">✔ ${product.name}</span>`;
                 }
                 
-                // إعادة تعيين الماسح
                 clearTimeout(scanLockTimer);
-                scanLockTimer = setTimeout(() => { 
-                    isScanning = false; 
-                    lastScannedCode = null; 
-                    if(scanResultEl) scanResultEl.innerHTML = 'جاهز...'; 
-                }, 1500); 
+                scanLockTimer = setTimeout(() => { isScanning = false; lastScannedCode = null; if(scanResultEl) scanResultEl.innerHTML = 'جاهز...'; }, 1500); 
             }
         } else {
             isScanning = true;
@@ -2323,5 +2277,5 @@ orderSource: sourceLabel, // حفظنا المصدر هنا
             setTimeout(() => { isScanning = false; }, 1500);
         }
     };
-} // نهاية النطاق المحصور
+}
 });
