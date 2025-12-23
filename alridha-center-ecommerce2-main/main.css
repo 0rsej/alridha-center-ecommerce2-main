@@ -70,9 +70,10 @@ button:active,
 /* =========================================
    تحسينات الحاسوب (Desktop)
    ========================================= */
-@media (min-width: 960px) {
+/* التغيير: رفعنا الرقم من 1024px إلى 1200px لضمان عدم تداخل الأزرار */
+@media (min-width: 1200px) {
     .container, .main-container, .navbar {
-        max-width: 1200px;
+        max-width: 1200px; /* يمكن إبقاؤها أو زيادتها حسب الرغبة */
         margin-left: auto !important;
         margin-right: auto !important;
         padding-left: 0; padding-right: 0;
@@ -120,8 +121,10 @@ button:active,
 /* =========================================
    تنسيقات تفاصيل المنتج (Desktop Force)
    ========================================= */
-@media (min-width: 1024px) {
+/* التغيير: رفعنا الرقم إلى 1200px */
+@media (min-width: 1200px) {
     .product-detail-card {
+        display: grid !important;
         display: grid !important;
         grid-template-columns: 450px 1fr !important;
         gap: 50px !important;
@@ -434,7 +437,36 @@ button:active,
     .header-left { display: flex; align-items: center; gap: 8px; z-index: 20; }
     .header-right { z-index: 20; }
 }
-@media (min-width: 960px) { .logo-btn-mobile { display: none !important; } }
+/* =========================================
+   تنسيقات شريط التنقل (الموبايل)
+   ========================================= */
+/* التغيير هنا: رفعنا الرقم من 991px إلى 1023px ليشمل التابلت والحواسب الصغيرة */
+@media (max-width: 1023px) {
+    .brand-logo-container {
+        position: absolute; left: 50%; transform: translateX(-50%);
+        margin: 0 !important; justify-content: center; width: auto !important; z-index: 10;
+    }
+    
+    /* هذا هو الكود المسؤول عن إخفاء أيقونة المتجر الصفراء بجانب الاسم */
+    .brand-logo-container img { display: none !important; }
+    
+    .logo-btn-mobile {
+        display: flex !important; padding: 0 !important; overflow: visible !important;
+        align-items: center; justify-content: center; border: 1px solid rgba(0,0,0,0.05);
+        position: relative !important;
+        border: none !important;
+    }
+    .logo-btn-mobile img {
+        width: 40px !important; height: 40px !important; 
+        object-fit: cover; border-radius: 50% !important;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .header-left { display: flex; align-items: center; gap: 8px; z-index: 20; }
+    .header-right { z-index: 20; }
+}
+
+/* التغيير هنا: رفعنا الرقم من 992px إلى 1024px ليبدأ إخفاء زر الموبايل فقط عند دخول وضع الحاسبة الكامل */
+@media (min-width: 1024px) { .logo-btn-mobile { display: none !important; } }
 
 /* =========================================
    تنسيقات تبويبات السلة
@@ -621,7 +653,7 @@ button:active,
 }
 
 /* في الشاشات الكبيرة (الحاسبة) */
-@media (min-width: 960px) {
+@media (min-width: 992px) {
     .remove-btn {
         width: 45px;
         height: 45px;
@@ -670,7 +702,7 @@ button:active,
 /* 3. تنسيق وموقع العداد (الرقم الأحمر) */
 #navScannerCount {
     position: absolute !important;
-    top: -3px !important;        /* يرتفع للأعلى خارج الأيقونة */
+    top: -4px !important;        /* يرتفع للأعلى خارج الأيقونة */
     right: -5px !important;      /* يزاح لليمين خارج الأيقونة */
     
     background-color: #e65100 !important; /* لون برتقالي غامق مميز */
@@ -697,7 +729,7 @@ button:active,
 /* 2. تنسيق عداد "سلة التطبيق" فقط (ليشبه سلة الماسح تماماً) */
 #navCartCount { 
     position: absolute !important;
-    top: -4px !important;    /* رفع الرقم للأعلى */
+    top: -5px !important;    /* رفع الرقم للأعلى */
     right: -8px !important;  /* إزاحة لليمين */
     
     background-color: #e65100 !important; 
@@ -750,44 +782,84 @@ button:active,
     border: 2px solid #e65100 !important; 
 }
 /* =========================================
-   تحديث نهائي لعدادات الشريط العلوي (إطار برتقالي + تكبير طفيف)
+   تنسيق سطح المكتب المرن (Smart Desktop Fit)
+   مع إصلاح اللوجو ليكون أفقياً وبحجم كامل
    ========================================= */
 
-#navCartCount, 
-#navScannerCount {
-    /* 1. الألوان: خلفية بيضاء، رقم برتقالي */
-    background-color: #ffffff !important;
-    color: #e65100 !important;
-
-    /* 2. الإطار: برتقالي (كما في المفضلة) */
-    border: 2px solid #e65100 !important;
-
-    /* 3. الحجم: تكبير طفيف جداً (كان 18px وأصبح 21px) */
-    min-width: 21px !important; 
-    height: 21px !important;
-
-    /* ضبط الخط ليتناسب مع الحجم الجديد */
-    font-size: 0.75rem !important; 
+@media (min-width: 992px) {
     
-    /* ضمان توسط الرقم */
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
+    /* 1. إعدادات الصفحة الأساسية */
+    body, html {
+        width: 100% !important;
+        margin: 0 !important;
+        overflow-x: hidden !important; 
+    }
+
+    .container, .main-container, .navbar {
+        width: 100% !important;
+        max-width: 1400px !important;
+        margin: 0 auto !important;
+        padding: 0 15px !important;
+        box-sizing: border-box !important;
+    }
+
+    /* 2. تنسيق الشريط العلوي */
+    .navbar {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important; /* توسيط عمودي */
+        height: 90px !important; /* زيادة الارتفاع قليلاً لاستيعاب اللوجو */
+        flex-wrap: nowrap !important;
+    }
+
+    /* 3. تنسيق الروابط (مرنة) */
+    .navbar .nav-links {
+        display: flex !important;
+        gap: 15px !important; 
+        align-items: center !important;
+        flex: 1 !important; 
+        justify-content: flex-end !important; 
+    }
+
+    .navbar .nav-links a, 
+    .navbar .nav-links button {
+        padding: 8px 15px !important;
+        font-size: clamp(0.8rem, 1.2vw, 1rem) !important;
+        white-space: nowrap !important;
+    }
+
+    /* =========================================
+       4. إصلاح اللوجو (القسم المهم)
+       ========================================= */
+    .brand-logo-container {
+        position: static !important;
+        transform: none !important;
+        display: flex !important; /* استخدام Flex لضمان المحاذاة الأفقية */
+        align-items: center !important; /* توسيط النص مع الأيقونة */
+        flex-direction: row !important; /* إجبار العناصر لتكون جنباً إلى جنب */
+        width: auto !important; /* السماح بالعرض التلقائي */
+        flex-shrink: 0 !important; /* منع الانكماش */
+        margin-left: 20px !important;
+        height: 100% !important; /* استغلال ارتفاع النافبار */
+    }
     
-    /* ضبط الموقع بدقة ليتناسب مع الحجم الجديد */
-    right: -8px !important;
-}
-/* تنسيق خاص لأيقونة سلة التطبيق داخل بطاقة الطلب لتشبه الهيدر */
-.app-cart-icon-style {
-    background-color: #e65100 !important; /* خلفية برتقالية */
-    color: white !important;              /* أيقونة بيضاء */
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.8em !important;
-    margin-left: 5px;
-    box-shadow: 0 2px 5px rgba(230, 81, 0, 0.3);
+    .brand-logo-container img { 
+        display: block !important;
+        /* السر هنا: نحدد الارتفاع ونترك العرض تلقائياً */
+        height: 70px !important; /* ارتفاع كبير ومناسب للنافبار */
+        width: auto !important;  /* العرض يتحدد تلقائياً للحفاظ على الشكل */
+        object-fit: contain !important; /* يمنع المط أو الضغط */
+        margin: 0 !important;
+        max-width: none !important; /* إزالة أي قيود سابقة على العرض */
+    }
+    
+    /* إخفاء زر الموبايل */
+    .logo-btn-mobile { display: none !important; }
+
+    /* 5. شبكة المنتجات */
+    .products-display-area, .categories-grid {
+        display: grid !important;
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important; 
+        gap: 20px !important;
+    }
 }
