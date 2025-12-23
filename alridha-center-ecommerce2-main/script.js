@@ -1915,7 +1915,11 @@ function displayOrders() {
             const sourceText = (order.orderSource === 'scanner') ? 'سلة الماسح' : 'سلة التطبيق';
             const sourceColor = (order.orderSource === 'scanner') ? '#8e44ad' : '#2980b9'; // بنفسجي للماسح، أزرق للتطبيق
             const sourceBg = (order.orderSource === 'scanner') ? '#f3e5f5' : '#e3f2fd';
-            const sourceIcon = (order.orderSource === 'scanner') ? 'fa-barcode' : 'fa-shopping-basket';
+          // التعديل: تغيير الايقونة إلى shopping-cart لتوحيد الشكل
+const sourceIcon = (order.orderSource === 'scanner') ? 'fa-barcode' : 'fa-shopping-cart';
+
+// التعديل: إضافة كلاس خاص إذا كان المصدر هو التطبيق ليأخذ الشكل الدائري البرتقالي
+const iconClassExtra = (order.orderSource === 'scanner') ? '' : 'app-cart-icon-style';
 
             html += `
             <div class="card order-item" style="padding: 15px; margin-bottom: 15px; border-radius: 12px; border-right: 6px solid ${statusColor}; box-shadow: 0 4px 10px rgba(0,0,0,0.05); background: white;">
@@ -1927,9 +1931,9 @@ function displayOrders() {
                 
                 <div style="font-size: 0.95rem; color: #555; margin-top: 10px; line-height: 1.8;">
                     
-                    <div style="margin-bottom: 8px;">
+ <div style="margin-bottom: 8px;">
                         <span style="background: ${sourceBg}; color: ${sourceColor}; padding: 3px 10px; border-radius: 6px; font-size: 0.85em; font-weight: bold; display: inline-flex; align-items: center; gap: 5px;">
-                            <i class="fas ${sourceIcon}"></i> ${sourceText}
+                            <i class="fas ${sourceIcon} ${iconClassExtra}"></i> ${sourceText}
                         </span>
                     </div>
 

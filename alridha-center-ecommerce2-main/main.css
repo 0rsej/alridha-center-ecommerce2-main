@@ -670,7 +670,7 @@ button:active,
 /* 3. تنسيق وموقع العداد (الرقم الأحمر) */
 #navScannerCount {
     position: absolute !important;
-    top: -4px !important;        /* يرتفع للأعلى خارج الأيقونة */
+    top: -3px !important;        /* يرتفع للأعلى خارج الأيقونة */
     right: -5px !important;      /* يزاح لليمين خارج الأيقونة */
     
     background-color: #e65100 !important; /* لون برتقالي غامق مميز */
@@ -697,7 +697,7 @@ button:active,
 /* 2. تنسيق عداد "سلة التطبيق" فقط (ليشبه سلة الماسح تماماً) */
 #navCartCount { 
     position: absolute !important;
-    top: -5px !important;    /* رفع الرقم للأعلى */
+    top: -4px !important;    /* رفع الرقم للأعلى */
     right: -8px !important;  /* إزاحة لليمين */
     
     background-color: #e65100 !important; 
@@ -724,4 +724,70 @@ button:active,
     background-color: #e65100 !important; /* تغيير اللون للبرتقالي */
     color: white !important;
     /* سيحافظ على حجمه وموقعه القديم */
+}
+/* =========================================
+   تعديل ألوان العدادات (Badges) لتطابق الحاسوب (أبيض وبرتقالي)
+   مع الحفاظ التام على الأحجام والمواقع السابقة
+   ========================================= */
+
+/* 1. عدادات الشريط العلوي (التي تظهر فوق الخلفية البرتقالية) */
+/* سلة التطبيق + سلة الماسح */
+#navCartCount, 
+#navScannerCount {
+    background-color: #ffffff !important; /* خلفية بيضاء مثل الحاسوب */
+    color: #e65100 !important;            /* رقم برتقالي */
+    border: 2px solid #ffffff !important; /* إطار أبيض (للحفاظ على نفس حجم الدائرة السابق) */
+}
+
+/* 2. عداد المفضلة (الذي يظهر في الشريط السفلي الأبيض) */
+#navWishlistCount {
+    background-color: #ffffff !important; /* خلفية بيضاء */
+    color: #e65100 !important;            /* رقم برتقالي */
+    /* هنا جعلنا الإطار برتقالياً بدلاً من الأبيض 
+       لأن الخلفية بيضاء، فإذا كان الإطار أبيض سيختفي العداد.
+       وهذا يحافظ على نفس الحجم (2px) الذي خصصته أنت سابقاً.
+    */
+    border: 2px solid #e65100 !important; 
+}
+/* =========================================
+   تحديث نهائي لعدادات الشريط العلوي (إطار برتقالي + تكبير طفيف)
+   ========================================= */
+
+#navCartCount, 
+#navScannerCount {
+    /* 1. الألوان: خلفية بيضاء، رقم برتقالي */
+    background-color: #ffffff !important;
+    color: #e65100 !important;
+
+    /* 2. الإطار: برتقالي (كما في المفضلة) */
+    border: 2px solid #e65100 !important;
+
+    /* 3. الحجم: تكبير طفيف جداً (كان 18px وأصبح 21px) */
+    min-width: 21px !important; 
+    height: 21px !important;
+
+    /* ضبط الخط ليتناسب مع الحجم الجديد */
+    font-size: 0.75rem !important; 
+    
+    /* ضمان توسط الرقم */
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    
+    /* ضبط الموقع بدقة ليتناسب مع الحجم الجديد */
+    right: -8px !important;
+}
+/* تنسيق خاص لأيقونة سلة التطبيق داخل بطاقة الطلب لتشبه الهيدر */
+.app-cart-icon-style {
+    background-color: #e65100 !important; /* خلفية برتقالية */
+    color: white !important;              /* أيقونة بيضاء */
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8em !important;
+    margin-left: 5px;
+    box-shadow: 0 2px 5px rgba(230, 81, 0, 0.3);
 }
