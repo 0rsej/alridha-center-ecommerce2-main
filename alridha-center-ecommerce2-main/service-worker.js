@@ -1,5 +1,9 @@
-const CACHE_NAME = 'alridha-cache-v2'; // قمنا بتحديث الإصدار
-const ASSETS_TO_CACHE = [
+/* * service-worker.js - الإصدار الاحترافي للعمل بدون إنترنت
+ * هذا الملف يضمن حفظ التصميم، الأيقونات، الصور، والبيانات لتعمل أوفلاين
+ */
+
+const CACHE_NAME = 'alridha-pwa-v4'; // قمنا بتحديث الإصدار لفرض التحديث
+const STATIC_ASSETS = [
   './',
   './index.html',
   './categories.html',
@@ -11,8 +15,10 @@ const ASSETS_TO_CACHE = [
   './main.css',
   './script.js',
   './logo.png',
+  './manifest.json',
   './category_names.json',
-  // ملفات الـ JSON للأقسام لضمان العمل أوفلاين
+  
+  // ملفات البيانات (JSON)
   './json/spices.json',
   './json/sweets.json',
   './json/nuts.json',
@@ -29,19 +35,25 @@ const ASSETS_TO_CACHE = [
   './json/school_supplies.json',
   './json/body_care_perfumes.json',
   './json/cleaning_supplies.json',
-  './json/drinks.json'
+  './json/drinks.json',
+
+  // أيقونات التطبيق (تأكد من وجودها)
+  './icons/icon-192.png',
+  './icons/icon-512.png'
 ];
 
-// تنصيب الكاش
+// 1. مرحلة التثبيت: تحميل الملفات الأساسية
 self.addEventListener('install', (event) => {
+  self.skipWaiting(); // تفعيل الخدمة فوراً دون انتظار إغلاق التبويبات
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
+      console.log('✅ جاري تخزين ملفات التطبيق الأساسية...');
+      return cache.addAll(STATIC_ASSETS);
     })
   );
 });
 
-// تفعيل وتنظيف الكاش القديم
+// 2. مرحلة التفعيل: تنظيف الكاش القديم
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
@@ -50,14 +62,44 @@ self.addEventListener('activate', (event) => {
       );
     })
   );
+  self.clients.claim(); // السيطرة على الصفحات المفتوحة فوراً
 });
 
-// استراتيجية الجلب: الشبكة أولاً للمحتوى المتجدد، والكاش للملفات الثابتة
+// 3. استراتيجية الجلب الذكية (Fetch Strategy)
 self.addEventListener('fetch', (event) => {
   const requestUrl = new URL(event.request.url);
 
-  // لملفات JSON والصور والصفحات: حاول الشبكة أولاً للحصول على أحدث الأسعار، إذا فشل اذهب للكاش
-  if (requestUrl.pathname.endsWith('.json') || requestUrl.pathname.endsWith('.html') || requestUrl.href.includes('script.js')) {
+  // أ) التعامل مع المصادر الخارجية (CDNs) - الأيقونات والمكتبات
+  // هذا الجزء هو الأهم لمنع انهيار التصميم
+  if (
+    requestUrl.origin.includes('cdnjs.cloudflare.com') || 
+    requestUrl.origin.includes('unpkg.com') || 
+    requestUrl.origin.includes('fonts.googleapis.com') || 
+    requestUrl.origin.includes('fonts.gstatic.com') ||
+    requestUrl.origin.includes('instant.page')
+  ) {
+    event.respondWith(
+      caches.match(event.request).then((cachedResponse) => {
+        // إذا كان الملف موجوداً في الكاش، استخدمه
+        if (cachedResponse) return cachedResponse;
+
+        // إذا لم يكن موجوداً، احلبه من النت وخزنه للمرة القادمة
+        return fetch(event.request).then((networkResponse) => {
+          return caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, networkResponse.clone());
+            return networkResponse;
+          });
+        }).catch(() => {
+            // في حال فشل الجلب (أوفلاين)، لا تفعل شيئاً (للأسف لا يوجد بديل للمكتبات الخارجية إلا تحميلها محلياً)
+        });
+      })
+    );
+    return;
+  }
+
+  // ب) التعامل مع ملفات JSON والصفحات HTML (شبكة أولاً، ثم كاش)
+  // لضمان الحصول على أحدث الأسعار دائماً عند وجود إنترنت
+  if (requestUrl.pathname.endsWith('.json') || requestUrl.pathname.endsWith('.html') || requestUrl.href === self.location.origin + '/') {
     event.respondWith(
       fetch(event.request)
         .then((networkResponse) => {
@@ -66,14 +108,42 @@ self.addEventListener('fetch', (event) => {
             return networkResponse;
           });
         })
-        .catch(() => caches.match(event.request))
+        .catch(() => {
+          // إذا فشل النت، اذهب للكاش
+          return caches.match(event.request).then((cachedResponse) => {
+             if (cachedResponse) return cachedResponse;
+             // إذا الصفحة غير موجودة في الكاش، وجهه للصفحة الرئيسية كبديل
+             if (event.request.mode === 'navigate') return caches.match('./index.html');
+          });
+        })
     );
-  } else {
-    // للملفات الثابتة الأخرى (CSS, مكتبات خارجية): الكاش أولاً للسرعة
+    return;
+  }
+
+  // ج) التعامل مع الصور (كاش أولاً، ثم شبكة، ثم صورة بديلة)
+  if (event.request.destination === 'image') {
     event.respondWith(
       caches.match(event.request).then((cachedResponse) => {
-        return cachedResponse || fetch(event.request);
+        if (cachedResponse) return cachedResponse;
+
+        return fetch(event.request).then((networkResponse) => {
+          return caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, networkResponse.clone());
+            return networkResponse;
+          });
+        }).catch(() => {
+          // إذا فشل تحميل الصورة (أوفلاين وليست في الكاش)، اعرض الشعار بدلاً من صورة مكسورة
+          return caches.match('./logo.png');
+        });
       })
     );
+    return;
   }
+
+  // د) باقي الملفات (CSS, JS المحلي) - كاش أولاً للسرعة
+  event.respondWith(
+    caches.match(event.request).then((response) => {
+      return response || fetch(event.request);
+    })
+  );
 });
