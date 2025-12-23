@@ -605,7 +605,6 @@ button:active,
 /* تنسيق الزر نفسه */
 .remove-btn {
     background-color: #ffebee; /* خلفية حمراء فاتحة جداً */
-    color: #c0392b;
     border: 1px solid #ffcdd2;
     border-radius: 8px; /* حواف ناعمة */
     padding: 8px 12px;
@@ -647,4 +646,48 @@ button:active,
         width: 100%; /* زر عريض في الموبايل لسهولة اللمس */
         margin-top: 5px;
     }
+}
+/* =========================================
+   إصلاح أيقونة سلة الماسح والعداد (Badge)
+   ========================================= */
+
+/* 1. السماح للرقم بالظهور خارج حدود الدائرة */
+.logo-btn-mobile {
+    overflow: visible !important; /* هذا السطر هو الأهم لإظهار الرقم بالخارج */
+    position: relative !important;
+    border: none !important; /* إزالة الإطار الرمادي الخفيف ليكون أنظف */
+}
+
+/* 2. تنسيق الصورة لتكون دائرية ومناسبة */
+.logo-btn-mobile img {
+    width: 40px !important;       /* عرض ثابت */
+    height: 40px !important;      /* ارتفاع ثابت */
+    border-radius: 50% !important; /* شكل دائري */
+    object-fit: cover !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* ظل خفيف للجمالية */
+}
+
+/* 3. تنسيق وموقع العداد (الرقم الأحمر) */
+#navScannerCount {
+    position: absolute !important;
+    top: -5px !important;        /* يرتفع للأعلى خارج الأيقونة */
+    right: -5px !important;      /* يزاح لليمين خارج الأيقونة */
+    
+    background-color: #e65100 !important; /* لون برتقالي غامق مميز */
+    color: white !important;
+    
+    font-size: 0.7rem !important;
+    font-weight: bold !important;
+    
+    min-width: 18px !important;
+    height: 18px !important;
+    border-radius: 50% !important;
+    
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    
+    border: 2px solid white !important; /* إطار أبيض لفصل الرقم عن الأيقونة */
+    z-index: 100 !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }

@@ -1870,8 +1870,10 @@ function downloadOrderPDF(order) {
 }
 
 // ============================================================
-// 1. وظيفة عرض الطلبات (التصميم الكلاسيكي: الاسم مقابل السعر)
+// بداية نظام إدارة الطلبات المتكامل (النسخة النهائية)
 // ============================================================
+
+// 1. وظيفة عرض الطلبات (التصميم الكلاسيكي + شارة المصدر العلوية)
 function displayOrders() {
     if (!ordersListEl) return;
 
@@ -1890,24 +1892,26 @@ function displayOrders() {
     } else {
         let html = head;
         
-        // فرز المصفوفة: الأحدث أولاً (حسب الكود القديم)
+        // ترتيب الطلبات: الأحدث أولاً
         const sortedOrders = orders.slice().sort((a, b) => b.orderId - a.orderId);
 
         sortedOrders.forEach((order) => {
-            // بيانات العرض
+            // تجهيز البيانات
             const displayTime = order.time || 'غير محدد';
             const displayDate = order.date || 'غير محدد';
-            const displayName = order.customerName || 'زبون'; // التأكد من وجود الاسم
-            const displayPhone = order.phone || 'لا يوجد';     // التأكد من وجود الهاتف
+            const displayName = order.customerName || 'زبون';
+            const displayPhone = order.phone || 'لا يوجد';
             
             // ألوان الحالة
             const isSent = order.status === 'تم الإرسال';
             const statusColor = isSent ? '#27ae60' : '#f39c12'; 
             const statusBg = isSent ? '#e8f8f5' : '#fef9e7';
 
-            // تحديد مصدر الطلب (للحفاظ على ميزة الماسح)
-            const sourceText = (order.orderSource === 'scanner') ? '(من سلة الماسح)' : '(من سلة التطبيق)';
-            const sourceColor = (order.orderSource === 'scanner') ? '#8e44ad' : '#2980b9';
+            // إعداد شارة المصدر (بدون أقواس)
+            const sourceText = (order.orderSource === 'scanner') ? 'سلة الماسح' : 'سلة التطبيق';
+            const sourceColor = (order.orderSource === 'scanner') ? '#8e44ad' : '#2980b9'; // بنفسجي للماسح، أزرق للتطبيق
+            const sourceBg = (order.orderSource === 'scanner') ? '#f3e5f5' : '#e3f2fd';
+            const sourceIcon = (order.orderSource === 'scanner') ? 'fa-barcode' : 'fa-shopping-basket';
 
             html += `
             <div class="card order-item" style="padding: 15px; margin-bottom: 15px; border-radius: 12px; border-right: 6px solid ${statusColor}; box-shadow: 0 4px 10px rgba(0,0,0,0.05); background: white;">
@@ -1919,15 +1923,18 @@ function displayOrders() {
                 
                 <div style="font-size: 0.95rem; color: #555; margin-top: 10px; line-height: 1.8;">
                     
+                    <div style="margin-bottom: 8px;">
+                        <span style="background: ${sourceBg}; color: ${sourceColor}; padding: 3px 10px; border-radius: 6px; font-size: 0.85em; font-weight: bold; display: inline-flex; align-items: center; gap: 5px;">
+                            <i class="fas ${sourceIcon}"></i> ${sourceText}
+                        </span>
+                    </div>
+
                     <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 8px;">
                         <span style="font-weight:bold; color:#2c3e50;">👤 ${displayName}</span>
                         <span style="color: #d35400; font-weight: bold;">${order.total} د.ع</span>
                     </div>
-
-                    <p style="margin: 0; font-size: 0.85em; color: ${sourceColor}; font-weight: bold;">${sourceText}</p>
                     
                     <p style="margin: 0;"><i class="fas fa-phone fa-fw"></i> ${displayPhone}</p>
-                    
                     <p style="margin: 0;"><i class="fas fa-map-marker-alt fa-fw"></i> ${order.location || 'الموقع غير محدد'}</p>
                     
                     <div style="display: flex; gap: 15px; margin-top: 8px; font-size: 0.85em; color: #777; background: #f9f9f9; padding: 5px; border-radius: 5px;">
@@ -1955,53 +1962,176 @@ function displayOrders() {
         });
         ordersListEl.innerHTML = html;
 
-        // تفعيل الأزرار
+        // تفعيل الأحداث للأزرار
         document.getElementById('order-search').addEventListener('input', (e) => {
             const val = e.target.value.toLowerCase();
-            const cards = ordersListEl.querySelectorAll('.order-item');
-            cards.forEach(card => {
-                const text = card.textContent.toLowerCase();
-                card.style.display = text.includes(val) ? 'block' : 'none';
+            ordersListEl.querySelectorAll('.order-item').forEach(card => {
+                card.style.display = card.textContent.toLowerCase().includes(val) ? 'block' : 'none';
             });
         });
 
         document.getElementById('del-all-btn').addEventListener('click', () => {
             if (confirm('سيتم مسح جميع سجلات الطلبات نهائياً، هل أنت متأكد؟')) {
-                orders = [];
-                saveOrders();
-                displayOrders();
-                showNotification('تم مسح السجل بالكامل', 'error');
+                orders = []; saveOrders(); displayOrders(); showNotification('تم مسح السجل بالكامل', 'error');
             }
         });
 
-        ordersListEl.querySelectorAll('.wa-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const orderId = parseInt(btn.getAttribute('data-id'));
-                const order = orders.find(o => o.orderId === orderId);
-                if(order) sendOrderToWhatsApp(order);
-            });
-        });
-
-        ordersListEl.querySelectorAll('.pdf-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const orderId = parseInt(btn.getAttribute('data-id'));
-                const order = orders.find(o => o.orderId === orderId);
-                if(order) downloadOrderPDF(order);
-            });
-        });
-
-        ordersListEl.querySelectorAll('.del-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const orderId = parseInt(btn.getAttribute('data-id'));
-                if (confirm('هل تريد حذف سجل هذا الطلب؟')) {
-                    orders = orders.filter(o => o.orderId !== orderId);
-                    saveOrders();
-                    displayOrders();
-                    showNotification('تم حذف السجل', 'error');
-                }
-            });
-        });
+        ordersListEl.querySelectorAll('.wa-btn').forEach(btn => btn.addEventListener('click', () => sendOrderToWhatsApp(orders.find(o => o.orderId == btn.dataset.id))));
+        ordersListEl.querySelectorAll('.pdf-btn').forEach(btn => btn.addEventListener('click', () => downloadOrderPDF(orders.find(o => o.orderId == btn.dataset.id))));
+        ordersListEl.querySelectorAll('.del-btn').forEach(btn => btn.addEventListener('click', () => { if(confirm('حذف هذا الطلب؟')) { orders = orders.filter(o => o.orderId != btn.dataset.id); saveOrders(); displayOrders(); } }));
     }
+}
+
+// 2. وظيفة إرسال واتساب (مع ذكر المصدر)
+function sendOrderToWhatsApp(order) {
+    // تحديد النص
+    const sourceText = (order.orderSource === 'scanner') ? 'سلة الماسح' : 'سلة التطبيق';
+    const customerName = order.customerName || "زبون";
+    
+    // بناء الرسالة
+    let message = `*📦 طلب جديد (${sourceText})*\n`; 
+    message += `*👤 الزبون:* ${customerName}\n`;
+    message += `*📱 رقم الهاتف:* ${order.phone}\n`;
+    message += `*🔢 رقم الطلب:* ${order.orderId}\n`;
+    message += `*📅 التاريخ:* ${order.date}\n`;
+    message += `*⏰ الوقت:* ${order.time}\n`;
+    message += `*📍 الموقع:* ${order.location}\n`;
+    message += `\n*🛒 تفاصيل المنتجات:*\n`;
+
+    order.items.forEach(item => {
+        const itemName = item.name || 'منتج';
+        if (item.isSoldByPrice) {
+            message += `- ${itemName}: ${item.quantity} د.ع\n`;
+        } else {
+            message += `- ${itemName}: ${item.quantity} × ${item.price} د.ع\n`;
+        }
+    });
+
+    message += `\n*💰 المجموع الكلي: ${order.total} د.ع*`;
+    message += `\n\n*بانتظار تأكيد الطلب...*`;
+    
+    const whatsappUrl = `https://wa.me/9647816780645?text=${encodeURIComponent(message)}`;
+    
+    order.status = 'تم الإرسال';
+    saveOrders();
+    displayOrders(); 
+    window.open(whatsappUrl, '_blank');
+}
+
+// 3. وظيفة طباعة PDF (مع ذكر المصدر)
+function downloadOrderPDF(order) {
+    const sourceText = (order.orderSource === 'scanner') ? 'سلة الماسح' : 'سلة التطبيق';
+    
+    const printWindow = window.open('', '_blank');
+    const itemsHtml = order.items.map(item => `
+        <tr>
+            <td style="border: 1px solid #ddd; padding: 8px;">${item.name || 'غير معروف'}</td>
+            <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">
+                ${item.isSoldByPrice ? item.quantity + ' د.ع' : item.quantity}
+            </td>
+            <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">
+                ${item.isSoldByPrice ? item.quantity : item.price * item.quantity} د.ع
+            </td>
+        </tr>`).join('');
+
+    const content = `
+        <div dir="rtl" style="font-family: Arial, sans-serif; padding: 20px;">
+            <h2 style="text-align: center; margin-bottom: 5px;">سنتر الرضا</h2>
+            <p style="text-align: center; margin-top: 0; color: #666; font-size: 14px;">فاتورة طلب - ${sourceText}</p>
+            <hr style="border: 1px dashed #ccc;">
+            <p><strong>الاسم:</strong> ${order.customerName || 'زبون'}</p>
+            <p><strong>الهاتف:</strong> ${order.phone}</p> 
+            <p><strong>رقم الفاتورة:</strong> #${order.orderId}</p>
+            <p><strong>التاريخ:</strong> ${order.date} | <strong>الوقت:</strong> ${order.time}</p>
+            <p><strong>العنوان:</strong> ${order.location}</p>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+                <thead><tr style="background: #f1f1f1;">
+                    <th style="border: 1px solid #ddd; padding: 8px;">المنتج</th>
+                    <th style="border: 1px solid #ddd; padding: 8px;">الكمية</th>
+                    <th style="border: 1px solid #ddd; padding: 8px;">السعر</th>
+                </tr></thead>
+                <tbody>${itemsHtml}</tbody>
+            </table>
+            <h3 style="text-align: left; margin-top: 20px;">المجموع النهائي: ${order.total} د.ع</h3>
+            <p style="text-align: center; margin-top: 50px; font-size: 12px;">شكراً لتسوقكم معنا</p>
+        </div>`;
+
+    printWindow.document.write(content);
+    printWindow.document.close();
+    printWindow.print();
+}
+
+// 4. زر تأكيد الطلب (مهم جداً: يحفظ المصدر والأسماء بشكل صحيح)
+const checkoutConfirmBtn = document.getElementById('confirm-btn');
+
+if (checkoutConfirmBtn && checkoutConfirmBtn.parentNode) {
+    
+    const newConfirmBtn = checkoutConfirmBtn.cloneNode(true);
+    checkoutConfirmBtn.parentNode.replaceChild(newConfirmBtn, checkoutConfirmBtn);
+
+    newConfirmBtn.addEventListener('click', () => {
+        const isScanner = (typeof currentCartView !== 'undefined' && currentCartView === 'scanner');
+        const targetCart = isScanner ? scannerCart : cart;
+        const sourceLabel = isScanner ? 'scanner' : 'app';
+
+        const phoneVal = document.getElementById('phone').value.trim();
+        const locVal = document.getElementById('location').value.trim();
+        const notesVal = document.getElementById('notes').value.trim();
+        const nameEl = document.getElementById('customer-name');
+        const nameVal = (nameEl && nameEl.value.trim() !== "") ? nameEl.value.trim() : "زبون";
+
+        if (!targetCart || targetCart.length === 0) {
+            showNotification('السلة فارغة!', 'error'); return;
+        }
+        if (!phoneVal.startsWith('07') || phoneVal.length < 11) {
+            showNotification('رقم الهاتف غير صحيح.', 'error'); return;
+        }
+        if (!locVal) {
+            showNotification('يرجى كتابة العنوان.', 'error'); return;
+        }
+
+        newConfirmBtn.textContent = 'جاري الحفظ...';
+        newConfirmBtn.disabled = true;
+
+        const now = new Date();
+        const order = {
+            orderId: Date.now(),
+            orderSource: sourceLabel, // حفظ المصدر
+            customerName: nameVal,
+            phone: phoneVal,
+            location: locVal,
+            notes: notesVal,
+            date: now.toLocaleDateString('en-GB'),
+            time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }).replace('AM', 'ص').replace('PM', 'م'),
+            // حفظ تفاصيل المنتجات لتجنب undefined لاحقاً
+            items: targetCart.map(item => ({
+                id: item.product.id,
+                name: item.product.name, 
+                price: item.product.price,
+                quantity: item.quantity,
+                isSoldByPrice: item.isSoldByPrice || false,
+                variantName: item.variant ? item.variant.value : ''
+            })),
+            total: document.getElementById('cart-total').textContent,
+            status: 'قيد المراجعة'
+        };
+
+        orders.unshift(order);
+        saveOrders();
+
+        if (isScanner) { scannerCart = []; saveScannerCart(); } 
+        else { cart = []; saveCart(); }
+
+        updateCartUI();
+        showNotification('تم إرسال الطلب بنجاح!', 'success');
+
+        setTimeout(() => {
+            document.querySelector('.checkout').classList.add('hidden');
+            newConfirmBtn.textContent = 'تأكيد الطلب';
+            newConfirmBtn.disabled = false;
+            window.location.href = 'orders.html';
+        }, 1500);
+    });
 }
     // إصلاح زر البحث (فتح/إغلاق النافذة المنبثقة)
     // ==========================================
