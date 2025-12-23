@@ -2472,7 +2472,7 @@ if (checkoutConfirmBtn && checkoutConfirmBtn.parentNode) {
     };
 }
 // ==========================================
-// 🚀 نظام التثبيت الإجباري (PWA Enforcer)
+// 🚀 نظام التثبيت الإجباري (PWA Enforcer) - النسخة المحدثة
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
     const installOverlay = document.getElementById('install-overlay');
@@ -2480,44 +2480,54 @@ document.addEventListener('DOMContentLoaded', () => {
     const iosInstructions = document.getElementById('ios-instructions');
     let deferredPrompt;
 
-    // 1. التحقق: هل التطبيق مثبت بالفعل ويعمل بملء الشاشة؟
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    // 1. التحقق: هل التطبيق مثبت ويعمل بملء الشاشة؟
+    // نتحقق من عدة طرق لضمان الدقة على مختلف المتصفحات
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                         window.navigator.standalone === true || 
+                         document.referrer.includes('android-app://');
 
-    // إذا كان مثبت، أخفِ شاشة التثبيت فوراً واسمح بالدخول
     if (isStandalone) {
+        // ✅ الحالة: التطبيق مثبت ومفتوح منه
+        // نقوم بإخفاء النافذة والسماح للمستخدم بالتسوق
         installOverlay.classList.add('hidden');
         console.log('✅ التطبيق يعمل في وضع Standalone');
-        return; 
     } else {
-        // إذا لم يكن مثبت، أظهر شاشة الحجب
-        installOverlay.classList.remove('hidden');
+        // ❌ الحالة: الموقع مفتوح في المتصفح
+        // لا نفعل شيئاً، لأن النافذة ظاهرة أصلاً في الـ HTML
+        // فقط نجهز أزرار التثبيت
+        console.log('⚠️ الموقع مفتوح في المتصفح - إظهار شاشة التثبيت');
+        
+        // التحقق مما إذا كان الجهاز آيفون لإظهار التعليمات
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        if (isIOS) {
+            if(installBtn) installBtn.style.display = 'none';
+            if(iosInstructions) iosInstructions.classList.remove('hidden');
+        }
     }
 
-    // 2. معالجة التثبيت للأندرويد (Chrome/Edge)
+    // 2. معالجة زر التثبيت (للأندرويد والكمبيوتر)
     window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault(); // منع المتصفح من إظهار الشريط الافتراضي
-        deferredPrompt = e; // حفظ الحدث لاستخدامه عند ضغط الزر
-        installBtn.style.display = 'flex'; // إظهار زر التثبيت
+        e.preventDefault();
+        deferredPrompt = e;
+        // نتأكد أن الزر ظاهر
+        if(installBtn) installBtn.style.display = 'flex';
     });
 
-    installBtn.addEventListener('click', async () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt(); // تشغيل نافذة التثبيت الأصلية
-            const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') {
-                deferredPrompt = null;
-                // بعد التثبيت، يمكننا إخفاء الشاشة أو إعادة تحميل الصفحة
-                // لكن عادةً سيقوم الهاتف بإنشاء أيقونة وفتحها
+    if (installBtn) {
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    deferredPrompt = null;
+                    // ملاحظة: عادة لا نخفي الشاشة هنا، لأن الهاتف سيقوم بتثبيت التطبيق 
+                    // وسيفتحه المستخدم لاحقاً من الأيقونة الجديدة
+                }
+            } else {
+                // في حال لم يدعم المتصفح التثبيت المباشر
+                alert('يرجى استخدام خيار "إضافة إلى الشاشة الرئيسية" من قائمة المتصفح.');
             }
-        }
-    });
-
-    // 3. معالجة التثبيت للآيفون (iOS)
-    // الآيفون لا يدعم زر تثبيت برمجي، لذا نظهر التعليمات
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-    if (isIOS) {
-        installBtn.style.display = 'none'; // إخفاء زر الأندرويد
-        iosInstructions.classList.remove('hidden'); // إظهار تعليمات الآيفون
+        });
     }
 });
 });
