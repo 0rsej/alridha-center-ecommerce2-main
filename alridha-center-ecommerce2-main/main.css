@@ -490,31 +490,47 @@ button:active,
     align-items: center; justify-content: center; text-align: center;
 }
 
-/* 2. تصميم اسم المنتج (لون + لمعان) */
+/* =========================================
+   تصميم الاسم الجديد (أناقة وهيبة)
+   ========================================= */
+
 .found-content h2 {
     font-family: 'Tajawal', sans-serif;
-    font-size: 1.6rem !important;
+    font-size: 1.4rem !important; /* حجم متزن */
+    font-weight: 800 !important;   /* خط سميك وواضح */
+    color: #2d3436 !important;     /* لون رصاصي غامق جداً (أفخم من الأسود) */
+    
     margin: 10px 0 15px 0 !important;
-    font-weight: 900 !important;
+    line-height: 1.5;              /* تباعد أسطر مريح */
+    position: relative;
+    padding-bottom: 15px;          /* مسافة للخط السفلي */
     
-    /* التدرج اللوني الذهبي/البرتقالي */
-    background: linear-gradient(to right, #b45309 0%, #f59e0b 25%, #ffd700 50%, #f59e0b 75%, #b45309 100%);
-    background-size: 200% auto;
-    
-    /* قص الخلفية على شكل النص */
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    color: transparent; /* متصفحات قديمة */
-    
-    /* حركة اللمعان */
-    animation: shineText 3s linear infinite;
+    /* حركة دخول ناعمة للاسم */
+    animation: fadeInUp 0.6s ease-out forwards;
+    opacity: 0;                    /* يبدأ مخفياً ثم يظهر */
+    transform: translateY(10px);   /* يبدأ من الأسفل قليلاً */
 }
 
-/* تعريف حركة اللمعان */
-@keyframes shineText {
+/* العنصر الجمالي (الخط الصغير تحت الاسم) */
+.found-content h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    
+    /* تصميم الخط */
+    width: 50px;              /* عرض قصير وأنيق */
+    height: 4px;              /* سمك مناسب */
+    background: linear-gradient(90deg, #e65100, #ff9800); /* تدرج برتقالي هادئ */
+    border-radius: 10px;      /* حواف ناعمة */
+}
+
+/* تعريف حركة الظهور */
+@keyframes fadeInUp {
     to {
-        background-position: 200% center;
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
