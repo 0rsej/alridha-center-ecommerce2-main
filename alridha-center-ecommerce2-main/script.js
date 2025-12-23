@@ -2472,62 +2472,70 @@ if (checkoutConfirmBtn && checkoutConfirmBtn.parentNode) {
     };
 }
 // ==========================================
-// 🚀 نظام التثبيت الإجباري (PWA Enforcer) - النسخة المحدثة
+// 🚀 نظام التثبيت الإجباري (PWA Enforcer) - النسخة النهائية
 // ==========================================
+
+// تعريف المتغير خارج الدوال لضمان التقاطه فوراً
+let deferredPrompt = null;
+
+// 1. التقاط حدث التثبيت فور انطلاق الموقع (قبل تحميل أي شيء آخر)
+window.addEventListener('beforeinstallprompt', (e) => {
+    // منع المتصفح من إظهار الشريط الافتراضي فوراً
+    e.preventDefault();
+    // حفظ الحدث لاستخدامه عند ضغط الزر
+    deferredPrompt = e;
+    console.log('✅ تم التقاط حدث التثبيت جاهز للاستخدام.');
+    
+    // إظهار زر التثبيت إذا كان مخفياً
+    const installBtn = document.getElementById('install-btn');
+    if (installBtn) installBtn.style.display = 'flex';
+});
+
 document.addEventListener('DOMContentLoaded', () => {
     const installOverlay = document.getElementById('install-overlay');
     const installBtn = document.getElementById('install-btn');
     const iosInstructions = document.getElementById('ios-instructions');
-    let deferredPrompt;
 
-    // 1. التحقق: هل التطبيق مثبت ويعمل بملء الشاشة؟
-    // نتحقق من عدة طرق لضمان الدقة على مختلف المتصفحات
+    // 2. التحقق: هل التطبيق مثبت بالفعل؟
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
                          window.navigator.standalone === true || 
                          document.referrer.includes('android-app://');
 
     if (isStandalone) {
-        // ✅ الحالة: التطبيق مثبت ومفتوح منه
-        // نقوم بإخفاء النافذة والسماح للمستخدم بالتسوق
-        installOverlay.classList.add('hidden');
+        // ✅ التطبيق مثبت ومفتوح => إخفاء الشاشة والسماح بالدخول
+        if(installOverlay) installOverlay.classList.add('hidden');
         console.log('✅ التطبيق يعمل في وضع Standalone');
+        return; 
     } else {
-        // ❌ الحالة: الموقع مفتوح في المتصفح
-        // لا نفعل شيئاً، لأن النافذة ظاهرة أصلاً في الـ HTML
-        // فقط نجهز أزرار التثبيت
-        console.log('⚠️ الموقع مفتوح في المتصفح - إظهار شاشة التثبيت');
-        
-        // التحقق مما إذا كان الجهاز آيفون لإظهار التعليمات
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-        if (isIOS) {
-            if(installBtn) installBtn.style.display = 'none';
-            if(iosInstructions) iosInstructions.classList.remove('hidden');
-        }
+        // ❌ التطبيق غير مثبت => التأكد من ظهور الشاشة
+        if(installOverlay) installOverlay.classList.remove('hidden');
+        console.log('⚠️ الموقع مفتوح في المتصفح - بانتظار التثبيت');
     }
 
-    // 2. معالجة زر التثبيت (للأندرويد والكمبيوتر)
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        // نتأكد أن الزر ظاهر
-        if(installBtn) installBtn.style.display = 'flex';
-    });
+    // 3. التحقق من نوع الجهاز (آيفون أم أندرويد)
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
-    if (installBtn) {
-        installBtn.addEventListener('click', async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') {
-                    deferredPrompt = null;
-                    // ملاحظة: عادة لا نخفي الشاشة هنا، لأن الهاتف سيقوم بتثبيت التطبيق 
-                    // وسيفتحه المستخدم لاحقاً من الأيقونة الجديدة
+    if (isIOS) {
+        // الآيفون لا يدعم الزر البرمجي -> نخفي الزر ونظهر التعليمات
+        if (installBtn) installBtn.style.display = 'none';
+        if (iosInstructions) iosInstructions.classList.remove('hidden');
+    } else {
+        // أندرويد وحاسوب -> نجهز الزر
+        if (installBtn) {
+            installBtn.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    // تشغيل نافذة التثبيت الأصلية
+                    deferredPrompt.prompt();
+                    // انتظار رد المستخدم
+                    const { outcome } = await deferredPrompt.userChoice;
+                    console.log(`User response to install prompt: ${outcome}`);
+                    deferredPrompt = null; // تصفير المتغير لأنه يستخدم مرة واحدة
+                } else {
+                    // إذا لم يعمل الزر (مثلاً المتصفح لا يدعم أو تم رفضه سابقاً)
+                    alert('للتثبيت يدوياً: \n1. اضغط على خيارات المتصفح (⋮) في الأعلى \n2. اختر "تثبيت التطبيق" أو "Install App"');
                 }
-            } else {
-                // في حال لم يدعم المتصفح التثبيت المباشر
-                alert('يرجى استخدام خيار "إضافة إلى الشاشة الرئيسية" من قائمة المتصفح.');
-            }
-        });
+            });
+        }
     }
 });
 });
