@@ -2471,4 +2471,53 @@ if (checkoutConfirmBtn && checkoutConfirmBtn.parentNode) {
         }
     };
 }
+// ==========================================
+// 🚀 نظام التثبيت الإجباري (PWA Enforcer)
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+    const installOverlay = document.getElementById('install-overlay');
+    const installBtn = document.getElementById('install-btn');
+    const iosInstructions = document.getElementById('ios-instructions');
+    let deferredPrompt;
+
+    // 1. التحقق: هل التطبيق مثبت بالفعل ويعمل بملء الشاشة؟
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+    // إذا كان مثبت، أخفِ شاشة التثبيت فوراً واسمح بالدخول
+    if (isStandalone) {
+        installOverlay.classList.add('hidden');
+        console.log('✅ التطبيق يعمل في وضع Standalone');
+        return; 
+    } else {
+        // إذا لم يكن مثبت، أظهر شاشة الحجب
+        installOverlay.classList.remove('hidden');
+    }
+
+    // 2. معالجة التثبيت للأندرويد (Chrome/Edge)
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault(); // منع المتصفح من إظهار الشريط الافتراضي
+        deferredPrompt = e; // حفظ الحدث لاستخدامه عند ضغط الزر
+        installBtn.style.display = 'flex'; // إظهار زر التثبيت
+    });
+
+    installBtn.addEventListener('click', async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt(); // تشغيل نافذة التثبيت الأصلية
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                deferredPrompt = null;
+                // بعد التثبيت، يمكننا إخفاء الشاشة أو إعادة تحميل الصفحة
+                // لكن عادةً سيقوم الهاتف بإنشاء أيقونة وفتحها
+            }
+        }
+    });
+
+    // 3. معالجة التثبيت للآيفون (iOS)
+    // الآيفون لا يدعم زر تثبيت برمجي، لذا نظهر التعليمات
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    if (isIOS) {
+        installBtn.style.display = 'none'; // إخفاء زر الأندرويد
+        iosInstructions.classList.remove('hidden'); // إظهار تعليمات الآيفون
+    }
+});
 });
