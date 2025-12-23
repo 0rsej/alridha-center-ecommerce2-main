@@ -129,40 +129,44 @@ function validatePhone(phone) {
     }
 
 function updateNavbarCartCount() {
-    // 1. تحديث سلة التطبيق العادية
-    const totalCartItems = cart.length; 
-    if (navCartCountEl) {
-        navCartCountEl.textContent = totalCartItems;
-        navCartCountEl.style.display = totalCartItems > 0 ? 'flex' : 'none';
-    }
-    
-    // 2. تحديث سلة الماسح (الجديد في الشريط العلوي)
-    const totalScannerItems = scannerCart.length; // تأكد أن scannerCart معرفة عالمياً
-    const navScannerCountEl = document.getElementById('navScannerCount');
-    if (navScannerCountEl) {
-        navScannerCountEl.textContent = totalScannerItems;
-        navScannerCountEl.style.display = totalScannerItems > 0 ? 'flex' : 'none';
-    }
+        // 1. تحديث سلة التطبيق (موبايل)
+        const totalCartItems = cart.length; 
+        if (navCartCountEl) {
+            navCartCountEl.textContent = totalCartItems;
+            // التعديل هنا: جعلناها تظهر دائماً (flex) حتى لو كانت 0
+            navCartCountEl.style.display = 'flex'; 
+        }
+        
+        // 2. تحديث سلة الماسح
+        const totalScannerItems = (typeof scannerCart !== 'undefined') ? scannerCart.length : 0;
+        const navScannerCountEl = document.getElementById('navScannerCount');
+        if (navScannerCountEl) {
+            navScannerCountEl.textContent = totalScannerItems;
+            navScannerCountEl.style.display = 'flex'; // تظهر دائماً
+        }
 
-    // 3. تحديث المفضلة
-    const totalWishlistItems = wishlist.length;
-    if (navWishlistCountEl) {
-        navWishlistCountEl.textContent = totalWishlistItems;
-        navWishlistCountEl.style.display = totalWishlistItems > 0 ? 'inline-block' : 'none';
-    }
+        // 3. تحديث المفضلة
+        const totalWishlistItems = wishlist.length;
+        if (navWishlistCountEl) {
+            navWishlistCountEl.textContent = totalWishlistItems;
+            navWishlistCountEl.style.display = 'flex'; // تظهر دائماً
+        }
 
-    // تحديث عدادات الحاسوب (Desktop)
-    const desktopCartCountEl = document.getElementById('desktopCartCount');
-    const desktopWishlistCountEl = document.getElementById('desktopWishlistCount');
-    if (desktopCartCountEl) {
-        desktopCartCountEl.textContent = totalCartItems;
-        desktopCartCountEl.style.display = totalCartItems > 0 ? 'inline-block' : 'none';
+        // 4. تحديث عدادات الحاسوب (Desktop)
+        const desktopCartCountEl = document.getElementById('desktopCartCount');
+        const desktopWishlistCountEl = document.getElementById('desktopWishlistCount');
+
+        if (desktopCartCountEl) {
+            desktopCartCountEl.textContent = totalCartItems; 
+            // في الحاسوب، نخفي الصفر إذا أردت (أو يمكنك جعلها 'inline-block' لتظهر دائماً)
+            desktopCartCountEl.style.display = totalCartItems > 0 ? 'inline-block' : 'none'; 
+        }
+
+        if (desktopWishlistCountEl) {
+            desktopWishlistCountEl.textContent = totalWishlistItems; 
+            desktopWishlistCountEl.style.display = totalWishlistItems > 0 ? 'inline-block' : 'none';
+        }
     }
-    if (desktopWishlistCountEl) {
-        desktopWishlistCountEl.textContent = totalWishlistItems;
-        desktopWishlistCountEl.style.display = totalWishlistItems > 0 ? 'inline-block' : 'none';
-    }
-}
     // وظيفة عرض المنتجات في القوائم (صفحة الأقسام)
     function displayProducts(productsToShow) {
         if (!productsListEl) return;
