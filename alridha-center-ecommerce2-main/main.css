@@ -70,7 +70,7 @@ button:active,
 /* =========================================
    تحسينات الحاسوب (Desktop)
    ========================================= */
-@media (min-width: 1024px) {
+@media (min-width: 992px) {
     .container, .main-container, .navbar {
         max-width: 1200px;
         margin-left: auto !important;

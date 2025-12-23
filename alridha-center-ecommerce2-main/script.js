@@ -1877,7 +1877,9 @@ function downloadOrderPDF(order) {
 // بداية نظام إدارة الطلبات المتكامل (النسخة النهائية)
 // ============================================================
 
-// 1. وظيفة عرض الطلبات (التصميم الكلاسيكي + شارة المصدر العلوية)
+// ============================================================
+// 1. وظيفة عرض الطلبات (النسخة المعدلة: أيقونة زرقاء، مسافة قريبة)
+// ============================================================
 function displayOrders() {
     if (!ordersListEl) return;
 
@@ -1911,15 +1913,14 @@ function displayOrders() {
             const statusColor = isSent ? '#27ae60' : '#f39c12'; 
             const statusBg = isSent ? '#e8f8f5' : '#fef9e7';
 
-            // إعداد شارة المصدر (بدون أقواس)
+            // -----------------------------------------------------------
+            // بداية التعديل المطلوب (إعدادات الأيقونة والألوان)
+            // -----------------------------------------------------------
             const sourceText = (order.orderSource === 'scanner') ? 'سلة الماسح' : 'سلة التطبيق';
-            const sourceColor = (order.orderSource === 'scanner') ? '#8e44ad' : '#2980b9'; // بنفسجي للماسح، أزرق للتطبيق
+            // اللون الأزرق (#2980b9) لسلة التطبيق
+            const sourceColor = (order.orderSource === 'scanner') ? '#8e44ad' : '#2980b9';
             const sourceBg = (order.orderSource === 'scanner') ? '#f3e5f5' : '#e3f2fd';
-          // التعديل: تغيير الايقونة إلى shopping-cart لتوحيد الشكل
-const sourceIcon = (order.orderSource === 'scanner') ? 'fa-barcode' : 'fa-shopping-cart';
-
-// التعديل: إضافة كلاس خاص إذا كان المصدر هو التطبيق ليأخذ الشكل الدائري البرتقالي
-const iconClassExtra = (order.orderSource === 'scanner') ? '' : 'app-cart-icon-style';
+            const sourceIcon = (order.orderSource === 'scanner') ? 'fa-barcode' : 'fa-shopping-cart';
 
             html += `
             <div class="card order-item" style="padding: 15px; margin-bottom: 15px; border-radius: 12px; border-right: 6px solid ${statusColor}; box-shadow: 0 4px 10px rgba(0,0,0,0.05); background: white;">
@@ -1931,9 +1932,9 @@ const iconClassExtra = (order.orderSource === 'scanner') ? '' : 'app-cart-icon-s
                 
                 <div style="font-size: 0.95rem; color: #555; margin-top: 10px; line-height: 1.8;">
                     
- <div style="margin-bottom: 8px;">
-                        <span style="background: ${sourceBg}; color: ${sourceColor}; padding: 3px 10px; border-radius: 6px; font-size: 0.85em; font-weight: bold; display: inline-flex; align-items: center; gap: 5px;">
-                            <i class="fas ${sourceIcon} ${iconClassExtra}"></i> ${sourceText}
+                    <div style="margin-bottom: 8px;">
+                        <span style="background: ${sourceBg}; color: ${sourceColor}; padding: 3px 10px; border-radius: 6px; font-size: 0.85em; font-weight: bold; display: inline-flex; align-items: center; gap: 3px;">
+                            <i class="fas ${sourceIcon}"></i> ${sourceText}
                         </span>
                     </div>
 
@@ -1970,7 +1971,7 @@ const iconClassExtra = (order.orderSource === 'scanner') ? '' : 'app-cart-icon-s
         });
         ordersListEl.innerHTML = html;
 
-        // تفعيل الأحداث للأزرار
+        // تفعيل الأحداث (Events) للأزرار
         document.getElementById('order-search').addEventListener('input', (e) => {
             const val = e.target.value.toLowerCase();
             ordersListEl.querySelectorAll('.order-item').forEach(card => {
@@ -1989,7 +1990,6 @@ const iconClassExtra = (order.orderSource === 'scanner') ? '' : 'app-cart-icon-s
         ordersListEl.querySelectorAll('.del-btn').forEach(btn => btn.addEventListener('click', () => { if(confirm('حذف هذا الطلب؟')) { orders = orders.filter(o => o.orderId != btn.dataset.id); saveOrders(); displayOrders(); } }));
     }
 }
-
 // 2. وظيفة إرسال واتساب (مع ذكر المصدر)
 function sendOrderToWhatsApp(order) {
     // تحديد النص
